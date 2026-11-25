@@ -2,7 +2,13 @@
 
 Edição personalizada mantida por **@erichpereira22**, para criar cortes de vídeos e lives, com interface escura em verde neon e processamento local.
 
-## Uso no Windows
+## Instalação no Windows
+
+Baixe **Instalar-Estudio-Criativo-Cortes.exe** na [última release](https://github.com/erichpereira1996/estudio-criativo-cortes/releases/latest), execute e clique em **Instalar agora**. O pacote inclui as ferramentas e os modelos de transcrição base e small. Não é necessário instalar Node.js ou Python separadamente. Requer Windows 10/11 x64 e Edge ou Chrome para a janela do app.
+
+Vídeos locais podem ser processados sem internet; links e lives precisam de conexão. Modelos adicionais podem exigir download. O instalador é por usuário e cria atalhos no menu Iniciar e, opcionalmente, na área de trabalho. A desinstalação preserva dados e presets.
+
+## Uso pelo código-fonte no Windows
 
 1. Execute `instalar.bat` para preparar as dependências.
 2. Execute `iniciar.bat` para abrir o programa.
@@ -17,7 +23,7 @@ A transcrição, a seleção dos momentos e a geração dos cortes usam os recur
 - Nome e ícone próprios, com destaques em verde neon.
 - Sem assinaturas, testes pagos, checkout, ativação ou serviços de IA Pro.
 - As atualizações automáticas do projeto original estão desativadas para preservar esta edição.
-- O código do instalador foi adaptado; o executável precisa ser recompilado para distribuir essas mudanças.
+- Instalador próprio para Windows, com interface escura e verde neon.
 
 ## Licença e origem
 
@@ -57,3 +63,7 @@ Na janela Identidade, **Resetar identidade** desativa as duas opções, remove o
 ### Presets de identidade
 
 Ao abrir ou recarregar o app, a identidade começa limpa. No painel Identidade, use **Salvar como preset** para guardar os anexos e parâmetros com um nome. Selecione um preset, clique em **Carregar** e depois em **Salvar identidade** para aplicá-lo aos próximos cortes nesta abertura. Excluir um preset não apaga arquivos utilizados em projetos anteriores.
+
+## Compilar o instalador
+
+No Windows x64, instale Python 3.12 e Pillow (`python -m pip install Pillow==13.0.0`), e mantenha os modelos base e small em `modelos/`. Execute `node instalador/montar.js`. A montagem valida o Python embarcado, gera a identidade visual e compila o pacote com Inno Setup. O resultado fica em `instalador/dist/Instalar-Estudio-Criativo-Cortes.exe`. O workflow do GitHub também gera o instalador ao publicar uma tag `v*`.

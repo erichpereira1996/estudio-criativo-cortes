@@ -1,10 +1,9 @@
-ESTÚDIO CRIATIVO CORTES — IDENTIDADE VISUAL
+Estúdio Criativo Cortes — v1.1.1
 
-• Vinheta de 2 segundos no início ou no fim de cada corte.
-• Marca d’água com posição, tamanho, margem e opacidade ajustáveis.
-• Configurações salvas para vídeos e lives.
-• Número da versão disponível no topo do programa.
+Instalador Windows com identidade visual escura e verde neon.
+Inclui Node.js, Python, FFmpeg, yt-dlp e os modelos base e small.
+Vinhetas de 2 segundos, marca de água ajustável e presets de identidade.
+A identidade começa limpa ao abrir ou recarregar o app.
+A desinstalação preserva configurações, presets, anexos e cortes.
 
-Abra Identidade para configurar. Os primeiros 2 segundos da vinheta são acrescentados ao conteúdo, sem remover a fala.
-
-Licença e avisos legais preservados em LICENSE.
+Edição mantida por @erichpereira22. Consulte LICENSE e THIRD_PARTY_NOTICES.md.

@@ -28,6 +28,8 @@ const IMAGENS = path.join(AQUI, 'imagens');
 const PYTHON_VERSAO = '3.12.10';
 const INNO_VERSAO = '6.7.3';
 const DOWNLOADS = {
+  'node-LICENSE.txt': 'https://raw.githubusercontent.com/nodejs/node/' + process.version + '/LICENSE',
+  'yt-dlp-LICENSE.txt': 'https://raw.githubusercontent.com/yt-dlp/yt-dlp/master/LICENSE',
   'python-embed.zip': 'https://www.python.org/ftp/python/' + PYTHON_VERSAO + '/python-' + PYTHON_VERSAO + '-embed-amd64.zip',
   'ffmpeg-essentials.zip': 'https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip',
   'yt-dlp.exe': 'https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe',
@@ -36,8 +38,8 @@ const DOWNLOADS = {
 
 // As mesmas versoes que rodam no PC onde o programa foi feito.
 const PACOTES_PY = [
-  'faster-whisper==1.2.1', 'ctranslate2==4.8.2', 'av==18.1.0', 'onnxruntime==1.29.0',
-  'tokenizers==0.23.1', 'numpy==2.5.2', 'huggingface_hub==1.29.0',
+  'faster-whisper==1.2.1', 'ctranslate2==4.8.2', 'av==18.1.1', 'onnxruntime==1.32.0',
+  'tokenizers==0.23.3', 'numpy==2.5.5', 'huggingface_hub==2.4.0',
 ];
 
 // Runtime do Visual C++ que o onnxruntime e o ctranslate2 pedem. Vai do lado do
@@ -72,11 +74,11 @@ function baixar() {
   fs.mkdirSync(CACHE, { recursive: true });
   for (const [nome, url] of Object.entries(DOWNLOADS)) {
     const alvo = path.join(CACHE, nome);
-    const assinatura = nome.endsWith('.zip') ? 'PK' : 'MZ';
-    if (fs.existsSync(alvo) && comecaCom(alvo, assinatura)) { console.log('   ja tenho ' + nome); continue; }
+    const assinatura = nome.endsWith('.txt') ? null : nome.endsWith('.zip') ? 'PK' : 'MZ';
+    if (fs.existsSync(alvo) && (assinatura ? comecaCom(alvo, assinatura) : fs.statSync(alvo).size > 100)) { console.log('   ja tenho ' + nome); continue; }
     console.log('   baixando ' + nome);
     rodar(CURL, ['-L', '--fail', '--retry', '3', '-o', alvo, url]);
-    if (!comecaCom(alvo, assinatura)) throw new Error(nome + ' veio errado (nao e ' + assinatura + ')');
+    if (assinatura && !comecaCom(alvo, assinatura)) throw new Error(nome + ' veio errado (nao e ' + assinatura + ')');
   }
 }
 
@@ -146,7 +148,7 @@ function montarNode() {
   fs.mkdirSync(destino, { recursive: true });
   fs.copyFileSync(process.execPath, path.join(destino, 'node.exe'));
   const licenca = path.join(path.dirname(process.execPath), 'LICENSE');
-  if (fs.existsSync(licenca)) fs.copyFileSync(licenca, path.join(destino, 'LICENSE.txt'));
+  fs.copyFileSync(fs.existsSync(licenca) ? licenca : path.join(CACHE, 'node-LICENSE.txt'), path.join(destino, 'LICENSE.txt'));
 }
 
 function montarPython() {
@@ -174,13 +176,14 @@ function montarPython() {
   // que, instalado em C:\Users\<nome>\AppData\..., passaria do limite de 260
   // letras do Windows. O faster-whisper so usa o InferenceSession.
   for (const sobra of ['bin', 'onnxruntime/tools', 'onnxruntime/transformers', 'onnxruntime/quantization']) {
-    fs.rmSync(path.join(sitePackages, sobra), { recursive: true, force: true });
+    removerGerado(path.join(sitePackages, sobra));
   }
 
   const sistema = path.join(process.env.WINDIR || 'C:\\Windows', 'System32');
   for (const dll of DLLS_VC) {
     const alvo = path.join(destino, dll);
     if (!fs.existsSync(alvo) && fs.existsSync(path.join(sistema, dll))) fs.copyFileSync(path.join(sistema, dll), alvo);
+    if (!fs.existsSync(alvo)) throw new Error('Runtime obrigatório ausente: ' + dll);
   }
 }
 
@@ -199,6 +202,7 @@ function montarFfmpeg() {
   console.log('   ' + path.basename(raiz));
 
   passo('yt-dlp');
+  fs.copyFileSync(path.join(CACHE, 'yt-dlp-LICENSE.txt'), path.join(MONTAGEM, 'runtime', 'yt-dlp-LICENSE.txt'));
   fs.copyFileSync(path.join(CACHE, 'yt-dlp.exe'), path.join(MONTAGEM, 'runtime', 'yt-dlp.exe'));
 }
 
@@ -245,6 +249,13 @@ function tamanho(pasta) {
   return total;
 }
 
+function removerGerado(alvo) {
+  const real = path.resolve(alvo), base = path.resolve(MONTAGEM);
+  if (real !== base && !real.startsWith(base + path.sep)) throw new Error('Limpeza fora da montagem: ' + real);
+  if (fs.existsSync(real) && fs.lstatSync(real).isSymbolicLink()) throw new Error('Montagem não pode ser link: ' + real);
+  fs.rmSync(real, { recursive: true, force: true });
+}
+
 function main() {
   if (os.platform() !== 'win32') throw new Error('O instalador so e montado no Windows.');
   // --so-montar: para antes do instalador, pra testar a pasta montada
@@ -254,13 +265,15 @@ function main() {
 
   if (!soInstalador) {
     baixar();
-    fs.rmSync(MONTAGEM, { recursive: true, force: true });
+    removerGerado(MONTAGEM);
+    rodar(acharPythonLocal(), [path.join(AQUI, 'icone.py')]);
     montarApp();
     montarNode();
     montarPython();
     montarFfmpeg();
     montarModelo();
     montarLancador();
+    rodar(path.join(MONTAGEM, 'runtime', 'python', 'python.exe'), ['-c', 'import faster_whisper, ctranslate2, av, onnxruntime; print("Python embarcado OK")']);
     console.log('\n   montagem: ' + Math.round(tamanho(MONTAGEM) / 1048576) + ' MB');
   }
 

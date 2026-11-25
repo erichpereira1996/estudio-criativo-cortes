@@ -1,4 +1,4 @@
-; Instalador do Estúdio Criativo Cortes (Inno Setup 6).
+﻿; Instalador do Estúdio Criativo Cortes (Inno Setup 6).
 ; Não compile direto: rode  node instalador/montar.js  - ele monta a pasta
 ; "montagem" com tudo que o programa precisa e chama o compilador.
 
@@ -40,16 +40,23 @@ CloseApplications=no
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0
-WizardStyle=modern
+WizardStyle=modern dark
+WizardBackColor=#101210
+WizardImageBackColor=#101210
+WizardSmallImageBackColor=#101210
+DisableWelcomePage=no
+DisableReadyPage=yes
+DisableFinishedPage=no
+WizardResizable=no
 WizardSizePercent=110
 SetupIconFile=imagens\icone.ico
-InfoBeforeFile=..\LEIA-ME-NOVIDADES.txt
+; Novidades acompanham os arquivos instalados.
 WizardImageFile=imagens\lateral-0.bmp,imagens\lateral-1.bmp,imagens\lateral-2.bmp
 WizardSmallImageFile=imagens\pequena-0.bmp,imagens\pequena-1.bmp,imagens\pequena-2.bmp
 ShowLanguageDialog=no
 OutputDir={#SAIDA}
 OutputBaseFilename=Instalar-Estudio-Criativo-Cortes
-Compression=lzma2/max
+Compression=lzma2/fast
 SolidCompression=yes
 LZMAUseSeparateProcess=yes
 LZMANumBlockThreads=2
@@ -61,20 +68,24 @@ Name: "ptbr"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
 WelcomeLabel2=Isso vai instalar o [name], no seu computador.%n%nEle transforma vídeos e lives da Twitch, Kick e YouTube em cortes verticais prontos pro TikTok, Reels e Shorts - de vídeo gravado ou ao vivo, enquanto a live acontece.%n%nTudo roda no seu PC, de graça. Os cortes ficam na pasta Vídeos > Estúdio Criativo Cortes.
 FinishedLabel=Pronto! O [name] está instalado.%n%nÉ só abrir pelo atalho na área de trabalho ou no menu Iniciar.
 
-[Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
-
 [InstallDelete]
 ; Atualização: tira os arquivos do programa antigo (os cortes ficam em Vídeos e não são tocados).
 Type: filesandordirs; Name: "{app}\app"
 
 [Files]
-Source: "{#MONTAGEM}\modelos\*"; DestDir: "{app}\modelos"; Flags: ignoreversion recursesubdirs createallsubdirs nocompression
-Source: "{#MONTAGEM}\*"; DestDir: "{app}"; Excludes: "\modelos"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "imagens\tela-*.bmp"; Flags: dontcopy
+Source: "imagens\botao-*.bmp"; Flags: dontcopy
+Source: "{#MONTAGEM}\app\*"; DestDir: "{app}\app"; Flags: ignoreversion recursesubdirs createallsubdirs; BeforeInstall: Etapa(0)
+Source: "{#MONTAGEM}\runtime\*"; DestDir: "{app}\runtime"; Flags: ignoreversion recursesubdirs createallsubdirs; BeforeInstall: Etapa(1)
+Source: "{#MONTAGEM}\modelos\*"; DestDir: "{app}\modelos"; Flags: ignoreversion recursesubdirs createallsubdirs nocompression; BeforeInstall: Etapa(2)
+Source: "{#MONTAGEM}\EstudioCriativoCortes.exe"; DestDir: "{app}"; Flags: ignoreversion; BeforeInstall: Etapa(3)
+Source: "{#MONTAGEM}\*.md"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MONTAGEM}\LICENSE"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#MONTAGEM}\LEIA-ME-NOVIDADES.txt"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{autoprograms}\{#Nome}"; Filename: "{app}\{#Exe}"
-Name: "{autodesktop}\{#Nome}"; Filename: "{app}\{#Exe}"; Tasks: desktopicon
+Name: "{autodesktop}\{#Nome}"; Filename: "{app}\{#Exe}"; Check: QuerAtalho
 
 [Run]
 Filename: "{app}\{#Exe}"; Description: "Abrir o {#Nome} agora"; Flags: nowait postinstall skipifsilent
@@ -82,4 +93,6 @@ Filename: "{app}\{#Exe}"; Description: "Abrir o {#Nome} agora"; Flags: nowait po
 [UninstallDelete]
 ; Modelos baixados depois, cache do Python e a janela do programa. Os cortes em Vídeos ficam.
 Type: filesandordirs; Name: "{app}"
-Type: filesandordirs; Name: "{localappdata}\EstudioCriativoCortes"
+; Configurações, presets e anexos ficam preservados após desinstalar.
+
+#include "visual.iss"
