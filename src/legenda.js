@@ -224,7 +224,7 @@ function gerarAss(palavras, offset, destino, opcoes) {
 }
 
 /** Legenda .srt simples, pra quem quiser editar depois no CapCut/Premiere. */
-function gerarSrt(palavras, offset, destino) {
+function gerarSrt(palavras, offset, destino, deslocamento = 0) {
   const blocos = montarBlocos((palavras || []).filter((p) => p && Number(p.fim) - offset > 0.05), 8);
 
   const partes = blocos.map((g, idx) => {
@@ -233,7 +233,7 @@ function gerarSrt(palavras, offset, destino) {
     const fim = Math.max(ini + 0.3, Math.min(g[g.length - 1].fim - offset, seguinte));
     return [
       String(idx + 1),
-      tempoSrt(ini) + ' --> ' + tempoSrt(fim),
+      tempoSrt(ini + deslocamento) + ' --> ' + tempoSrt(fim + deslocamento),
       g.map((p) => p.texto).join(' ').replace(/\s+/g, ' ').trim(),
       '',
     ].join('\n');

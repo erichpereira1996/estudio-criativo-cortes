@@ -1,19 +1,17 @@
-# Nome e marca
+# Nome e identidade visual
 
-O **código** do Cortador Automático é aberto, sob a licença [MIT](LICENSE).
+Esta edição se chama **Estúdio Criativo Cortes** e é mantida por **@erichpereira22**.
 
-O **nome "Cortador Automático"**, o **nome "Gabriel Workspace"**, o **logo** (a tesoura azul) e a identidade visual do programa e do site **não fazem parte da licença MIT** e continuam sendo do Gabriel Workspace.
+Sua identidade visual utiliza fundo escuro, destaques em verde neon e um símbolo de reprodução com marcas de enquadramento.
 
-Isso quer dizer que, se você fizer uma versão própria a partir deste código:
+## Edição independente
 
-- dê **outro nome** a ela e use **outro logo**;
-- não diga nem dê a entender que é o Cortador Automático oficial ou que é feita, apoiada ou aprovada pelo Gabriel Workspace;
-- mantenha o aviso de copyright da licença MIT, como ela exige.
+Este projeto é uma versão personalizada e independente. Não representa o projeto de origem nem implica vínculo, apoio ou aprovação de seus responsáveis.
 
-O Cortador Automático oficial é grátis e só sai destes lugares:
+A marca desta edição não inclui os nomes, logotipos ou canais oficiais do projeto de origem. As marcas de terceiros permanecem com seus respectivos titulares.
 
-- Site: https://gabrielworkspace.github.io/cortador-automatico/
-- GitHub: https://github.com/gabrielworkspace/cortador-automatico
-- Instagram: [@gabriel.workspace](https://www.instagram.com/gabriel.workspace/)
+## Licença do código
 
-Se encontrar uma cópia usando o nome ou o logo, sendo vendida ou pedindo cadastro, ela não é nossa.
+A licença do código está em [LICENSE](LICENSE), e os avisos de copyright estão preservados em [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Esses avisos devem acompanhar as cópias e distribuições do código, conforme os termos da licença MIT.
+
+As licenças de bibliotecas, fontes e demais componentes de terceiros também devem ser preservadas.

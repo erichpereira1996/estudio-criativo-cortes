@@ -1,4 +1,4 @@
-// Cortador Automatico - o .exe do atalho no desktop.
+// Estúdio Criativo Cortes - o .exe do atalho no desktop.
 //
 // Sobe o servidor (node) escondido, sem janela preta, abre a tela do programa
 // numa janela propria do Edge (modo app, sem barra de endereco) e, quando essa
@@ -20,22 +20,20 @@ using System.Threading;
 using System.Windows.Forms;
 using Microsoft.Win32;
 
-[assembly: System.Reflection.AssemblyTitle("Cortador Automático")]
-[assembly: System.Reflection.AssemblyProduct("Cortador Automático")]
-[assembly: System.Reflection.AssemblyDescription("Cortador Automático - Gabriel Workspace")]
-[assembly: System.Reflection.AssemblyCompany("Gabriel Workspace")]
-[assembly: System.Reflection.AssemblyCopyright("© 2026 Gabriel Workspace")]
-[assembly: System.Reflection.AssemblyVersion("2.0.8.0")]
-[assembly: System.Reflection.AssemblyFileVersion("2.0.8.0")]
+[assembly: System.Reflection.AssemblyTitle("Estúdio Criativo Cortes")]
+[assembly: System.Reflection.AssemblyProduct("Estúdio Criativo Cortes")]
+[assembly: System.Reflection.AssemblyDescription("Estúdio Criativo Cortes - edição personalizada")]
+[assembly: System.Reflection.AssemblyCompany("@erichpereira22")]
+[assembly: System.Reflection.AssemblyCopyright("Edição personalizada: @erichpereira22. Avisos de terceiros: THIRD_PARTY_NOTICES.md")]
 
 static class Programa
 {
-    const string NOME = "Cortador Automático";
+    const string NOME = "Estúdio Criativo Cortes";
 
     static string pastaApp;       // onde o programa foi instalado
-    static string pastaLocal;     // %LOCALAPPDATA%\CortadorAutomatico: registro, perfil da janela, endereco
+    static string pastaLocal;     // %LOCALAPPDATA%\EstudioCriativoCortes: registro, perfil da janela, endereco
     static string perfilJanela;   // perfil do Edge so nosso: fechar a janela = fechar o programa
-    static string pastaDados;     // Videos\Cortador Automatico: cortes e videos baixados
+    static string pastaDados;     // Videos\Estúdio Criativo Cortes: cortes e videos baixados
     static string endereco;
     static Process servidor;
     static IntPtr job = IntPtr.Zero;
@@ -51,15 +49,15 @@ static class Programa
         Application.SetCompatibleTextRenderingDefault(false);
 
         pastaApp = AppDomain.CurrentDomain.BaseDirectory.TrimEnd('\\');
-        pastaLocal = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CortadorAutomatico");
+        pastaLocal = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EstudioCriativoCortes");
         perfilJanela = Path.Combine(pastaLocal, "janela");
         string videos = Environment.GetFolderPath(Environment.SpecialFolder.MyVideos);
         if (string.IsNullOrEmpty(videos)) videos = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Videos");
-        pastaDados = Path.Combine(videos, "Cortador Automatico");
+        pastaDados = Path.Combine(videos, "Estúdio Criativo Cortes");
         string arquivoEndereco = Path.Combine(pastaLocal, "endereco.txt");
 
         bool primeiro;
-        using (var trava = new Mutex(true, "CortadorAutomatico", out primeiro)) // o instalador espera ele fechar (AppMutex)
+        using (var trava = new Mutex(true, "EstudioCriativoCortes", out primeiro)) // o instalador espera ele fechar (AppMutex)
         {
             if (!primeiro)
             {

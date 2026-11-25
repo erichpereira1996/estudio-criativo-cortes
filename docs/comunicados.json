@@ -1,16 +1,6 @@
 {
-  "versao": "2.0.8",
-  "resumoVersao": "Nova opção para apagar projetos + Diretor IA Pro + vídeo fluido nas lives do YouTube.",
+  "versao": "1.1.0",
+  "resumoVersao": "Edição independente de @erichpereira22: identidade visual, vinheta e marca d’água.",
   "precisaInstalador": false,
-  "proApiUrl": "https://cortador-pro.gabrielhraa.workers.dev",
-  "aviso": {
-    "id": "instagram-duvidas-v1",
-    "ativo": true,
-    "tipo": "info",
-    "titulo": "Alguma dúvida ou sugestão?",
-    "texto": "Siga @gabriel.workspace no Instagram para acompanhar as novidades e mandar qualquer dúvida por lá.",
-    "botaoTexto": "Seguir no Instagram",
-    "botaoUrl": "https://www.instagram.com/gabriel.workspace/",
-    "fixo": false
-  }
+  "aviso": null
 }

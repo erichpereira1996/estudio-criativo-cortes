@@ -2,6 +2,7 @@
 /** Do arquivo de video ate os clipes prontos na pasta de saida. */
 
 const { spawn } = require('child_process');
+const identidade = require('./identidade');
 const crypto = require('crypto');
 const fs = require('fs');
 const os = require('os');
@@ -316,6 +317,7 @@ async function prepararAnalise(video, opcoes, emitir, avisar) {
  * @param {function} avisar  (evento) => void
  */
 async function processar(opcoes, avisar) {
+  opcoes.identidade = identidade.validar(opcoes.identidade === undefined ? identidade.ler() : opcoes.identidade);
   const video = opcoes.video;
   if (!fs.existsSync(video)) throw new Error('Nao achei esse arquivo: ' + video);
   conferirTrecho(opcoes.trecho, Infinity, opcoes.modoTrecho);
@@ -356,28 +358,9 @@ async function processar(opcoes, avisar) {
 
   // ---- 5. escolher os melhores momentos
   let cortes;
-  let feitoComIa = false;
   if (exato) {
     emitir(64, 'analise', 'Montando o corte de ' + mmss(trecho.inicio) + ' a ' + mmss(trecho.fim) + '...');
     cortes = [corteDoTrecho(transcricao, energia, trecho, { momentos: picos, perfil: perfilFinal, intencao: intencao, sessao: sessao.id })];
-  } else if (opcoes.usarIaPro) {
-    const pro = require('./pro');
-    const ctxVid = contextoDoVideo(video);
-    emitir(64, 'analise', 'Diretor IA Pro lendo a conversa inteira e criando títulos virais...');
-    const resIa = await pro.analisarComIa(transcricao, picos, info.duracao, {
-      quantidade: opcoes.quantidade || 8,
-      minDur: opcoes.minDur || 28,
-      maxDur: opcoes.maxDur || 62,
-      descricao: opcoes.descricao,
-      contexto: ctxVid.texto,
-      canal: ctxVid.canal,
-      trecho: trecho,
-    });
-    cortes = resIa.cortes;
-    feitoComIa = true;
-    if (resIa.usouTrial) {
-      avisar({ tipo: 'aviso', msg: '✨ Diretor IA Pro usado! Você ainda tem ' + resIa.trialsRestantes + ' teste(s) grátis.' });
-    }
   } else {
     emitir(64, 'analise', trecho
       ? 'Procurando os melhores momentos entre ' + mmss(trecho.inicio) + ' e ' + mmss(trecho.fim) + '...'
@@ -408,13 +391,7 @@ async function processar(opcoes, avisar) {
   const pedidos = opcoes.quantidade || 8;
   let recado = null;
   if (!exato && cortes.length < pedidos) {
-    recado = feitoComIa
-      ? {
-          titulo: 'Você pediu ' + pedidos + ' cortes e o Diretor IA Pro separou os ' + cortes.length + ' momentos realmente virais.',
-          detalhe: 'A IA analisou a conversa inteira e descartou trechos sem contexto, agradecimentos de live ou assuntos que não fechavam uma ideia forte.',
-          sugestao: null,
-        }
-      : explicarPoucos(cortes.length, pedidos,
+    recado = explicarPoucos(cortes.length, pedidos,
           diagnosticarCortes(transcricao, info.duracao, opcoes), opcoes);
     avisar({ tipo: 'aviso', msg: recado.titulo });
   }
@@ -693,6 +670,8 @@ async function renderizarClipe(ctx, c) {
   const aoProgredir = ctx.aoProgredir || (() => { });
   const rotulo = ctx.rotulo || 'clipe';
   const mp4 = path.join(ctx.pastaSaida, ctx.base + '.mp4');
+  const marcaDoClipe = identidade.validar(opcoes.identidade);
+  const renderMp4 = path.join(ctx.pastaSaida, '.render-' + crypto.randomUUID() + '.mp4');
 
   // O layout do video muda ao longo da gravacao: as vezes e webcam + gameplay,
   // as vezes o streamer poe a cara em tela cheia. Aplicar o split nesse segundo
@@ -748,34 +727,48 @@ async function renderizarClipe(ctx, c) {
     });
   }
 
-  await media.cortarClipe({
-    video: ctx.video,
-    inicio: c.inicio,
-    duracao: c.duracao,
-    destino: mp4,
-    formato: formatoDoClipe,
-    recorte: opcoes.recorte,
-    qualidade: opcoes.qualidade || 'maxima',
-    arquivoAss,
-    // chamariz: 3s da carta na frente do corte (vem no proprio corte, porque
-    // o instante da revelacao muda de clipe pra clipe)
-    teaser: c.teaser || null,
-    atrasoAudio: c.atrasoAudio || 0,
-    fontsdir: arquivoAss ? fontsdirRelativo() : null,
-    pastaTrabalho: pastas.trabalho(),
-    aoProgredir: (frac) => aoProgredir(frac,
-      'Gerando o ' + rotulo + '... ' + Math.round(frac * 100) + '%'),
-  });
+  // Só substitui um corte anterior quando conteúdo e identidade estiverem prontos.
+  let finalizacao;
+  try {
+    await media.cortarClipe({
+      video: ctx.video,
+      inicio: c.inicio,
+      duracao: c.duracao,
+      destino: renderMp4,
+      formato: formatoDoClipe,
+      recorte: opcoes.recorte,
+      qualidade: opcoes.qualidade || 'maxima',
+      arquivoAss,
+      // chamariz: 3s da carta na frente do corte (vem no proprio corte, porque
+      // o instante da revelacao muda de clipe pra clipe)
+      teaser: c.teaser || null,
+      atrasoAudio: c.atrasoAudio || 0,
+      fontsdir: arquivoAss ? fontsdirRelativo() : null,
+      pastaTrabalho: pastas.trabalho(),
+      aoProgredir: (frac) => aoProgredir((marcaDoClipe.vinheta.ativa || marcaDoClipe.marca.ativa) ? frac * 0.8 : frac,
+        'Gerando o ' + rotulo + '... ' + Math.round(frac * 100) + '%'),
+    });
+
+
+    finalizacao = await identidade.aplicar(renderMp4, marcaDoClipe, opcoes.qualidade, frac => aoProgredir(0.8 + frac * 0.2, 'Aplicando identidade ao ' + rotulo + '...'));
+
+      fs.renameSync(renderMp4, mp4);
+  } finally {
+    try { fs.unlinkSync(renderMp4); } catch (_) {}
+    if (arquivoAss) { try { fs.unlinkSync(path.join(pastas.trabalho(), arquivoAss)); } catch (_) {} }
+  }
 
   // legenda solta, pra editar depois
-  legenda.gerarSrt(c.palavras || [], c.inicio, path.join(ctx.pastaSaida, ctx.base + '.srt'));
+  legenda.gerarSrt(c.palavras || [], c.inicio, path.join(ctx.pastaSaida, ctx.base + '.srt'), finalizacao.deslocamento);
 
   const miniatura = path.join(ctx.pastaSaida, ctx.base + '.jpg');
-  await media.gerarMiniatura(ctx.video, c.inicio + c.duracao / 2, miniatura, ctx.vertical);
+  await media.gerarMiniatura(mp4, finalizacao.deslocamento + c.duracao / 2, miniatura, ctx.vertical);
 
-  if (arquivoAss) { try { fs.unlinkSync(path.join(pastas.trabalho(), arquivoAss)); } catch (_) { } }
 
   return Object.assign(semPalavras(c), {
+    identidade: marcaDoClipe,
+    duracaoFinal: finalizacao.duracaoFinal || c.duracao,
+    deslocamentoConteudo: finalizacao.deslocamento,
     arquivo: mp4,
     nomeArquivo: path.basename(mp4),
     base: ctx.base,
@@ -965,7 +958,7 @@ async function refazerClipe(pedido, avisar) {
     assinatura: fonte.assinatura,
     pastaSaida: pedido.pasta,
     base: antigo.base || path.basename(antigo.nomeArquivo, '.mp4'),
-    opcoes: Object.assign({}, sessao.opcoes || {}, doClipeDaLive(antigo), { legendar: legendar }),
+    opcoes: Object.assign({}, sessao.opcoes || {}, doClipeDaLive(antigo), { legendar: legendar, identidade: antigo.identidade || (sessao.opcoes || {}).identidade }),
     vertical: (antigo.fonte && antigo.formatoUsado ? antigo.formatoUsado : (sessao.opcoes || {}).formato) !== 'original',
     avisar: avisar,
     aoProgredir: (frac, msg) => emitir(8 + frac * 88, msg),

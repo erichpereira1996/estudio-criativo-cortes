@@ -122,6 +122,7 @@ async function inspecionar(video) {
     altura: v ? v.height : 0,
     temAudio: !!a,
     temVideo: !!v,
+    codecVideo: v ? v.codec_name : null,
     fps: v && v.r_frame_rate ? eval2(v.r_frame_rate) : 30,
   };
 }

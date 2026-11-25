@@ -1,13 +1,13 @@
 'use strict';
 /**
- * Monta o instalador do Cortador Automatico pra Windows.
+ * Monta o instalador do Estúdio Criativo Cortes pra Windows.
  *
  *     node instalador/montar.js
  *
  * Junta numa pasta so (instalador/montagem) tudo que o programa precisa pra
  * rodar num PC que nao tem nada instalado - Node, Python com o faster-whisper,
  * ffmpeg, yt-dlp e o modelo "small" - compila o .exe que abre o programa e
- * gera instalador/dist/Instalar-Cortador-Automatico.exe com o Inno Setup.
+ * gera instalador/dist/Instalar-Estudio-Criativo-Cortes.exe com o Inno Setup.
  *
  * O que vem da internet (Python embutido, ffmpeg, yt-dlp, Inno Setup) fica
  * guardado em instalador/cache pra proxima vez.
@@ -123,6 +123,10 @@ function montarApp() {
   // PC tem fonte paga (Burbank) que nao pode ir num instalador publico.
   for (const pasta of ['src', 'py']) copiar(path.join(RAIZ, pasta), path.join(app, pasta), semLixo);
   fs.copyFileSync(path.join(RAIZ, 'package.json'), path.join(app, 'package.json'));
+  for (const arquivo of ['LICENSE', 'THIRD_PARTY_NOTICES.md']) {
+    fs.copyFileSync(path.join(RAIZ, arquivo), path.join(app, arquivo));
+    fs.copyFileSync(path.join(RAIZ, arquivo), path.join(MONTAGEM, arquivo));
+  }
   const arqNov = path.join(RAIZ, 'LEIA-ME-NOVIDADES.txt');
   if (fs.existsSync(arqNov)) {
     fs.copyFileSync(arqNov, path.join(MONTAGEM, 'LEIA-ME-NOVIDADES.txt'));
@@ -209,13 +213,16 @@ function montarModelo() {
 }
 
 function montarLancador() {
-  passo('Compilando o CortadorAutomatico.exe');
+  const versao = require('../package.json').version;
+  const versaoCs = path.join(MONTAGEM, 'Versao.cs');
+  fs.writeFileSync(versaoCs, '[assembly: System.Reflection.AssemblyVersion("' + versao + '.0")]\n[assembly: System.Reflection.AssemblyFileVersion("' + versao + '.0")]\n');
+  passo('Compilando o EstudioCriativoCortes.exe');
   rodar(acharCsc(), [
     '/nologo', '/target:winexe', '/optimize+', '/platform:anycpu',
     '/win32icon:' + path.join(IMAGENS, 'icone.ico'),
     '/r:System.Windows.Forms.dll', '/r:System.Drawing.dll', '/r:System.Management.dll',
-    '/out:' + path.join(MONTAGEM, 'CortadorAutomatico.exe'),
-    path.join(AQUI, 'lancador', 'CortadorAutomatico.cs'),
+    '/out:' + path.join(MONTAGEM, 'EstudioCriativoCortes.exe'),
+    path.join(AQUI, 'lancador', 'EstudioCriativoCortes.cs'), versaoCs,
   ]);
 }
 
@@ -226,7 +233,7 @@ function compilarInstalador() {
   const texto = fs.readFileSync(iss, 'utf8');
   if (texto.charCodeAt(0) !== 0xfeff) fs.writeFileSync(iss, '\ufeff' + texto, 'utf8');
   fs.mkdirSync(DIST, { recursive: true });
-  rodar(acharInno(), ['/Q', '/DMONTAGEM=' + MONTAGEM, '/DSAIDA=' + DIST, iss], { cwd: AQUI });
+  rodar(acharInno(), ['/Q', '/DVersao=' + require('../package.json').version, '/DMONTAGEM=' + MONTAGEM, '/DSAIDA=' + DIST, iss], { cwd: AQUI });
 }
 
 function tamanho(pasta) {
@@ -259,7 +266,7 @@ function main() {
 
   if (soMontar) return;
   compilarInstalador();
-  const exe = path.join(DIST, 'Instalar-Cortador-Automatico.exe');
+  const exe = path.join(DIST, 'Instalar-Estudio-Criativo-Cortes.exe');
   console.log('\nPronto: ' + exe + ' (' + Math.round(fs.statSync(exe).size / 1048576) + ' MB)');
 }
 

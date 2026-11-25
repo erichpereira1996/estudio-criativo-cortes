@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Desenha o icone do Cortador Automatico (degrade azul da tela, com
+Desenha o icone do Estúdio Criativo Cortes (degrade azul da tela, com
 a tesoura branca) e as imagens do instalador. Roda uma vez; os arquivos
 gerados ficam em instalador/imagens e o montar.js so usa.
 
@@ -12,8 +12,8 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 SAIDA = os.path.join(AQUI, "imagens")
-AZUL_FUNDO = (35, 98, 214)       # azul mais fundo (em cima, a esquerda)
-AZUL_CLARO = (110, 172, 255)  # azul claro, --marca2 da tela
+AZUL_FUNDO = (16, 26, 3)       # azul mais fundo (em cima, a esquerda)
+AZUL_CLARO = (34, 65, 12)  # azul claro, --marca2 da tela
 TESOURA = "\u2702"
 FONTE = os.path.join(os.environ.get("WINDIR", r"C:\Windows"), "Fonts", "seguisym.ttf")
 
@@ -30,20 +30,16 @@ def degrade(largura, altura):
     return img
 
 
-def tesoura(lado, cor=(255, 255, 255, 255)):
-    """A tesoura branca num quadrado transparente, com uma sombra leve."""
+def tesoura(lado, cor=(163, 255, 18, 255)):
+    """Símbolo geométrico próprio: reprodução entre marcas de enquadramento."""
     camada = Image.new("RGBA", (lado, lado), (0, 0, 0, 0))
-    fonte = ImageFont.truetype(FONTE, round(lado * 0.78))
     d = ImageDraw.Draw(camada)
-    caixa = d.textbbox((0, 0), TESOURA, font=fonte)
-    x = (lado - (caixa[2] - caixa[0])) / 2 - caixa[0]
-    y = (lado - (caixa[3] - caixa[1])) / 2 - caixa[1]
-
-    sombra = Image.new("RGBA", (lado, lado), (0, 0, 0, 0))
-    ImageDraw.Draw(sombra).text((x, y + lado * 0.025), TESOURA, font=fonte, fill=(8, 24, 64, 120))
-    sombra = sombra.filter(ImageFilter.GaussianBlur(lado * 0.02))
-    ImageDraw.Draw(camada).text((x, y), TESOURA, font=fonte, fill=cor)
-    return Image.alpha_composite(sombra, camada).rotate(-20, resample=Image.BICUBIC)
+    def pontos(coords):
+        return [(round(x * lado), round(y * lado)) for x, y in coords]
+    d.polygon(pontos([(0.36, 0.25), (0.76, 0.5), (0.36, 0.75)]), fill=cor)
+    d.line(pontos([(0.16, 0.33), (0.16, 0.16), (0.4, 0.16)]), fill=cor, width=max(1, round(lado * 0.055)))
+    d.line(pontos([(0.84, 0.67), (0.84, 0.84), (0.6, 0.84)]), fill=cor, width=max(1, round(lado * 0.055)))
+    return camada
 
 
 def icone(lado=1024):

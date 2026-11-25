@@ -1,11 +1,11 @@
 @echo off
 chcp 65001 >nul
-title Instalador - Cortador Automatico
+title Instalador - Estúdio Criativo Cortes
 cd /d "%~dp0"
 
 echo.
 echo  ============================================================
-echo    INSTALADOR DO CORTADOR AUTOMATICO
+echo    INSTALADOR DO ESTUDIO CRIATIVO CORTES
 echo  ============================================================
 echo.
 echo   Isso instala o que o programa precisa pra funcionar:

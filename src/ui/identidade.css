@@ -1,0 +1,32 @@
+.versao-app { flex:none; color:var(--marca-claro); background:var(--marca-fundo); border:1px solid var(--marca); border-radius:99px; padding:2px 8px; font-size:11px; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.identidade-resumo { display:flex; align-items:center; justify-content:space-between; gap:18px; flex-wrap:wrap; }
+.identidade-resumo p { color:var(--texto2); font-size:var(--t5); margin-top:4px; }
+#dialogIdentidade { position:fixed; inset:0; margin:auto; width:min(950px, calc(100vw - 24px)); max-height:92vh; padding:0; color:var(--texto); background:var(--superficie); border:1px solid var(--linha2); border-radius:20px; box-shadow:0 30px 100px #000a; }
+#dialogIdentidade::backdrop { background:#000b; backdrop-filter:blur(5px); }
+.id-cabecalho, .id-rodape { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:18px 24px; background:var(--superficie); }
+.id-cabecalho { border-bottom:1px solid var(--linha); }
+.id-cabecalho h2 { font-size:20px; } .id-cabecalho p { color:var(--texto2); font-size:12px; }
+.id-corpo { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(230px,1fr); gap:24px; padding:22px 24px; }
+.id-opcoes fieldset { border:1px solid var(--linha2); border-radius:14px; padding:16px; margin:0 0 18px; min-width:0; }
+.id-opcoes legend { font-weight:700; padding:0 6px; color:var(--marca-claro); }
+.id-opcoes input[type=file] { font-size:12px; padding:10px; margin:10px 0 4px; max-width:100%; }
+.id-opcoes select { margin-top:6px; }
+.id-arquivo { display:block; font-size:12px; color:var(--texto2); overflow-wrap:anywhere; margin-bottom:12px; }
+.id-linha { display:flex; gap:12px; align-items:center; justify-content:space-between; margin:12px 0; font-size:12px; }
+.id-linha input[type=range] { min-width:60px; width:50%; padding:0; accent-color:var(--marca); }
+.id-linha output { width:44px; text-align:right; font-variant-numeric:tabular-nums; }
+.id-posicoes { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; }
+.id-posicoes button { padding:7px; min-height:36px; }
+.id-ajuda { color:var(--texto2); font-size:12px; line-height:1.5; margin:8px 0; }
+.id-preview-col { min-width:0; }
+.id-preview { position:relative; width:100%; max-width:290px; aspect-ratio:9/16; margin:10px auto; overflow:hidden; border:1px solid var(--linha2); border-radius:12px; background:linear-gradient(140deg,#1b291d,#080d09); touch-action:none; }
+.id-preview::before { content:'PRÉVIA DE POSIÇÃO'; position:absolute; inset:45% 0 auto; text-align:center; color:#c5ff7066; font-size:10px; letter-spacing:.15em; }
+#idPreviewFundo { width:100%; height:100%; object-fit:fill; position:absolute; inset:0; }
+#idPreviewLogo { position:absolute; object-fit:fill; cursor:grab; touch-action:none; user-select:none; }
+#idPreviewLogo:focus-visible { outline:2px solid var(--marca); outline-offset:3px; }
+#idVideoVinheta { display:block; width:100%; max-height:150px; margin-top:12px; border-radius:8px; background:#000; }
+.id-rodape { position:sticky; bottom:0; border-top:1px solid var(--linha); flex-wrap:wrap; }
+#idStatus { font-size:12px; flex:1; min-width:140px; color:var(--texto2); }
+#idStatus.erro { color:#ff9aa2; }
+.id-desativado { opacity:.55; }
+@media(max-width:650px) { .id-corpo { grid-template-columns:1fr; padding:16px; } .id-preview { max-width:210px; } .id-preview-col { order:-1; } .id-cabecalho,.id-rodape { padding:14px 16px; } .id-cabecalho h2 { font-size:17px; } }

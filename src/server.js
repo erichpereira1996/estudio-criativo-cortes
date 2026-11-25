@@ -22,6 +22,8 @@ const baixador = require('./baixar');
 const projetos = require('./projetos');
 const sessoes = require('./sessoes');
 const aovivo = require('./aovivo');
+const identidade = require('./identidade');
+const versao = require('./versao');
 
 // Um erro solto em algum canto (um ffmpeg que sumiu, uma conexao que caiu)
 // nao pode derrubar o programa inteiro: a janela ficaria dando "Failed to fetch"
@@ -97,6 +99,9 @@ const TIPOS = {
   '.mkv': 'video/x-matroska',
   '.jpg': 'image/jpeg',
   '.png': 'image/png',
+  '.webp': 'image/webp',
+  '.jpeg': 'image/jpeg',
+  '.svg': 'image/svg+xml',
   '.woff2': 'font/woff2',
   '.srt': 'text/plain; charset=utf-8',
   '.txt': 'text/plain; charset=utf-8',
@@ -197,11 +202,11 @@ function paginaLogin(erro) {
     'input{width:100%;padding:11px 12px;border-radius:10px;background:#1b212c;border:1px solid #333d4d;' +
     'color:#e8eef6;font:inherit;box-sizing:border-box;margin-bottom:12px}' +
     'button{width:100%;padding:12px;border:none;border-radius:10px;' +
-    'background:linear-gradient(135deg,#ff4d6d,#ff8a5c);color:#fff;font:inherit;font-weight:650;cursor:pointer}' +
+    'background:linear-gradient(135deg,#c5ff70,#a3ff12);color:#101a03;font:inherit;font-weight:650;cursor:pointer}' +
     '.erro{color:#fca5a5;font-size:13px;margin-bottom:12px}' +
     '</style></head><body>' +
     '<form method="POST" action="/api/login">' +
-    '<h1>✂️ Cortador Automático</h1>' +
+    '<h1>▶ Estúdio Criativo Cortes</h1>' +
     (erro ? '<div class="erro">Senha incorreta.</div>' : '') +
     '<input type="password" name="senha" placeholder="Senha" autofocus required>' +
     '<button type="submit">Entrar</button>' +
@@ -302,7 +307,7 @@ function janelaDoWindows(linhasDoDialogo, propriedade) {
 function escolherPastaNativa() {
   return janelaDoWindows([
     '$d = New-Object System.Windows.Forms.FolderBrowserDialog',
-    '$d.Description = "Escolha onde o Cortador Automatico vai salvar os cortes"',
+    '$d.Description = "Escolha onde o Estúdio Criativo Cortes vai salvar os cortes"',
     '$d.ShowNewFolderButton = $true',
   ], 'SelectedPath').then((r) => r.caminho);
 }
@@ -428,6 +433,33 @@ const servidor = http.createServer(async (req, res) => {
       return servirArquivo(req, res, path.join(__dirname, 'ui', path.basename(rota)));
     }
 
+    if (rota === '/api/versao' && req.method === 'GET') return json(res, 200, { versao: versao.version, rotulo: versao.rotulo() });
+    if (rota === '/api/identidade' && req.method === 'GET') return json(res, 200, identidade.publico(url.searchParams.has('limpa') ? {} : undefined));
+    if (rota === '/api/identidade' && req.method === 'PUT') {
+      try { return json(res, 200, identidade.salvar(await lerCorpo(req))); }
+      catch (e) { return json(res, 400, { erro: e.message }); }
+    }
+    if (rota === '/api/identidade/presets') {
+      try {
+        if (req.method === 'GET') return json(res, 200, { presets: identidade.presets().map(({id,nome}) => ({id,nome})) });
+        if (req.method === 'POST') { const corpo = await lerCorpo(req); return json(res, 200, identidade.salvarPreset(corpo.nome, corpo.config)); }
+        if (req.method === 'DELETE') { identidade.excluirPreset(url.searchParams.get('id')); return json(res, 200, { ok: true }); }
+      } catch (e) { return json(res, 400, { erro: e.message }); }
+    }
+    if (rota === '/api/identidade/preset' && req.method === 'GET') {
+      try { return json(res, 200, identidade.carregarPreset(url.searchParams.get('id'))); }
+      catch (e) { return json(res, 400, { erro: e.message }); }
+    }
+    if (rota === '/api/identidade/upload' && req.method === 'POST') {
+      try { return json(res, 200, { arquivo: await identidade.receber(req, url.searchParams.get('tipo'), url.searchParams.get('nome')) }); }
+      catch (e) { return json(res, 400, { erro: e.message }); }
+    }
+    if (rota === '/api/identidade/arquivo' && req.method === 'GET') {
+      const a = identidade.asset(url.searchParams.get('id'));
+      if (!a) return json(res, 404, { erro: 'Arquivo de identidade não encontrado.' });
+      return servirArquivo(req, res, identidade.caminho(a.id));
+    }
+
     // A janela usa isso pra mostrar o endereco do celular e o QR code, e pra
     // saber se pode oferecer o dialogo nativo (so faz sentido no Windows local).
     if (rota === '/api/rede') {
@@ -513,29 +545,7 @@ const servidor = http.createServer(async (req, res) => {
       const corpo = await lerCorpo(req);
       if (aoVivoAtual && !aoVivoAtual.parado) {
         return json(res, 409, { erro: 'Já tem uma live sendo gravada. Pare ela antes de começar outra.' });
-      }
-      let expiraIaLive = null;
-      if (corpo.usarIaPro) {
-        const pro = require('./pro');
-        const estPro = await pro.obterEstado(true);
-        if (!estPro.podeUsarLive) {
-          const msg = estPro.liveUsado && estPro.trialsRestantes > 0
-            ? 'Seu teste grátis de 15 minutos na Live já foi usado! Você ainda tem ' + estPro.trialsRestantes + ' teste(s) grátis para Vídeos — ou atualize para o Plano Pro para usar na live sem limite.'
-            : 'Seus 3 testes grátis do Diretor IA Pro acabaram! Atualize o plano para usar a IA na live.';
-          return json(res, 402, { erro: msg, precisaUpgrade: true });
-        }
-        if (!corpo.preparar && !estPro.ativo) {
-          try {
-            const rLive = await pro.iniciarTrialLive();
-            expiraIaLive = rLive.liveExpiraEm || null;
-          } catch (e) {
-            return json(res, 402, { erro: e.message || 'Atualize o plano para usar a IA na live.', precisaUpgrade: true });
-          }
-        }
-      }
-      const s = new aovivo.SessaoAoVivo(corpo, emitirAoVivo);
-      if (expiraIaLive) s.definirExpiraIaLive(expiraIaLive);
-      aoVivoAtual = s;
+      }      const s = new aovivo.SessaoAoVivo(corpo, emitirAoVivo);      aoVivoAtual = s;
       try {
         await s.iniciar();
         return json(res, 200, s.resumo());
@@ -558,21 +568,7 @@ const servidor = http.createServer(async (req, res) => {
         return json(res, 200, { ok: true, novaSessao: false, resumo: aoVivoAtual.resumo() });
       }
       // A live anterior ja tinha encerrado/caido: cria nova sessao no mesmo canal com os mesmos ajustes
-      const ant = aoVivoAtual;
-      let expiraIaLive = null;
-      let usarIa = !!ant.usarIaPro;
-      if (usarIa) {
-        try {
-          const pro = require('./pro');
-          const estPro = await pro.obterEstado(true);
-          if (!estPro.podeUsarLive) usarIa = false;
-          else if (!estPro.ativo) {
-            const rLive = await pro.iniciarTrialLive();
-            expiraIaLive = rLive.liveExpiraEm || null;
-          }
-        } catch (_) { usarIa = false; }
-      }
-      const s = new aovivo.SessaoAoVivo({
+      const ant = aoVivoAtual;      const s = new aovivo.SessaoAoVivo({
         url: ant.url,
         formato: ant.formato,
         recorte: ant.recorte,
@@ -582,11 +578,9 @@ const servidor = http.createServer(async (req, res) => {
         idioma: ant.idioma,
         lerChat: ant.lerChat,
         textoFixo: ant.textoFixo,
-        usarIaPro: usarIa,
+        identidade: ant.identidade,
         preparar: false,
-      }, emitirAoVivo);
-      if (expiraIaLive) s.definirExpiraIaLive(expiraIaLive);
-      aoVivoAtual = s;
+      }, emitirAoVivo);      aoVivoAtual = s;
       try {
         await s.iniciar();
         return json(res, 200, { ok: true, novaSessao: true, resumo: s.resumo() });
@@ -605,45 +599,9 @@ const servidor = http.createServer(async (req, res) => {
     }
 
     if (rota === '/api/aovivo/ajustar' && req.method === 'POST') {
-      const corpo = await lerCorpo(req);
-      let expiraIaLive = null;
-      let estadoLiveTrial = null;
-      if (corpo.usarIaPro) {
-        const pro = require('./pro');
-        const estPro = await pro.obterEstado(true);
-        if (!estPro.podeUsarLive) {
-          const msg = estPro.liveUsado && estPro.trialsRestantes > 0
-            ? 'Seu teste grátis de 15 minutos na Live já foi usado! Você ainda tem ' + estPro.trialsRestantes + ' teste(s) grátis para Vídeos — ou atualize para o Plano Pro para usar na live sem limite.'
-            : 'Seus 3 testes grátis do Diretor IA Pro acabaram! Atualize o plano para usar a IA na live.';
-          return json(res, 402, { erro: msg, precisaUpgrade: true });
-        }
-        const vaiCliparAgora = !!(corpo.clipando || (aoVivoAtual && aoVivoAtual.clipando));
-        if (vaiCliparAgora && !estPro.ativo) {
-          try {
-            estadoLiveTrial = await pro.iniciarTrialLive();
-            expiraIaLive = estadoLiveTrial.liveExpiraEm || null;
-          } catch (e) {
-            return json(res, 402, { erro: e.message || 'Atualize o plano para usar a IA na live.', precisaUpgrade: true });
-          }
-        }
-      }
-      if (aoVivoAtual && !aoVivoAtual.parado) {
-        if (expiraIaLive) aoVivoAtual.definirExpiraIaLive(expiraIaLive);
-        else if (corpo.usarIaPro === false) aoVivoAtual.definirExpiraIaLive(null);
-        aoVivoAtual.ajustar(corpo);
-        if (estadoLiveTrial) {
-          aoVivoAtual.emitir({
-            tipo: 'pro-estado',
-            usouTrial: !!estadoLiveTrial.iniciouAgora,
-            iniciouLiveTrial: !!estadoLiveTrial.iniciouAgora,
-            trialsRestantes: estadoLiveTrial.trialsRestantes,
-            liveUsado: estadoLiveTrial.liveUsado,
-            liveAtivo: estadoLiveTrial.liveAtivo,
-            liveExpiraEm: estadoLiveTrial.liveExpiraEm,
-          });
-        }
-      }
-      return json(res, 200, { ok: true, liveExpiraEm: expiraIaLive });
+      const corpo = await lerCorpo(req);      if (aoVivoAtual && !aoVivoAtual.parado) {
+        aoVivoAtual.ajustar(corpo);      }
+      return json(res, 200, { ok: true });
     }
 
     if (rota === '/api/aovivo/estado') {
@@ -1067,58 +1025,6 @@ const servidor = http.createServer(async (req, res) => {
       }
     }
 
-    // ---------------------------------------------------------- cortador pro (ia na nuvem + infinitepay)
-    if (rota === '/api/pro/estado' && req.method === 'GET') {
-      const pro = require('./pro');
-      const forcar = url.searchParams.get('forcar') === '1';
-      return json(res, 200, await pro.obterEstado(forcar));
-    }
-
-    if (rota === '/api/pro/ativar' && req.method === 'POST') {
-      const corpo = await lerCorpo(req);
-      const pro = require('./pro');
-      try {
-        return json(res, 200, await pro.ativarChave(corpo.chave));
-      } catch (e) {
-        return json(res, 400, { erro: e.message });
-      }
-    }
-
-    if (rota === '/api/pro/sair' && req.method === 'POST') {
-      const pro = require('./pro');
-      pro.sairDaChave();
-      return json(res, 200, await pro.obterEstado(true));
-    }
-
-    if (rota === '/api/pro/provedor' && req.method === 'POST') {
-      const corpo = await lerCorpo(req);
-      const pro = require('./pro');
-      try {
-        return json(res, 200, pro.salvarProvedor(corpo.provedor, corpo.chave, corpo.modelo));
-      } catch (e) {
-        return json(res, 400, { erro: e.message });
-      }
-    }
-
-    if (rota === '/api/pro/checkout' && req.method === 'POST') {
-      const corpo = await lerCorpo(req);
-      const pro = require('./pro');
-      try {
-        return json(res, 200, await pro.criarCheckout(corpo.plano));
-      } catch (e) {
-        return json(res, 400, { erro: e.message });
-      }
-    }
-
-    if (rota === '/api/pro/pedido' && req.method === 'GET') {
-      const pro = require('./pro');
-      try {
-        return json(res, 200, await pro.checarPedido(url.searchParams.get('id')));
-      } catch (e) {
-        return json(res, 200, { pago: false });
-      }
-    }
-
     // ---------------------------------------------------------- avisos e atualizacao
     if (rota === '/api/comunicados' && req.method === 'GET') {
       const atualizador = require('./atualizar');
@@ -1205,7 +1111,7 @@ function subir(porta, tentativas) {
   servidor.once('listening', () => {
     const endereco = 'http://127.0.0.1:' + porta;
     console.log('');
-    console.log('  Cortador automatico rodando em ' + endereco);
+    console.log('  Estúdio Criativo Cortes rodando em ' + endereco);
 
     if (NA_REDE) {
       for (const ip of enderecosDaRede()) {

@@ -36,3 +36,15 @@ fontes/
 
 # Python so do programa (o instalar.bat cria)
 ambiente/
+
+# Verificações e arquivos temporários locais
+work/
+
+# Dados locais e credenciais (não publicar)
+ao-vivo/
+.env.*
+!.env.example
+*.pem
+*.p12
+*.pfx
+*.log

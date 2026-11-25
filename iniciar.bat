@@ -2,11 +2,11 @@
 rem Garante o PATH basico do Windows - se ele vier quebrado, nada aqui funciona.
 set "PATH=%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;%SystemRoot%\System32\WindowsPowerShell\v1.0;%PATH%"
 chcp 65001 >nul 2>nul
-title Cortador Automatico
+title Estúdio Criativo Cortes
 cd /d "%~dp0"
 
 echo.
-echo   Iniciando o Cortador Automatico...
+echo   Iniciando o Estúdio Criativo Cortes...
 echo   A janela do programa abre sozinha em alguns segundos.
 echo.
 echo   NAO FECHE ESTA JANELA PRETA enquanto estiver usando.

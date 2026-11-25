@@ -1,12 +1,15 @@
 {
-  "name": "cortador-automatico",
-  "version": "2.0.8",
+  "name": "estudio-criativo-cortes",
+  "version": "1.1.0",
   "private": true,
-  "description": "Cortador automatico: corta video e live (gravada ou ao vivo) da Kick, Twitch e YouTube em clipes verticais, tudo no proprio PC",
+  "description": "Estúdio Criativo Cortes: corta video e live (gravada ou ao vivo) da Kick, Twitch e YouTube em clipes verticais, tudo no proprio PC",
   "main": "src/server.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "version:next": "node scripts/proxima-versao.js",
+    "test": "node --test tests/*.test.js"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "author": "@erichpereira22"
 }

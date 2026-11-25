@@ -1,60 +1,10 @@
-======================================================================
-CORTADOR AUTOMATICO v2.0.8 - NOTAS DA ATUALIZACAO (CHANGELOG)
-por Gabriel Workspace (@gabriel.workspace)
-======================================================================
+ESTÚDIO CRIATIVO CORTES — IDENTIDADE VISUAL
 
-O QUE FOI ATUALIZADO E MELHORADO NESTA VERSAO:
+• Vinheta de 2 segundos no início ou no fim de cada corte.
+• Marca d’água com posição, tamanho, margem e opacidade ajustáveis.
+• Configurações salvas para vídeos e lives.
+• Número da versão disponível no topo do programa.
 
-1. DIRETOR IA PRO (EM VIDEO GRAVADO E AO VIVO NA LIVE)
-   - Novo motor opcional de alta precisao na nuvem que le a conversa
-     inteira, crava o inicio e o fim exato de cada historia e cria
-     titulos magneticos + gancho de 4 segundos na tela.
-   - Google Gemini nativo ja incluso, com opcao de conectar sua propria
-     chave de API do Claude (Anthropic) ou ChatGPT (OpenAI).
-   - 3 testes gratis liberados por computador: use os 3 em videos, ou 2
-     em videos + 1 sessao de ate 15 minutos na Live! Assinantes do Plano
-     Pro usam em videos e lives inteiras sem limite de tempo.
-   - Motor Local continua 100% gratuito, offline e ilimitado.
+Abra Identidade para configurar. Os primeiros 2 segundos da vinheta são acrescentados ao conteúdo, sem remover a fala.
 
-2. SINCRONIA ZERO-ATRASO DE AUDIO E VIDEO FLUIDO (YOUTUBE, KICK E TWITCH)
-   - Leitura dupla sincronizada por sequencia de transmissao no YouTube
-     ao vivo com normalizacao de timestamps (fim do atraso na voz e fim
-     do video travado em quadro fixo nos cortes de live).
-   - Trava de quadros constantes (CFR) + compensacao ativa de audio
-     (aresample async=1000) em VODs e lives para eliminar atrasos mesmo
-     quando o OBS do streamer perde quadros.
-
-3. DOWNLOADS BLINDADOS EM QUALQUER CONEXAO + ESCOLHA DE RESOLUCAO
-   - Compatibilidade automatica com conexoes IPv4, dual-stack com IPv6
-     instavel e redes moveis/IPv6 puro, alem de retomada automatica.
-   - Acesso direto a lives, chats e VODs da Kick sem bloqueio 403.
-   - Novo card imersivo antes de baixar: veja miniatura, canal e duracao,
-     escolha a resolucao (480p, 720p, 1080p, 1440p, 4K) e acompanhe
-     velocidade, tamanho e tempo restante em tempo real.
-
-4. DETECTOR DE LIVE CALIBRADO + FILTRO VIRAL E SEO POR PLATAFORMA
-   - Novo medidor adaptativo de dinamica vocal a prova de limiter/OBS +
-     leitura em tempo real do chat da Twitch e da Kick (gera muito mais
-     cortes reais ao longo de 1h de live).
-   - Abertura Cold-Open (corta silencio inicial no segundo 0.0) e filtro
-     contra agradecimentos de Pix, sub, raid e propaganda.
-   - Botoes de copia rapida com SEO sob medida para o algoritmo de cada
-     rede: TikTok, YouTube Shorts e Instagram Reels.
-
-5. DETECCAO APRIMORADA DA WEBCAM DO STREAMER
-   - Varre 6 posicoes (4 cantos + meio-esquerdo e meio-direito) combinando
-     estabilidade temporal, textura interna e borda da moldura, tanto em
-     videos gravados quanto nas lives ao vivo.
-
-6. AGORA O APLICATIVO ATUALIZA SOZINHO
-   - Sempre que sair uma melhoria ou correcao nova no GitHub, o proprio
-     programa verifica ao abrir, baixa em segundos com tela de progresso
-     e reinicia atualizado - sem precisar baixar o instalador de novo.
-
-7. APAGAR PROJETOS DIRETO PELO PROGRAMA
-   - Agora voce pode excluir os projetos que nao precisa mais direto pela
-     lista de Projetos (botao de lixeira) ou dentro de um projeto aberto,
-     com confirmacao segura para liberar espaco no disco na hora.
-
-Duvidas e novidades: https://www.instagram.com/gabriel.workspace/
-======================================================================
+Licença e avisos legais preservados em LICENSE.

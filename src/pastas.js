@@ -9,8 +9,8 @@
  *
  * Qual pasta vale, nesta ordem:
  *   1. a que a pessoa escolheu nos Ajustes (config.json)
- *   2. a variavel DADOS (o programa instalado aponta pra Videos\Cortador Automatico)
- *   3. D:\CortadorAutomatico, se o D: existir (o C: costuma viver cheio)
+ *   2. a variavel DADOS (o programa instalado aponta pra Videos\Estúdio Criativo Cortes)
+ *   3. pasta própria no D:, preservando a pasta legada quando já existir
  *   4. a propria pasta do programa
  */
 
@@ -22,10 +22,12 @@ const RAIZ = path.join(__dirname, '..');
 
 /** O arquivo de configuracao fica fora da pasta de dados: ela pode mudar de lugar. */
 function arquivoConfig() {
-  const base = process.platform === 'win32'
-    ? path.join(process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local'), 'CortadorAutomatico')
-    : path.join(os.homedir(), '.cortador-automatico');
-  return path.join(base, 'config.json');
+  const local = process.env.LOCALAPPDATA || path.join(os.homedir(), 'AppData', 'Local');
+  const novo = process.platform === 'win32' ? path.join(local, 'EstudioCriativoCortes', 'config.json') : path.join(os.homedir(), '.estudio-criativo-cortes', 'config.json');
+  // Compatibilidade: preserva ajustes e anexos de instalações anteriores.
+  const legado = process.platform === 'win32' ? path.join(local, 'CortadorAutomatico', 'config.json') : path.join(os.homedir(), '.cortador-automatico', 'config.json');
+  if (fs.existsSync(novo)) return novo;
+  return fs.existsSync(legado) ? legado : novo;
 }
 
 function lerConfig() {
@@ -41,7 +43,10 @@ function gravarConfig(cfg) {
 /** A pasta de dados quando nada foi escolhido. */
 function padrao() {
   if (process.env.DADOS) return process.env.DADOS;
-  if (process.platform === 'win32' && fs.existsSync('D:/')) return 'D:\\CortadorAutomatico';
+  if (process.platform === 'win32' && fs.existsSync('D:/')) {
+    const legado = 'D:/CortadorAutomatico';
+    return fs.existsSync(legado) ? legado : 'D:/EstudioCriativoCortes';
+  }
   return RAIZ;
 }
 

@@ -23,6 +23,7 @@ try { require('dns').setDefaultResultOrder('ipv4first'); } catch (_) { }
 
 const { spawn } = require('child_process');
 const fs = require('fs');
+const identidade = require('./identidade');
 const path = require('path');
 
 const media = require('./media');
@@ -383,8 +384,8 @@ class SessaoAoVivo {
     this.idioma = /^[a-z]{2}$|^auto$/.test(String(o.idioma || '')) ? o.idioma : 'pt';
     // texto fixo na tela de todo clipe: { texto, posicao, duracao, cor, tamanho }
     this.textoFixo = o.textoFixo || null;
-    // Diretor IA Pro na live: refina inicio/fim pela conversa e cria titulo + gancho + SEO
-    this.usarIaPro = !!o.usarIaPro;
+    this.identidade = identidade.validar(o.identidade === undefined ? identidade.ler() : o.identidade);
+
     this.salaChat = null;
     // "preparar": conecta e ja guarda a live, mas so clipa depois que a pessoa
     // marcar webcam/foco/texto e apertar "Comecar a clipar"
@@ -468,8 +469,6 @@ class SessaoAoVivo {
       pasta: this.pasta || null,
       quantidade: this.clipes.length,
       clipando: this.clipando,
-      usarIaPro: !!this.usarIaPro,
-      iaLiveExpiraEm: this.iaLiveExpiraEm || null,
       textoFixo: this.textoFixo,
       // o pedaco mais novo: e dele que sai a imagem pra marcar webcam e foco
       ultimoPedaco: this.ultimoPedaco(),
@@ -1123,6 +1122,7 @@ class SessaoAoVivo {
     const { ffmpeg } = await media.garantirFfmpeg();
     const bordas = pedidoBruto.origem === 'auto' ? this.ajustarBordasPeloAudio(pedidoBruto) : { inicio: pedidoBruto.inicio, fim: pedidoBruto.fim };
     const pedido = Object.assign({}, pedidoBruto, bordas);
+    const identidadeDoClipe = identidade.validar(this.identidade);
     const usados = this.pedacos.filter((p) => p.t0 < pedido.fim && p.t0 + p.dur > pedido.inicio && fs.existsSync(p.arquivo));
     if (!usados.length) throw new Error('esse trecho já saiu do buffer');
 
@@ -1182,8 +1182,9 @@ class SessaoAoVivo {
       if (ass) { try { fs.unlinkSync(path.join(pastas.trabalho(), ass)); } catch (_) { } }
     }
 
+    const finalizacao = await identidade.aplicar(mp4, identidadeDoClipe, 'rapida');
     const jpg = path.join(this.pasta, nomeBase + '.jpg');
-    try { await media.gerarMiniatura(mp4, Math.min(dur / 2, 8), jpg, this.formato !== 'original'); } catch (_) { }
+    try { await media.gerarMiniatura(mp4, finalizacao.deslocamento + Math.min(dur / 2, 8), jpg, this.formato !== 'original'); } catch (_) { }
 
     const nota = pedido.nota != null ? pedido.nota : 70;
     const clipe = {
@@ -1196,6 +1197,9 @@ class SessaoAoVivo {
       inicio: Math.round(pedido.inicio * 10) / 10,
       fim: Math.round((pedido.inicio + dur) * 10) / 10,
       duracao: Math.round(dur * 10) / 10,
+      duracaoFinal: finalizacao.duracaoFinal || dur,
+      deslocamentoConteudo: finalizacao.deslocamento,
+      identidade: identidadeDoClipe,
       inicioTexto: hms(pedido.inicio),
       fimTexto: hms(pedido.inicio + dur),
       quando: new Date().toISOString(),
@@ -1315,112 +1319,7 @@ class SessaoAoVivo {
         clipe.texto = texto;
 
         const ctxCopy = { texto: this.titulo || '', canal: this.nomeCanal || this.canal || '', evitar: (this.titulosUsados = this.titulosUsados || new Set()) };
-        let aplicouIa = false;
-
-        if (this.usarIaPro && this.iaLiveExpiraEm && Date.now() >= new Date(this.iaLiveExpiraEm).getTime()) {
-          this.definirExpiraIaLive(null);
-          this.usarIaPro = false;
-          this.emitir({
-            tipo: 'pro-esgotado',
-            msg: 'Seus 15 minutos grátis do Diretor IA Pro na Live acabaram! Atualize para o Plano Pro para continuar usando IA na live (os próximos cortes seguem no Motor Local).',
-          });
-          this.emitir(Object.assign({ tipo: 'estado' }, this.resumo()));
-        }
-
-        if (this.usarIaPro && texto.length >= 12) {
-          try {
-            const pro = require('./pro');
-            const resIa = await pro.refinarClipeAoVivo(t, offset, clipe.duracao, clipe.fonte.duracao, {
-              canal: this.nomeCanal || this.canal || '',
-              contexto: this.titulo || 'Live ao vivo',
-              sessaoLiveId: this.id,
-            });
-            if (resIa.liveExpiraEm) this.definirExpiraIaLive(resIa.liveExpiraEm);
-            this.emitir({
-              tipo: 'pro-estado',
-              usouTrial: resIa.usouTrial,
-              trialsRestantes: resIa.trialsRestantes,
-              liveUsado: resIa.liveUsado,
-              liveAtivo: resIa.liveAtivo,
-              liveExpiraEm: resIa.liveExpiraEm || this.iaLiveExpiraEm || null,
-            });
-            if (resIa.corte) {
-              const ci = resIa.corte;
-              if (clipe.titulo) this.titulosUsados.delete(String(clipe.titulo).toLowerCase());
-              clipe.titulo = ci.titulo || clipe.titulo;
-              this.titulosUsados.add(String(clipe.titulo).toLowerCase());
-              clipe.titulos = ci.titulosIa || [{ texto: clipe.titulo, estilo: 'ia' }];
-              clipe.hashtags = ci.hashtagsIa || clipe.hashtags;
-              clipe.gancho = ci.ganchoIa || null;
-              clipe.nota = ci.nota || clipe.nota;
-              clipe.motivos = ci.motivos || clipe.motivos;
-              clipe.geradoPorIa = true;
-              const seoBase = gerarSeoPlataformas({ texto: ci.texto || texto }, clipe.titulo, clipe.hashtags, ctxCopy);
-              clipe.seo = Object.assign({}, seoBase, ci.seoIa || {});
-              clipe.legendaPost = clipe.seo.tiktok || (clipe.titulo + '\n\n' + clipe.hashtags.map((h) => '#' + h).join(' '));
-              aplicouIa = true;
-
-              // Refina o arquivo de video nas frases exatas escolhidas pela IA + queima o gancho de 4s
-              if (this.formato !== 'original' && (clipe.gancho || Math.abs(ci.inicio - offset) >= 0.8 || Math.abs(ci.duracao - clipe.duracao) >= 1.2)) {
-                const assIa = 'aovivo-ia-' + this.id + '-' + clipe.numero + '.ass';
-                const caminhoAssIa = path.join(pastas.trabalho(), assIa);
-                try {
-                  legenda.gerarAss([], 0, caminhoAssIa, {
-                    incluirPalavras: false,
-                    gancho: clipe.gancho,
-                    textoFixo: this.textoFixo,
-                    alturaDivisao: legenda.alturaDaDivisao(this.formato, this.recorte),
-                  });
-                  const mp4Ia = clipe.arquivo + '.ia.mp4';
-                  await media.cortarClipe({
-                    video: original,
-                    inicio: ci.inicio,
-                    duracao: ci.duracao,
-                    formato: this.formato,
-                    recorte: this.recorte,
-                    arquivoAss: assIa,
-                    fontsdir: fontsdirRelativo(),
-                    cwdAss: pastas.trabalho(),
-                    qualidade: 'rapida',
-                    destino: mp4Ia,
-                  });
-                  if (fs.existsSync(mp4Ia) && fs.statSync(mp4Ia).size > 1024) {
-                    fs.renameSync(mp4Ia, clipe.arquivo);
-                    clipe.inicio = ci.inicio;
-                    clipe.duracao = ci.duracao;
-                    clipe.fim = Math.round((ci.inicio + ci.duracao) * 100) / 100;
-                    clipe.texto = ci.texto || texto;
-                    clipe.tamanhoMb = Math.round((fs.statSync(clipe.arquivo).size / 1048576) * 10) / 10;
-                  }
-                } catch (_) { }
-                finally { try { fs.unlinkSync(caminhoAssIa); } catch (_) { } }
-              }
-            }
-            if (resIa.usouTrial && !resIa.liveAtivo && Number(resIa.trialsRestantes) <= 0) {
-              this.definirExpiraIaLive(null);
-              this.usarIaPro = false;
-              this.emitir({
-                tipo: 'pro-esgotado',
-                msg: 'Seu teste grátis do Diretor IA Pro na Live terminou! Atualize o plano para continuar usando IA na live (os próximos cortes seguem no Motor Local).',
-              });
-              this.emitir(Object.assign({ tipo: 'estado' }, this.resumo()));
-            }
-          } catch (errIa) {
-            if (/teste|grátis|acabaram|usado|402|Atualize o plano|Plano Pro/i.test(errIa.message || '')) {
-              this.definirExpiraIaLive(null);
-              this.usarIaPro = false;
-              this.emitir({
-                tipo: 'pro-esgotado',
-                msg: errIa.message || 'Seu teste grátis do Diretor IA Pro na Live acabou! Atualize o plano Pro para usar a IA na live (seguindo no Motor Local).',
-              });
-              this.emitir(Object.assign({ tipo: 'estado' }, this.resumo()));
-            } else {
-              this.emitir({ tipo: 'aviso', msg: 'IA Pro indisponível neste clipe (' + errIa.message + '). Usando título local.' });
-            }
-          }
-        }
-
-        if (!aplicouIa && this.sugerirTitulo) {
+        if (this.sugerirTitulo) {
           const cp = gerarCopy({ texto, inicio: offset, tags: [], palavras, motivos: clipe.motivos, origem: clipe.origem },
             ctxCopy, sessoes.pegar());
           if (clipe.titulo) this.titulosUsados.delete(String(clipe.titulo).toLowerCase());
@@ -1469,6 +1368,7 @@ class SessaoAoVivo {
       video: null,
       duracaoVideo: 0,
       opcoes: {
+        identidade: this.identidade,
         sessao: sessoes.pegar().id, formato: this.formato, recorte: this.recorte, textoFixo: this.textoFixo,
         legendar: false, textoGancho: false, qualidade: 'alta', detectarWebcam: false, idioma: this.idioma,
       },
@@ -1486,33 +1386,16 @@ class SessaoAoVivo {
     this.emitir({ tipo: 'clipe-atualizado', clipe: this.clipes[i] });
   }
 
-  definirExpiraIaLive(expiraIso) {
-    clearTimeout(this.timerExpiraIaLive);
-    this.timerExpiraIaLive = null;
-    this.iaLiveExpiraEm = expiraIso || null;
-    if (!expiraIso || this.parado) return;
-    const ms = new Date(expiraIso).getTime() - Date.now();
-    if (!isFinite(ms)) return;
-    this.timerExpiraIaLive = setTimeout(() => {
-      if (this.parado || !this.usarIaPro) return;
-      this.iaLiveExpiraEm = null;
-      this.usarIaPro = false;
-      this.emitir({
-        tipo: 'pro-esgotado',
-        msg: 'Seus 15 minutos grátis do Diretor IA Pro na Live acabaram! Atualize para o Plano Pro para continuar usando IA na live (a gravação segue normalmente no Motor Local).',
-      });
-      this.emitir(Object.assign({ tipo: 'estado' }, this.resumo()));
-    }, Math.max(500, ms));
-  }
+
 
   ajustar(o) {
+    if (o.identidade !== undefined) this.identidade = identidade.validar(o.identidade);
     if (o.auto != null) this.auto = !!o.auto;
     if (LIMIAR[o.sensibilidade]) this.sensibilidade = o.sensibilidade;
     if (o.duracao) this.duracao = limitar(Number(o.duracao) || 30, 10, 120);
     if (['split', 'vertical', 'foco', 'blur', 'original'].includes(o.formato)) this.formato = o.formato;
     if (o.recorte) this.recorte = o.recorte;
     if (o.textoFixo !== undefined) this.textoFixo = o.textoFixo;
-    if (typeof o.usarIaPro === 'boolean') this.usarIaPro = o.usarIaPro;
     if (o.clipando === true && !this.clipando) {
       this.clipando = true;
       // o nivel de antes nao dispara clipe: o automatico comeca agora
@@ -1541,7 +1424,7 @@ class SessaoAoVivo {
     clearInterval(this.relogio);
     clearTimeout(this.timerHls);
     clearTimeout(this.timerReconexao);
-    clearTimeout(this.timerExpiraIaLive);
+
     if (this.fecharChat) this.fecharChat();
     if (this.proc) { try { this.proc.kill(); } catch (_) { } }
     if (this.procYt) { try { this.procYt.kill(); } catch (_) { } }

@@ -3,9 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cortador Automático</title>
-<link rel="icon" type="image/png" href="/ui/icone.png">
+<title>Estúdio Criativo Cortes</title>
+<link rel="icon" type="image/svg+xml" href="/ui/estudio.svg">
 <script src="/ui/lucide.js"></script>
+<link rel="stylesheet" href="/ui/identidade.css">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   [hidden] { display: none !important; }
@@ -20,7 +21,7 @@
     src: url(/ui/manrope.woff2) format('woff2');
   }
 
-  /* Quase preto, linhas finas translucidas, texto branco-gelo e um azul
+  /* Quase preto, linhas finas translucidas, texto branco-gelo e verde neon
      usado com economia (botao principal, marcados, destaques) */
   :root {
     color-scheme: dark;
@@ -36,16 +37,16 @@
     --texto2: rgba(250,250,247,.64);
     --texto3: rgba(250,250,247,.40);
 
-    --marca: #3d8bff;
-    --marca2: #7fb2ff;
+    --marca: #a3ff12;
+    --marca2: #c5ff70;
     /* tons da cor da marca pra fundo de botao marcado */
-    --marca-fundo: rgba(61,139,255,.13);
-    --marca-fundo2: rgba(61,139,255,.06);
-    --marca-ic: rgba(61,139,255,.15);
-    --marca-claro: #cfe1ff;
-    --marca-brilho: rgba(61,139,255,.40);
-    --sobre-marca: #04122a;
-    --brilho-fundo: rgba(24,46,82,.55);
+    --marca-fundo: rgba(163,255,18,.13);
+    --marca-fundo2: rgba(163,255,18,.06);
+    --marca-ic: rgba(163,255,18,.15);
+    --marca-claro: #e2ffbd;
+    --marca-brilho: rgba(163,255,18,.40);
+    --sobre-marca: #101a03;
+    --brilho-fundo: rgba(34,65,12,.55);
     --azul: #8fb3e0;
     --verde: #86d3a4;
     --amarelo: #e2c27a;
@@ -553,9 +554,9 @@
   .clipar {
     width: 100%; margin-top: 12px; padding: 20px; border: 0; border-radius: 16px; cursor: pointer;
     display: flex; align-items: center; justify-content: center; gap: 12px;
-    background: linear-gradient(180deg, #5b9dff, #2f74e8); color: #fff;
+    background: linear-gradient(180deg, var(--marca2), var(--marca)); color: var(--sobre-marca);
     font: inherit; font-size: 22px; font-weight: 800; letter-spacing: .06em;
-    box-shadow: 0 18px 40px -18px rgba(61,139,255,.85), inset 0 1px 0 rgba(255,255,255,.25);
+    box-shadow: 0 18px 40px -18px rgba(163,255,18,.85), inset 0 1px 0 rgba(255,255,255,.25);
     transition: transform .12s var(--suave), filter .2s;
   }
   .clipar:hover:not(:disabled) { filter: brightness(1.07); }
@@ -809,7 +810,7 @@
   background: rgba(2,3,5,.78); backdrop-filter: blur(8px); }
 .dsp-fundo[hidden] { display: none; }
 .dsp-caixa { width: 100%; max-width: 760px; margin: auto; padding: 30px 28px 24px; border-radius: var(--raio-g);
-  background: radial-gradient(ellipse 90% 50% at 50% 0%, rgba(61,139,255,.16), transparent 70%), var(--superficie);
+  background: radial-gradient(ellipse 90% 50% at 50% 0%, rgba(163,255,18,.16), transparent 70%), var(--superficie);
   border: 1px solid var(--linha2); box-shadow: 0 50px 100px -30px rgba(0,0,0,.95); }
 .dsp-caixa h2 { font-size: 22px; letter-spacing: -.02em; text-align: center; margin: 0; }
 .dsp-caixa > p { color: var(--texto2); text-align: center; margin: 8px auto 18px; max-width: 34em; font-size: var(--t3); }
@@ -820,7 +821,7 @@
 @media (max-width: 640px) { .dsp-opcoes { grid-template-columns: 1fr; } }
 .dsp-op { text-align: left; font: inherit; color: var(--texto); cursor: pointer; padding: 18px; border-radius: var(--raio-g);
   border: 1px solid var(--linha2); background: var(--vidro); display: grid; gap: 8px; align-content: start; transition: border-color .2s, background .2s; }
-.dsp-op:hover { border-color: rgba(127,178,255,.5); background: var(--vidro2); }
+.dsp-op:hover { border-color: rgba(197,255,112,.5); background: var(--vidro2); }
 .dsp-op[aria-pressed="true"] { border-color: var(--marca); background: var(--marca-fundo2); box-shadow: 0 0 0 1px var(--marca) inset; }
 .dsp-op .dsp-tit { display: flex; align-items: center; gap: 10px; font-weight: 750; font-size: 16.5px; }
 .dsp-op .dsp-tit .i { color: var(--marca2); }
@@ -858,8 +859,8 @@
   .comunicado {
     display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
     padding: 12px 15px; border-radius: 14px; margin-bottom: 14px;
-    background: linear-gradient(180deg, rgba(61,139,255,.11), rgba(61,139,255,.04));
-    border: 1px solid rgba(61,139,255,.32); font-size: var(--t5); line-height: 1.45;
+    background: linear-gradient(180deg, rgba(163,255,18,.11), rgba(163,255,18,.04));
+    border: 1px solid rgba(163,255,18,.32); font-size: var(--t5); line-height: 1.45;
   }
   .comunicado[hidden] { display: none !important; }
   .comunicado.novidade {
@@ -873,7 +874,7 @@
   .comunicado .com-ic {
     width: 34px; height: 34px; border-radius: 10px; flex: none;
     display: grid; place-items: center; font-size: 17px;
-    background: rgba(61,139,255,.16); color: var(--marca2);
+    background: rgba(163,255,18,.16); color: var(--marca2);
   }
   .comunicado.novidade .com-ic { background: rgba(226,194,122,.16); color: var(--amarelo); }
   .comunicado.urgente .com-ic { background: rgba(255,107,107,.16); color: #ff9aa2; }
@@ -886,84 +887,6 @@
     padding: 5px; border-radius: 8px; display: grid; place-items: center;
   }
   .comunicado .com-fechar:hover { color: var(--texto); background: var(--vidro2); }
-
-  /* ---------- cortador pro (seletor motor + modal checkout) */
-  .btn-pro-topo {
-    background: linear-gradient(180deg, rgba(226,194,122,.18), rgba(226,194,122,.06));
-    border-color: rgba(226,194,122,.42); color: #f4dca0;
-  }
-  .btn-pro-topo:hover:not(:disabled) { background: rgba(226,194,122,.24); border-color: rgba(226,194,122,.65); }
-  .btn-pro-topo.ativo { background: linear-gradient(180deg, #f3d488, #d4a94a); color: #1a1202; border-color: rgba(255,255,255,.3); font-weight: 750; }
-  .motores { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  @media (max-width: 680px) { .motores { grid-template-columns: 1fr; } }
-  .motor-op {
-    text-align: left; font: inherit; color: var(--texto); cursor: pointer; padding: 15px 16px;
-    border-radius: 15px; border: 1px solid var(--linha2); background: var(--vidro);
-    display: grid; gap: 5px; align-content: start; transition: .22s var(--suave); position: relative;
-  }
-  .motor-op:hover { border-color: rgba(255,255,255,.26); background: var(--vidro2); }
-  .motor-op[aria-pressed="true"] { border-color: var(--marca); background: var(--marca-fundo2); box-shadow: 0 0 0 1px var(--marca) inset; }
-  .motor-op.pro[aria-pressed="true"] { border-color: var(--amarelo); background: rgba(226,194,122,.09); box-shadow: 0 0 0 1px var(--amarelo) inset; }
-  .motor-topo { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .motor-topo b { display: inline-flex; align-items: center; gap: 7px; font-size: var(--t3); font-weight: 700; }
-  .motor-op p { font-size: var(--t6); color: var(--texto2); line-height: 1.45; margin: 0; }
-  .pilula-pro {
-    font-size: 11px; font-weight: 750; padding: 2px 9px; border-radius: 99px;
-    background: rgba(226,194,122,.18); color: #f4dca0; border: 1px solid rgba(226,194,122,.35); white-space: nowrap;
-  }
-  .pilula-pro.gratis { background: var(--vidro2); color: var(--texto2); border-color: var(--linha2); }
-  .pilula-pro.ativo { background: rgba(134,211,164,.16); color: var(--verde); border-color: rgba(134,211,164,.35); }
-  .pro-caixa {
-    max-width: 660px; text-align: left; position: relative; overflow: hidden;
-    border-radius: 22px; border: 1px solid rgba(127,178,255,.16);
-    background:
-      radial-gradient(ellipse 85% 42% at 50% -12%, rgba(61,139,255,.18), transparent 65%),
-      #0b0d12;
-    box-shadow: 0 36px 90px -24px rgba(0,0,0,.92), 0 0 48px -18px rgba(61,139,255,.32), inset 0 1px 0 rgba(255,255,255,.08);
-    padding: 28px 28px 22px;
-  }
-  .pro-caixa::before {
-    content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px; pointer-events: none;
-    background: conic-gradient(
-      from var(--of-ang),
-      transparent 0deg,
-      rgba(61,139,255,.12) 220deg,
-      #3d8bff 295deg,
-      #a8ceff 330deg,
-      #3d8bff 350deg,
-      transparent 360deg
-    );
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    mask-composite: exclude;
-    animation: ofGirar 4.2s linear infinite;
-  }
-  .dsp-caixa.pro-caixa h2 { font-size: 24px; font-weight: 600; letter-spacing: -.035em; color: #f6f8fc; text-align: left; margin: 0 0 6px; }
-  .dsp-caixa.pro-caixa > p { font-size: 14px; font-weight: 400; color: var(--texto2); text-align: left; margin: 0 0 18px; line-height: 1.55; }
-  .pro-planos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-  @media (max-width: 600px) { .pro-planos { grid-template-columns: 1fr; } }
-  .pro-plano {
-    padding: 16px 18px; border-radius: 14px; border: 1px solid rgba(255,255,255,.09); background: rgba(255,255,255,.025);
-    display: flex; flex-direction: column; gap: 6px; transition: border-color .18s;
-  }
-  .pro-plano > b { font-size: 13.5px; font-weight: 600; color: var(--texto); letter-spacing: -.01em; }
-  .pro-plano.destaque {
-    border-color: rgba(61,139,255,.45);
-    background: linear-gradient(180deg, rgba(61,139,255,.11), rgba(61,139,255,.02));
-  }
-  .pro-plano .preco { font-size: 26px; font-weight: 600; color: #fff; letter-spacing: -.03em; line-height: 1.1; }
-  .pro-plano small { font-size: 12px; color: var(--texto3); line-height: 1.45; flex: 1; }
-  .pro-chave-bloco { border-top: 1px solid rgba(255,255,255,.08); padding-top: 14px; margin-top: 8px; }
-  .pro-chave-linha { display: flex; gap: 8px; margin-top: 8px; }
-  .pro-chave-linha input { flex: 1; font-family: Consolas, monospace; text-transform: uppercase; letter-spacing: .06em; }
-  .pro-provedores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 8px 0; }
-  @media (max-width: 600px) { .pro-provedores { grid-template-columns: 1fr; } }
-  .pro-prov { font: inherit; color: var(--texto); text-align: left; cursor: pointer; padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,.09); background: rgba(255,255,255,.025); display: grid; gap: 2px; transition: .15s; }
-  .pro-prov b { font-size: 13px; font-weight: 600; }
-  .pro-prov small { font-size: 11px; color: var(--texto3); }
-  .pro-prov[aria-pressed="true"] { border-color: rgba(61,139,255,.65); background: rgba(61,139,255,.12); box-shadow: 0 0 0 1px rgba(61,139,255,.45) inset; }
-  .pro-espera { padding: 14px 16px; border-radius: 13px; border: 1px solid rgba(127,178,255,.28); background: rgba(61,139,255,.08); margin-bottom: 14px; font-size: 13px; }
 
   /* ---------- previa imersiva de download + seletor de resolucao */
   .dl-card {
@@ -1013,7 +936,7 @@
   .dl-fases { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; font-size: 11.5px; color: var(--texto3); }
   @media (max-width: 560px) { .dl-fases { grid-template-columns: 1fr; } }
   .dl-fase { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 9px; background: rgba(255,255,255,.03); border: 1px solid var(--linha); }
-  .dl-fase.ativa { color: var(--texto); border-color: rgba(61,139,255,.45); background: rgba(61,139,255,.10); font-weight: 600; }
+  .dl-fase.ativa { color: var(--texto); border-color: rgba(163,255,18,.45); background: rgba(163,255,18,.10); font-weight: 600; }
   .dl-fase.pronta { color: var(--verde); border-color: rgba(134,211,164,.3); }
 
   /* ---------- seo por plataforma + novidades */
@@ -1037,20 +960,22 @@
   .upd-caixa { max-width: 480px; text-align: center; position: relative; overflow: hidden; }
   .upd-orbita {
     width: 72px; height: 72px; margin: 0 auto 16px; border-radius: 22px; display: grid; place-items: center;
-    background: linear-gradient(145deg, rgba(61,139,255,.22), rgba(226,194,122,.14));
-    border: 1px solid rgba(127,178,255,.38); box-shadow: 0 0 36px rgba(61,139,255,.26);
+    background: linear-gradient(145deg, rgba(163,255,18,.22), rgba(226,194,122,.14));
+    border: 1px solid rgba(197,255,112,.38); box-shadow: 0 0 36px rgba(163,255,18,.26);
     animation: updPulso 2.2s ease-in-out infinite;
   }
-  .upd-orbita .i { font-size: 30px; color: #9bc3ff; animation: girar 2.8s linear infinite; }
-  @keyframes updPulso { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); box-shadow: 0 0 48px rgba(61,139,255,.42); } }
+  .upd-orbita .i { font-size: 30px; color: #ceff8a; animation: girar 2.8s linear infinite; }
+  @keyframes updPulso { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); box-shadow: 0 0 48px rgba(163,255,18,.42); } }
   @keyframes girar { to { transform: rotate(360deg); } }
   .upd-etapas { display: grid; gap: 7px; margin: 16px 0 8px; text-align: left; font-size: var(--t5); }
   .upd-etapa {
     display: flex; align-items: center; gap: 9px; padding: 8px 12px; border-radius: 10px;
     background: rgba(255,255,255,.03); border: 1px solid var(--linha); color: var(--texto3); transition: .2s;
   }
-  .upd-etapa.ativa { color: var(--texto); border-color: rgba(61,139,255,.45); background: rgba(61,139,255,.10); font-weight: 600; }
+  .upd-etapa.ativa { color: var(--texto); border-color: rgba(163,255,18,.45); background: rgba(163,255,18,.10); font-weight: 600; }
   .upd-etapa.pronta { color: var(--verde); border-color: rgba(134,211,164,.3); }
+
+  .selo-info { display:inline-flex; padding:4px 9px; border-radius:99px; background:var(--marca-fundo); color:var(--marca-claro); font-size:11px; font-weight:700; }
 
   /* ---- modal de tutorial interativo (boas-vindas) ---- */
   .tut-caixa { max-width: 660px; padding: 26px 28px 22px; }
@@ -1066,17 +991,17 @@
     background: rgba(255,255,255,.06); font-size: 11px; font-weight: 700;
   }
   .tut-passo-btn.ativo {
-    border-color: rgba(61,139,255,.55); background: rgba(61,139,255,.12); color: var(--texto);
+    border-color: rgba(163,255,18,.55); background: rgba(163,255,18,.12); color: var(--texto);
   }
-  .tut-passo-btn.ativo .n { background: var(--marca); color: #061326; }
+  .tut-passo-btn.ativo .n { background: var(--marca); color: #101c09; }
   .tut-passo-btn.feito .n { background: rgba(134,211,164,.2); color: var(--verde); }
   .tut-slide { display: none; animation: tutFade .22s ease; }
   .tut-slide.ativo { display: block; }
   @keyframes tutFade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
   .tut-heroi {
     padding: 16px 18px; border-radius: 14px; margin-bottom: 14px;
-    background: linear-gradient(145deg, rgba(61,139,255,.12), rgba(255,255,255,.02));
-    border: 1px solid rgba(61,139,255,.25);
+    background: linear-gradient(145deg, rgba(163,255,18,.12), rgba(255,255,255,.02));
+    border: 1px solid rgba(163,255,18,.25);
   }
   .tut-heroi h3 { font-size: 18px; font-weight: 700; margin: 0 0 6px; display: flex; align-items: center; gap: 9px; color: var(--texto); }
   .tut-heroi h3 svg { color: var(--marca); }
@@ -1088,7 +1013,6 @@
   }
   .tut-card > b:first-child { display: flex; align-items: center; gap: 7px; color: var(--texto); font-size: var(--t5); margin-bottom: 4px; }
   .tut-card b { color: var(--texto); font-weight: 600; }
-  .tut-card.destaque-pro { border-color: rgba(226,194,122,.35); background: linear-gradient(145deg, rgba(226,194,122,.09), var(--superficie)); }
   .tut-dica {
     margin-top: 12px; padding: 10px 13px; border-radius: 10px;
     background: rgba(134,211,164,.08); border: 1px solid rgba(134,211,164,.24);
@@ -1104,168 +1028,20 @@
     .tut-grade2 { grid-template-columns: 1fr; }
   }
 
-  /* ---- oferta unica minimalista (estilo Linear/Apple, mesma identidade do app) ---- */
-  @property --of-ang { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
-  @keyframes ofGirar { to { --of-ang: 360deg; } }
-  .of-caixa {
-    max-width: 580px; padding: 30px 30px 24px; text-align: left; position: relative; overflow: hidden;
-    border: 1px solid rgba(127,178,255,.16);
-    border-radius: 22px;
-    background:
-      radial-gradient(ellipse 85% 50% at 50% -15%, rgba(61,139,255,.18), transparent 68%),
-      #0b0d12;
-    box-shadow: 0 36px 90px -24px rgba(0,0,0,.92), 0 0 48px -18px rgba(61,139,255,.35), inset 0 1px 0 rgba(255,255,255,.08);
-  }
-  .of-caixa::before, .vip-caixa::before {
-    content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px; pointer-events: none;
-    background: conic-gradient(
-      from var(--of-ang),
-      transparent 0deg,
-      rgba(61,139,255,.12) 220deg,
-      #3d8bff 295deg,
-      #a8ceff 330deg,
-      #3d8bff 350deg,
-      transparent 360deg
-    );
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    mask-composite: exclude;
-    animation: ofGirar 4.2s linear infinite;
-  }
-  .of-topo-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
-  .of-selo {
-    display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 99px;
-    background: rgba(61,139,255,.12); border: 1px solid rgba(127,178,255,.26);
-    color: #9ec5ff; font-size: 12px; font-weight: 500; letter-spacing: -.01em;
-  }
-  .of-selo svg { width: 13px; height: 13px; color: #7fb2ff; }
-  .of-x {
-    width: 32px; height: 32px; border-radius: 99px; border: 1px solid rgba(255,255,255,.10);
-    background: rgba(255,255,255,.04); color: var(--texto3); cursor: pointer; display: grid; place-items: center;
-    transition: background .15s, color .15s;
-  }
-  .of-x:hover { background: rgba(255,255,255,.09); color: var(--texto); }
-  .dsp-caixa.of-caixa .of-titulo {
-    font-size: 25px; line-height: 1.18; font-weight: 600; letter-spacing: -.035em; margin: 0 0 8px;
-    color: #f6f8fc; text-align: left;
-  }
-  .dsp-caixa.of-caixa .of-sub { margin: 0 0 20px; color: var(--texto2); font-size: 14px; font-weight: 400; line-height: 1.55; text-align: left; }
-  .of-sec-rot {
-    font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
-    color: var(--texto3); margin: 0 0 8px; display: flex; align-items: center; gap: 6px;
-  }
-  .of-sec-rot svg { width: 13px; height: 13px; color: #7fb2ff; margin: 0; vertical-align: 0; }
-  .of-duas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-  .of-box {
-    padding: 13px 15px; border-radius: 13px; background: rgba(255,255,255,.025);
-    border: 1px solid rgba(255,255,255,.08); display: grid; gap: 6px; align-content: start;
-  }
-  .of-box.pro {
-    background: linear-gradient(160deg, rgba(61,139,255,.11), rgba(61,139,255,.025));
-    border-color: rgba(127,178,255,.32);
-  }
-  .of-box-tit {
-    display: flex; align-items: center; justify-content: space-between; gap: 6px;
-    font-size: 13px; font-weight: 600; color: var(--texto); margin-bottom: 2px;
-  }
-  .of-box.pro .of-box-tit { color: #a8ceff; }
-  .of-box-tit .tag-m {
-    font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 99px;
-    background: rgba(255,255,255,.06); color: var(--texto3);
-  }
-  .of-box.pro .of-box-tit .tag-m { background: rgba(61,139,255,.22); color: #b5d4ff; }
-  .of-li { display: flex; align-items: flex-start; gap: 7px; font-size: 12px; color: var(--texto2); line-height: 1.45; }
-  .of-li svg { width: 13px; height: 13px; flex: none; margin-top: 2px; color: var(--texto3); }
-  .of-box.pro .of-li { color: #e2eeff; }
-  .of-box.pro .of-li svg { color: #5da0ff; }
-  .of-motor-txt { font-size: 12px; color: var(--texto3); line-height: 1.5; margin: 0; }
-  .of-box.pro .of-motor-txt { color: #cfe2ff; }
-  .of-ias {
-    display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
-    padding: 10px 14px; border-radius: 12px; margin-bottom: 14px;
-    background: rgba(61,139,255,.06); border: 1px solid rgba(127,178,255,.16);
-  }
-  .of-ias-rot { font-size: 11.5px; font-weight: 500; color: var(--texto2); display: inline-flex; align-items: center; gap: 6px; }
-  .of-ias-rot svg { width: 13px; height: 13px; color: #7fb2ff; margin: 0; vertical-align: 0; }
-  .of-ias-pills { display: flex; gap: 6px; flex-wrap: wrap; }
-  .of-ia-pill {
-    display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 99px;
-    background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.10);
-    font-size: 11.5px; font-weight: 500; color: var(--texto);
-  }
-  .of-ia-pill small { color: #8ec0ff; font-size: 10.5px; font-weight: 500; }
-  .of-preco-box {
-    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
-    padding: 16px 18px; border-radius: 14px; margin-bottom: 16px;
-    background: rgba(255,255,255,.032); border: 1px solid rgba(255,255,255,.09);
-  }
-  .of-preco-esq strong { display: block; font-size: 14.5px; font-weight: 600; color: var(--texto); letter-spacing: -.01em; }
-  .of-preco-esq span { display: block; font-size: 12.5px; color: var(--texto3); margin-top: 2px; }
-  .of-preco-dir { display: flex; align-items: baseline; gap: 9px; }
-  .of-preco-antes { font-size: 14px; font-weight: 400; color: var(--texto3); text-decoration: line-through; }
-  .of-preco-agora { font-size: 28px; font-weight: 600; letter-spacing: -.035em; color: #fff; line-height: 1; }
-  .of-cta-btn {
-    width: 100%; justify-content: center; padding: 13px 20px; border-radius: 12px;
-    border: 1px solid rgba(255,255,255,.18); cursor: pointer;
-    background: linear-gradient(180deg, #5da0ff 0%, #2f7bf6 100%); color: #051126;
-    font-size: 14.5px; font-weight: 650; letter-spacing: -.01em;
-    box-shadow: 0 12px 30px -10px rgba(61,139,255,.55), inset 0 1px 0 rgba(255,255,255,.45);
-    display: inline-flex; align-items: center; gap: 8px; transition: filter .18s, transform .15s;
-  }
-  .of-cta-btn:hover { filter: brightness(1.07); }
-  .of-cta-btn:active { transform: scale(.985); }
-  .of-cta-btn:disabled { opacity: .6; cursor: wait; }
-  .of-rodape {
-    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
-    margin-top: 12px; font-size: 12px; color: var(--texto3);
-  }
-  .of-fechar-link {
-    background: none; border: 0; padding: 4px 0; color: var(--texto3); font-size: 12.5px; font-weight: 500;
-    cursor: pointer; transition: color .15s;
-  }
-  .of-fechar-link:hover { color: var(--texto); }
-
-  /* ---- modal VIP de agradecimento especial ao assinar ---- */
-  .vip-caixa {
-    max-width: 540px; padding: 30px 28px 24px; text-align: center; position: relative; overflow: hidden;
-    border: 1px solid rgba(127,178,255,.28); border-radius: 22px;
-    background:
-      radial-gradient(ellipse 80% 50% at 50% -12%, rgba(61,139,255,.22), transparent 68%),
-      #0b0d12;
-    box-shadow: 0 36px 90px -24px rgba(0,0,0,.92), inset 0 1px 0 rgba(255,255,255,.08);
-  }
-  .vip-coroa {
-    width: 56px; height: 56px; margin: 0 auto 14px; border-radius: 16px; display: grid; place-items: center;
-    background: rgba(61,139,255,.15); border: 1px solid rgba(127,178,255,.32); color: #8ec0ff;
-  }
-  .vip-coroa svg { width: 26px; height: 26px; }
-  .vip-carta {
-    margin: 16px 0; padding: 16px 18px; border-radius: 14px; text-align: left;
-    background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08);
-    font-size: 13.5px; color: var(--texto2); line-height: 1.65; font-weight: 400;
-  }
-  .vip-carta strong { color: var(--texto); font-weight: 600; }
-  .vip-assinatura { margin-top: 12px; font-size: 12.5px; color: #9ec5ff; font-weight: 500; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
-  .vip-chave-box {
-    display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
-    padding: 12px 14px; border-radius: 12px; margin-bottom: 16px;
-    background: rgba(0,0,0,.35); border: 1px dashed rgba(127,178,255,.35);
-  }
-  .vip-chave-box code { font: 600 15px Consolas, monospace; color: #8ec0ff; letter-spacing: .8px; }
-  @media (max-width: 600px) { .of-duas { grid-template-columns: 1fr; } .of-caixa { padding: 22px 20px 18px; } }
 </style>
 </head>
 <body data-modo="fluxo">
 <div class="topo">
-  <div class="marca-logo"><i data-lucide="scissors" class="i"></i></div>
-  <h1>Cortador Automático</h1>
+  <img class="marca-logo" src="/ui/estudio.svg" alt="">
+  <h1>Estúdio Criativo Cortes</h1>
+  <span class="versao-app" data-versao-app aria-label="Versão do programa">…</span>
+  <button class="btn p" type="button" data-abrir-identidade><i data-lucide="stamp" class="i"></i> Identidade</button>
   <form class="link-topo" id="formLinkTopo" autocomplete="off">
     <i data-lucide="link-2" class="i"></i>
     <input type="text" id="linkTopo" placeholder="Cole aqui o link da live ou do vídeo · Kick, Twitch ou YouTube" aria-label="Link da live ou do vídeo">
     <button class="btn principal p" id="btnLinkTopo" type="submit">Ir</button>
   </form>
-  <button class="btn p btn-pro-topo" id="btnTopoPro" type="button"><i data-lucide="sparkles" class="i"></i> <span id="txtTopoPro">Pro</span></button>
+
   <button class="btn p" id="btnTopoTutorial" type="button" title="Abrir tutorial passo a passo"><i data-lucide="circle-help" class="i"></i> Como usar</button>
   <button class="btn p" id="btnProjetos"><i data-lucide="folder-kanban" class="i"></i> Projetos</button>
   <button class="btn p" id="btnAjustes"><i data-lucide="settings-2" class="i"></i> Ajustes</button>
@@ -1538,25 +1314,11 @@
     <h2>O que você quer nos cortes</h2>
     <p class="sub">De que parte do vídeo, e que tipo de momento. Pode marcar mais de um.</p>
 
+    <div class="cartao identidade-resumo"><div><b>Vinheta e marca d’água</b><p data-identidade-resumo>Personalize a assinatura dos seus cortes.</p></div><button class="btn" type="button" data-abrir-identidade>Configurar identidade</button></div>
+
     <div class="cartao" id="cartaoMotor">
       <label class="rot"><i data-lucide="sparkles" class="i"></i> Inteligência que escolhe os cortes</label>
-      <div class="motores" id="seletorMotor">
-        <button type="button" class="motor-op" data-motor="local" aria-pressed="true">
-          <div class="motor-topo">
-            <b><i data-lucide="cpu" class="i"></i> Motor Local</b>
-            <span class="pilula-pro gratis">Grátis · Ilimitado</span>
-          </div>
-          <p>Acha os melhores momentos pelas reações, volume da voz, ritmo e palavras-chave. Roda 100% offline no seu PC.</p>
-        </button>
-        <button type="button" class="motor-op pro" data-motor="ia" aria-pressed="false">
-          <div class="motor-topo">
-            <b><i data-lucide="sparkles" class="i" style="color:var(--marca-claro)"></i> Diretor IA Pro · Gemini</b>
-            <span class="pilula-pro" id="seloMotorIa">3 testes grátis</span>
-          </div>
-          <p>Mais precisão, qualidade e engajamento: o Google Gemini lê a história inteira, encontra exatamente o momento que você descrever e entrega gancho de 4s, títulos e SEO prontos.</p>
-          <p style="font-size:11px; color:var(--texto3)" id="motorIaProvedorTxt">Google Gemini incluso · ou conecte seu Claude / ChatGPT</p>
-        </button>
-      </div>
+      <p>Processamento local, sem assinatura: detecta reações, ritmo e palavras-chave no seu computador.</p>
     </div>
 
     <div class="cartao">
@@ -1685,23 +1447,7 @@
 
       <div class="cartao">
         <label class="rot"><i data-lucide="sparkles" class="i"></i> Inteligência dos cortes na live</label>
-        <div class="motores" id="seletorMotorLive">
-          <button type="button" class="motor-op" data-motor="local" aria-pressed="true">
-            <div class="motor-topo">
-              <b><i data-lucide="cpu" class="i"></i> Motor Local</b>
-              <span class="pilula-pro gratis">Grátis · Ilimitado</span>
-            </div>
-            <p>Detecta picos de voz e explosões do chat e gera título + SEO localmente no seu PC.</p>
-          </button>
-          <button type="button" class="motor-op pro" data-motor="ia" aria-pressed="false">
-            <div class="motor-topo">
-              <b><i data-lucide="sparkles" class="i" style="color:var(--amarelo)"></i> Diretor IA Pro na Live</b>
-              <span class="pilula-pro" id="seloMotorIaLive">1 live grátis · 15 min</span>
-            </div>
-            <p>A IA ouve cada clipe da live, refina o começo/fim exato da fala, queima o gancho de 4s e cria o SEO de cada rede.</p>
-            <p style="font-size:11px; color:var(--texto3)" id="motorIaLiveSub">Usa 1 dos 3 testes grátis (válido por 15 min na live) · Assinante Pro usa sem limite!</p>
-          </button>
-        </div>
+        <p>Processamento local, sem assinatura: detecta reações, ritmo e palavras-chave no seu computador.</p>
       </div>
 
       <div class="cartao av-cfg">
@@ -1784,14 +1530,14 @@
         <button class="btn principal p" id="btnAvReconectarAgora" type="button"><i data-lucide="refresh-cw" class="i"></i> Reconectar agora</button>
       </div>
 
-      <div class="cartao" id="avBarraPro" style="margin-bottom:14px; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap">
+      <div class="cartao" id="avBarraMotor" style="margin-bottom:14px; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap">
         <div style="display:flex; align-items:center; gap:9px; font-size:var(--t5)">
           <i data-lucide="sparkles" class="i" style="color:var(--amarelo)"></i>
           <span id="avStatusMotorTxt">Motor Local ativo nesta live</span>
         </div>
         <div style="display:flex; gap:8px; align-items:center">
-          <button class="btn p" id="btnAlternarIaLive" type="button">Usar Diretor IA Pro</button>
-          <button class="btn p btn-pro-topo" id="btnUpgradeLive" type="button" hidden>Atualizar plano Pro</button>
+
+
         </div>
       </div>
 
@@ -1953,15 +1699,7 @@
       </div>
     </div>
 
-    <div class="cartao" id="cardSugestaoProResultado" hidden style="margin-bottom:16px; border-color:rgba(226,194,122,.4); background:linear-gradient(145deg, rgba(226,194,122,.10), rgba(61,139,255,.06)); display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap">
-      <div style="flex:1; min-width:240px">
-        <b id="sugProResTitulo" style="color:var(--amarelo); font-size:var(--t4); display:block; margin-bottom:4px">✨ Leve seus cortes pro próximo nível com o Diretor IA Pro</b>
-        <span id="sugProResTexto" style="font-size:var(--t5); color:var(--texto2); line-height:1.5"></span>
-      </div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap">
-        <button class="btn principal p" id="btnSugProUpgrade" type="button"><i data-lucide="zap" class="i"></i> Fazer Upgrade Pro</button>
-      </div>
-    </div>
+
 
     <div class="aviso-ia" role="note"><i data-lucide="sparkles" class="i"></i><span><b>A IA pode cometer falhas.</b> Confira o corte, a legenda e o título antes de postar. Tudo dá pra corrigir no editor.</span></div>
 
@@ -1988,117 +1726,13 @@
   <button class="btn principal" id="btnAvancar" disabled>Continuar <i data-lucide="chevron-right" class="i"></i></button>
 </div>
 
-<div class="dsp-fundo" id="modalPro" hidden role="dialog" aria-modal="true" aria-labelledby="proModalTitulo">
-  <div class="dsp-caixa pro-caixa">
-    <div class="of-topo-row" style="margin-bottom:14px">
-      <span class="of-selo" id="proModalSelo"><i data-lucide="sparkles" class="i"></i> Cortador Pro · Google Gemini incluso</span>
-      <button class="of-x" id="btnFecharPro" type="button" aria-label="Fechar"><i data-lucide="x" class="i"></i></button>
-    </div>
-    <h2 id="proModalTitulo">Mais precisão, qualidade e engajamento com Google Gemini.</h2>
-    <p id="proModalSub">Compare o que já é gratuito para sempre com o que você desbloqueia no Plano Pro — e veja como os dois motores trabalham:</p>
 
-    <div class="of-sec-rot"><i data-lucide="layers" class="i"></i> 1. Recursos · Grátis vs. Plano Pro</div>
-    <div class="of-duas">
-      <div class="of-box">
-        <div class="of-box-tit"><span>Plano Grátis</span><span class="tag-m">Pra sempre</span></div>
-        <div class="of-li"><i data-lucide="check" class="i"></i><span>Cortes ilimitados em vídeos e lives</span></div>
-        <div class="of-li"><i data-lucide="check" class="i"></i><span>Enquadramento 9:16 + webcam automática</span></div>
-        <div class="of-li"><i data-lucide="check" class="i"></i><span>Legenda palavra por palavra + áudio sincronizado</span></div>
-        <div class="of-li"><i data-lucide="check" class="i"></i><span>3 testes grátis do Pro (até 1 live de 15 min)</span></div>
-      </div>
-      <div class="of-box pro">
-        <div class="of-box-tit"><span>Plano Pro</span><span class="tag-m">Completo</span></div>
-        <div class="of-li"><i data-lucide="check" class="i"></i><span>Tudo do grátis + Google Gemini já incluso</span></div>
-        <div class="of-li"><i data-lucide="check" class="i"></i><span>Lives inteiras com IA sem limite de 15 min</span></div>
-        <div class="of-li"><i data-lucide="check" class="i"></i><span>Até 80 vídeos/mês com precisão de editor</span></div>
-        <div class="of-li"><i data-lucide="check" class="i"></i><span>Gancho 4s + títulos e SEO por rede</span></div>
-      </div>
-    </div>
-
-    <div class="of-sec-rot"><i data-lucide="cpu" class="i"></i> 2. Diferença dos motores</div>
-    <div class="of-duas">
-      <div class="of-box">
-        <div class="of-box-tit"><span>Motor Local</span><span class="tag-m">Offline no PC</span></div>
-        <p class="of-motor-txt">Corta por <b>volume da voz, explosão do chat e palavras-chave</b>. Ótimo pra gritos e reações rápidas, mas não lê o contexto da história.</p>
-      </div>
-      <div class="of-box pro">
-        <div class="of-box-tit"><span>Diretor IA Pro · Gemini</span><span class="tag-m">Alta precisão</span></div>
-        <p class="of-motor-txt">O <b>Google Gemini</b> entende a conversa inteira, corta no ponto exato com precisão de editor pra gerar mais engajamento — <b>e ainda encontra qualquer momento que você escrever.</b></p>
-      </div>
-    </div>
-
-    <div class="of-ias">
-      <span class="of-ias-rot"><i data-lucide="plug" class="i"></i> Integração de IA</span>
-      <div class="of-ias-pills">
-        <span class="of-ia-pill">Google Gemini <small>incluso</small></span>
-        <span class="of-ia-pill">Claude <small>API própria</small></span>
-        <span class="of-ia-pill">ChatGPT <small>API própria</small></span>
-      </div>
-    </div>
-
-    <div id="proConviteBanner" class="pro-espera" hidden>
-      <b style="color:#9ec5ff; font-size:13.5px; font-weight:600" id="proConviteTitulo">Diretor IA Pro</b>
-      <div style="color:var(--texto2); margin-top:4px; line-height:1.5" id="proConviteTexto"></div>
-    </div>
-
-    <div id="proPainelAtivo" class="pro-espera" hidden style="border-color:rgba(134,211,164,.35); background:rgba(134,211,164,.07)">
-      <b style="color:var(--verde); font-size:var(--t3)" id="proAtivoPlano">⚡ Cortador Pro Ativo</b>
-      <div style="color:var(--texto2); margin-top:4px" id="proAtivoMeta"></div>
-      <div style="margin-top:10px; display:flex; gap:8px; align-items:center; flex-wrap:wrap">
-        <code id="proAtivoChave" style="padding:4px 9px; border-radius:7px; background:var(--superficie); border:1px solid var(--linha2)"></code>
-        <button class="btn p" id="btnSairChavePro" type="button">Trocar chave</button>
-      </div>
-    </div>
-
-    <div id="proPainelEspera" class="pro-espera" hidden>
-      <b style="color:#9ec5ff">Aguardando confirmação do pagamento...</b>
-      <div style="color:var(--texto2); margin-top:4px" id="proEsperaTxt">Conclua o Pix ou Cartão na aba da InfinitePay que abriu. Assim que aprovar, seu Cortador Pro <b>ativa sozinho aqui na tela</b>!</div>
-      <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap">
-        <a class="btn principal p" id="btnReabrirCheckout" href="#" target="_blank" rel="noopener">Abrir pagamento novamente</a>
-        <button class="btn p" id="btnCancelarEspera" type="button">Cancelar</button>
-      </div>
-    </div>
-
-    <div id="proPlanosWrap">
-      <div class="pro-planos" id="proPlanosLista"></div>
-    </div>
-
-    <div class="pro-chave-bloco">
-      <label class="rot" for="selProvedorIa"><i data-lucide="plug" class="i"></i> Qual IA analisa seus cortes</label>
-      <div class="pro-provedores" id="proProvedores">
-        <button type="button" class="pro-prov" data-prov="gemini" aria-pressed="true"><b>Google Gemini</b><small>Nativo · já incluso</small></button>
-        <button type="button" class="pro-prov" data-prov="anthropic" aria-pressed="false"><b>Claude</b><small>Sua chave da Anthropic</small></button>
-        <button type="button" class="pro-prov" data-prov="openai" aria-pressed="false"><b>ChatGPT</b><small>Sua chave da OpenAI</small></button>
-      </div>
-      <div id="proChavePropriaWrap" hidden>
-        <div class="pro-chave-linha">
-          <input type="password" id="inputChaveIa" placeholder="Cole sua chave de API" autocomplete="off" spellcheck="false" style="text-transform:none; letter-spacing:0">
-          <input type="text" id="inputModeloIa" placeholder="Modelo (opcional)" autocomplete="off" spellcheck="false" style="max-width:170px; text-transform:none; letter-spacing:0">
-        </div>
-        <small style="display:block; color:var(--texto3); font-size:var(--t6); margin-top:6px" id="proChaveDica"></small>
-      </div>
-      <div style="margin-top:8px; display:flex; gap:8px; align-items:center; flex-wrap:wrap">
-        <button class="btn p" id="btnSalvarProvedor" type="button"><i data-lucide="check" class="i"></i> Salvar escolha</button>
-        <span class="pasta-status" id="proProvedorMsg" style="margin:0"></span>
-      </div>
-    </div>
-
-    <div class="pro-chave-bloco">
-      <label class="rot" for="inputChavePro"><i data-lucide="key-round" class="i"></i> Já tem uma chave de ativação?</label>
-      <div class="pro-chave-linha">
-        <input type="text" id="inputChavePro" placeholder="CORT-XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false">
-        <button class="btn principal" id="btnAtivarChave" type="button">Ativar</button>
-      </div>
-      <div class="pasta-status" id="proStatusMsg"></div>
-    </div>
-  </div>
-</div>
 
 <div class="dsp-fundo" id="modalAutoUpdate" hidden role="dialog" aria-modal="true" aria-labelledby="autoUpdTitulo" style="z-index:260">
   <div class="dsp-caixa upd-caixa">
     <div class="upd-orbita" id="autoUpdOrbita"><i data-lucide="refresh-cw" class="i"></i></div>
-    <span class="pilula-pro" id="autoUpdSelo">Nova atualização encontrada no GitHub</span>
-    <h2 id="autoUpdTitulo" style="margin-top:10px">Atualizando o Cortador Automático</h2>
+    <span class="selo-info" id="autoUpdSelo">Nova atualização encontrada no GitHub</span>
+    <h2 id="autoUpdTitulo" style="margin-top:10px">Atualizando o Estúdio Criativo Cortes</h2>
     <p id="autoUpdResumo" style="margin:6px auto 14px; color:var(--texto2); font-size:var(--t5)">Baixando a versão mais recente para manter tudo sincronizado...</p>
     <div class="barra-fora"><div class="barra-dentro" id="autoUpdBarra" style="width:18%; transition:width .45s ease"></div></div>
     <div class="upd-etapas" id="autoUpdEtapas">
@@ -2112,117 +1746,16 @@
   </div>
 </div>
 
-<div class="dsp-fundo" id="modalOferta20" hidden role="dialog" aria-modal="true" aria-labelledby="oferta20Titulo" style="z-index:240">
-  <div class="dsp-caixa of-caixa">
-    <div class="of-topo-row">
-      <span class="of-selo"><i data-lucide="sparkles" class="i"></i> Condição especial · válida somente nesta tela</span>
-      <button class="of-x" id="btnFecharOferta20X" type="button" aria-label="Fechar"><i data-lucide="x" class="i"></i></button>
-    </div>
 
-    <h2 class="of-titulo" id="oferta20Titulo">Mais precisão, qualidade e engajamento com Google Gemini.</h2>
-    <p class="of-sub">
-      Veja a diferença nos recursos e nos motores. Ao fechar esta mensagem, o valor volta para R$&nbsp;24,90.
-    </p>
 
-    <div class="of-sec-rot"><i data-lucide="layers" class="i"></i> 1. Recursos · Grátis vs. Plano Pro</div>
-    <div class="of-duas">
-      <div class="of-box">
-        <div class="of-box-tit"><span>Plano Grátis</span><span class="tag-m">Pra sempre</span></div>
-        <div class="of-li"><i data-lucide="check" class="i"></i><span>Cortes ilimitados em vídeos e lives</span></div>
-        <div class="of-li"><i data-lucide="check" class="i"></i><span>Enquadramento 9:16 + webcam</span></div>
-        <div class="of-li"><i data-lucide="check" class="i"></i><span>Legenda + áudio sincronizado</span></div>
-        <div class="of-li"><i data-lucide="check" class="i"></i><span>3 testes grátis (1 live de 15 min)</span></div>
-      </div>
-      <div class="of-box pro">
-        <div class="of-box-tit"><span>Plano Pro</span><span class="tag-m">Completo</span></div>
-        <div class="of-li"><i data-lucide="check" class="i"></i><span>Tudo do grátis + Google Gemini incluso</span></div>
-        <div class="of-li"><i data-lucide="check" class="i"></i><span>Lives inteiras com IA sem limite</span></div>
-        <div class="of-li"><i data-lucide="check" class="i"></i><span>Até 80 vídeos/mês com IA de editor</span></div>
-        <div class="of-li"><i data-lucide="check" class="i"></i><span>Gancho 4s + títulos e SEO por rede</span></div>
-      </div>
-    </div>
 
-    <div class="of-sec-rot"><i data-lucide="cpu" class="i"></i> 2. Diferença dos motores</div>
-    <div class="of-duas">
-      <div class="of-box">
-        <div class="of-box-tit"><span>Motor Local</span><span class="tag-m">Grátis</span></div>
-        <p class="of-motor-txt">Escolhe por <b>volume, chat e palavras-chave</b>. Ótimo para reações rápidas, mas sem ler o contexto da história.</p>
-      </div>
-      <div class="of-box pro">
-        <div class="of-box-tit"><span>Diretor IA Pro · Gemini</span><span class="tag-m">Precisão</span></div>
-        <p class="of-motor-txt">O <b>Google Gemini</b> entende a conversa inteira, corta no ponto exato com precisão de editor pra gerar mais engajamento — <b>e ainda encontra qualquer momento que você escrever.</b></p>
-      </div>
-    </div>
-
-    <div class="of-ias">
-      <span class="of-ias-rot"><i data-lucide="plug" class="i"></i> Integração de IA</span>
-      <div class="of-ias-pills">
-        <span class="of-ia-pill">Google Gemini <small>incluso</small></span>
-        <span class="of-ia-pill">Claude <small>API própria</small></span>
-        <span class="of-ia-pill">ChatGPT <small>API própria</small></span>
-      </div>
-    </div>
-
-    <div class="of-preco-box">
-      <div class="of-preco-esq">
-        <strong>Passe 30 dias · Diretor IA Pro</strong>
-        <span>Pix ou cartão · sem renovação automática</span>
-      </div>
-      <div class="of-preco-dir">
-        <span class="of-preco-antes">R$ 24,90</span>
-        <span class="of-preco-agora">R$ 20,00</span>
-      </div>
-    </div>
-
-    <button class="of-cta-btn" id="btnGarantirOferta20" type="button">
-      <i data-lucide="zap" class="i"></i> Desbloquear Pro por R$ 20,00
-    </button>
-
-    <div class="of-rodape">
-      <span>Ativação automática na tela via InfinitePay</span>
-      <button class="of-fechar-link" id="btnFecharOferta20" type="button">Agora não</button>
-    </div>
-    <div class="pasta-status" id="oferta20Status" style="margin-top:8px; text-align:center"></div>
-  </div>
-</div>
-
-<div class="dsp-fundo" id="modalBoasVindasPro" hidden role="dialog" aria-modal="true" aria-labelledby="vipTitulo" style="z-index:255">
-  <div class="dsp-caixa vip-caixa">
-    <div class="vip-coroa"><i data-lucide="sparkles" class="i"></i></div>
-    <span class="of-selo" style="margin-bottom:10px">Cortador Pro ativado</span>
-    <h2 id="vipTitulo" style="margin:4px 0 4px; font-size:23px; font-weight:600; letter-spacing:-.03em; color:#f6f8fc">Obrigado por apoiar o Cortador Automático!</h2>
-    <p id="vipSub" style="margin:0; font-size:13.5px; color:var(--texto2)">Seu Diretor IA Pro já está liberado neste computador.</p>
-
-    <div class="vip-carta">
-      De coração, <strong>muito obrigado por acreditar no nosso trabalho.</strong><br><br>
-      Você acabou de liberar o <strong>Diretor IA Pro</strong> completo — lives inteiras sem limite de tempo, cortes com contexto real, ganchos de retenção e SEO por rede — e está ajudando um projeto independente brasileiro a continuar evoluindo toda semana.<br><br>
-      Se tiver qualquer sugestão ou ideia de recurso novo, me manda uma mensagem no Instagram <strong>@gabriel.workspace</strong>.
-      <div class="vip-assinatura">
-        <span>— Gabriel Workspace</span>
-        <span id="vipValidade" style="color:var(--texto3)"></span>
-      </div>
-    </div>
-
-    <div class="vip-chave-box" id="vipChaveWrap" hidden>
-      <div style="text-align:left">
-        <div style="font-size:11px; color:var(--texto3); letter-spacing:.04em">Sua chave de ativação</div>
-        <code id="vipChaveTxt"></code>
-      </div>
-      <button class="btn p" id="btnVipCopiarChave" type="button"><i data-lucide="copy" class="i"></i> Copiar</button>
-    </div>
-
-    <button class="of-cta-btn" id="btnVipComecar" type="button">
-      Começar a cortar com o Diretor IA Pro
-    </button>
-  </div>
-</div>
 
 <div class="dsp-fundo" id="modalTutorial" hidden role="dialog" aria-modal="true" aria-labelledby="tutTitulo" style="z-index:220">
   <div class="dsp-caixa tut-caixa">
     <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px">
       <div>
-        <span class="pilula-pro">Como usar · Guia rápido</span>
-        <h2 id="tutTitulo" style="margin-top:8px">Bem-vindo ao Cortador Automático!</h2>
+        <span class="selo-info">Como usar · Guia rápido</span>
+        <h2 id="tutTitulo" style="margin-top:8px">Bem-vindo ao Estúdio Criativo Cortes!</h2>
       </div>
       <button class="btn p" id="btnFecharTutorial" type="button" aria-label="Fechar tutorial"><i data-lucide="x" class="i"></i></button>
     </div>
@@ -2231,7 +1764,7 @@
     <div class="tut-passos-barra" id="tutBarraPassos">
       <button type="button" class="tut-passo-btn ativo" data-tut-ir="0"><span class="n">1</span><span>Vídeo ou Live</span></button>
       <button type="button" class="tut-passo-btn" data-tut-ir="1"><span class="n">2</span><span>Formato em pé</span></button>
-      <button type="button" class="tut-passo-btn" data-tut-ir="2"><span class="n">3</span><span>Grátis ou Pro</span></button>
+      <button type="button" class="tut-passo-btn" data-tut-ir="2"><span class="n">3</span><span>Personalizar</span></button>
       <button type="button" class="tut-passo-btn" data-tut-ir="3"><span class="n">4</span><span>Editar e Postar</span></button>
     </div>
 
@@ -2277,26 +1810,7 @@
       </div>
     </div>
 
-    <div class="tut-slide" data-tut-slide="2">
-      <div class="tut-heroi">
-        <h3><i data-lucide="sparkles" class="i"></i> 3. Escolha o motor: Grátis ou Diretor IA Pro</h3>
-        <p>Você decide qual inteligência vai analisar a conversa e separar os melhores momentos:</p>
-      </div>
-      <div class="tut-grade2">
-        <div class="tut-card">
-          <b><i data-lucide="cpu" class="i" style="color:var(--verde)"></i> Motor Local · 100% Grátis</b>
-          Funciona direto no seu computador, sem cadastro e <b>sem limite de cortes para sempre</b>. Identifica picos de voz, risadas, reações e agitação do chat.
-        </div>
-        <div class="tut-card destaque-pro">
-          <b><i data-lucide="sparkles" class="i" style="color:var(--amarelo)"></i> Diretor IA Pro · 3 usos grátis</b>
-          Entende o contexto inteiro da conversa, corta no ponto certo da história e cria ganchos e títulos fortes. Você tem <b>3 usos grátis</b>: pode usar 2 em vídeos e escolher se usa o 3º em mais 1 vídeo ou em <b>1 live por 15 minutos</b>.
-        </div>
-      </div>
-      <div class="tut-dica">
-        <i data-lucide="crown" class="i"></i>
-        <span>Quem assina o <b>Plano Pro</b> (via Pix ou Cartão aqui mesmo no programa) usa o Diretor IA em vídeos e durante toda a live, sem limite de 15 minutos!</span>
-      </div>
-    </div>
+    <div class="tut-slide" data-tut-slide="2"><div class="tut-card"><h3>3. Personalize os cortes</h3><p>Escolha o trecho, a duração e os tipos de momento. O processamento é local e não exige assinatura.</p></div></div>
 
     <div class="tut-slide" data-tut-slide="3">
       <div class="tut-heroi">
@@ -2310,7 +1824,7 @@
         </div>
         <div class="tut-card">
           <b><i data-lucide="sliders-horizontal" class="i" style="color:var(--verde)"></i> Edição fácil e pasta no PC</b>
-          Quer mudar o segundo inicial, o final ou corrigir alguma palavra da legenda? Clique em <b>Editar</b>. Todos os cortes ficam salvos em <b>Vídeos &gt; Cortador Automatico</b>.
+          Quer mudar o segundo inicial, o final ou corrigir alguma palavra da legenda? Clique em <b>Editar</b>. Todos os cortes ficam salvos em <b>Vídeos &gt; Estúdio Criativo Cortes</b>.
         </div>
       </div>
       <div class="tut-dica">
@@ -2322,7 +1836,7 @@
     <div class="tut-rodape">
       <div style="display:flex; gap:8px; align-items:center">
         <button class="btn p" id="btnTutPular" type="button">Pular guia</button>
-        <button class="btn p" id="btnTutVerNovidades" type="button"><i data-lucide="gift" class="i"></i> Ver novidades da v2.0.8</button>
+        <button class="btn p" id="btnTutVerNovidades" type="button"><i data-lucide="gift" class="i"></i> Ver novidades desta versão</button>
       </div>
       <div style="display:flex; gap:8px; align-items:center">
         <button class="btn p" id="btnTutVoltar" type="button" hidden><i data-lucide="chevron-left" class="i"></i> Voltar</button>
@@ -2336,20 +1850,17 @@
   <div class="dsp-caixa nov-caixa">
     <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px">
       <div>
-        <span class="pilula-pro">Atualização v2.0.8 · O que mudou</span>
+        <span class="selo-info"><span data-versao-app>…</span> · O que mudou</span>
         <h2 id="novTitulo" style="margin-top:8px">Novidades e melhorias desta versão</h2>
       </div>
       <button class="btn p" id="btnFecharNovidades" type="button" aria-label="Fechar"><i data-lucide="x" class="i"></i></button>
     </div>
     <p style="margin:6px 0 0; color:var(--texto2)">Confira tudo o que foi atualizado para deixar seus cortes mais precisos, sincronizados e prontos para viralizar:</p>
     <ul class="nov-lista">
-      <li><i data-lucide="refresh-cw" class="i"></i><div><b>Agora o aplicativo atualiza sozinho!</b>Sempre que sair uma melhoria ou correção nova no GitHub, o próprio programa avisa, baixa em segundos com tela de progresso e reinicia atualizado — sem precisar baixar o instalador de novo.</div></li>
-      <li><i data-lucide="trash-2" class="i"></i><div><b>Apagar projetos direto pelo programa</b>Exclua os projetos que não precisa mais direto da lista de <b>Projetos</b> ou dentro de um projeto aberto, com confirmação segura para liberar espaço no disco na hora.</div></li>
-      <li><i data-lucide="sparkles" class="i"></i><div><b>Diretor IA Pro em Vídeo e em Live (3 usos grátis inclusos)</b>Entende a conversa inteira, corta no início e fim exatos da história e cria ganchos e títulos virais (com Gemini nativo incluso ou sua chave Claude/ChatGPT). Use seus 3 testes grátis (2 em vídeos + 1 vídeo ou 1 live de 15 min) — e no Plano Pro use na live inteira sem limite!</div></li>
-      <li><i data-lucide="audio-lines" class="i"></i><div><b>Áudio 100% sincronizado e vídeo fluido nas lives (YouTube, Kick e Twitch)</b>Nova sincronização de áudio e vídeo em vídeos gravados e lives ao vivo — corrigido o bug que podia congelar a imagem em cortes de lives do YouTube e eliminando qualquer atraso na voz do streamer.</div></li>
-      <li><i data-lucide="monitor-play" class="i"></i><div><b>Prévia do vídeo + Escolha de resolução antes de baixar</b>Veja capa, canal e duração na hora, escolha entre 480p, 720p, 1080p, 1440p ou 4K e acompanhe velocidade e tempo restante em qualquer conexão de internet.</div></li>
-      <li><i data-lucide="flame" class="i"></i><div><b>Detector de Live mais esperto + Títulos prontos por rede</b>Reconhece muito melhor os momentos de reação na live, corta silêncios no início e entrega botões prontos de legenda e hashtags para <b>TikTok, Shorts e Reels</b>.</div></li>
-      <li><i data-lucide="scan-face" class="i"></i><div><b>Detecção automática da webcam em 6 posições</b>Encontra a câmera do streamer nos 4 cantos e também nas laterais da tela, tanto em vídeos gravados quanto nas lives ao vivo.</div></li>
+      <li><i data-lucide="rotate-ccw" class="i"></i><div><b>Resetar identidade</b>Limpe os anexos e restaure os parâmetros. Salve para gerar os próximos cortes sem vinheta e sem marca d’água.</div></li>
+      <li><i data-lucide="clapperboard" class="i"></i><div><b>Vinheta de 2 segundos</b>Adicione sua abertura ou encerramento em cada corte, preservando o conteúdo e a sincronia das legendas.</div></li>
+      <li><i data-lucide="stamp" class="i"></i><div><b>Marca d’água ajustável</b>Envie sua imagem, escolha posição, tamanho e opacidade e salve para os próximos projetos.</div></li>
+      <li><i data-lucide="tag" class="i"></i><div><b>Versão sempre visível</b>O número no topo acompanha a versão instalada do Estúdio Criativo Cortes.</div></li>
     </ul>
     <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap">
       <button class="btn p" id="btnNovAbrirTutorial" type="button"><i data-lucide="circle-help" class="i"></i> Ver tutorial passo a passo</button>
@@ -2482,12 +1993,10 @@
     </div>
 
     <div class="grupo assinatura">
-      <img src="/ui/icone.png" alt="">
+      <img src="/ui/estudio.svg" alt="">
       <div>
-        <b>Cortador Automático</b>
-        <span>por <b>Gabriel Workspace</b></span>
-        <a href="https://www.instagram.com/gabriel.workspace/" target="_blank" rel="noopener">Instagram @gabriel.workspace</a>
-        <a href="https://gabrielworkspace.github.io/cortador-automatico/" target="_blank" rel="noopener">Site e versão nova</a>
+        <b>Estúdio Criativo Cortes</b>
+        <span>Edição personalizada · @erichpereira22</span>
         <span class="ia">A IA pode cometer falhas. Confira sempre antes de postar.</span>
       </div>
     </div>
@@ -2664,8 +2173,8 @@
         return await fetchOriginal(recurso, opcoes);
       } catch (e2) {
         if (e2 && e2.name === 'AbortError') throw e2;
-        throw new Error('A janela perdeu a conexão com o programa. Feche o Cortador Automático e abra de novo. ' +
-          'Se continuar, o antivírus pode estar bloqueando: libere a pasta do Cortador Automático nele.');
+        throw new Error('A janela perdeu a conexão com o programa. Feche o Estúdio Criativo Cortes e abra de novo. ' +
+          'Se continuar, o antivírus pode estar bloqueando: libere a pasta do Estúdio Criativo Cortes nele.');
       }
     }
   };
@@ -2676,7 +2185,7 @@
       '<h1 style="font-size:21px;margin-bottom:14px">Esse não é o arquivo certo pra abrir</h1>' +
       '<p style="color:#a6b0bf;margin-bottom:20px">Este é só o desenho da tela. Quem corta o vídeo é o programa que roda por trás.</p>' +
       '<div style="background:#131822;border:1px solid #242c38;border-radius:14px;padding:20px;text-align:left;color:#a6b0bf">' +
-      'Feche esta janela, volte na pasta e dê dois cliques em <b style="color:#7fb2ff">iniciar</b>. ' +
+      'Feche esta janela, volte na pasta e dê dois cliques em <b style="color:#c5ff70">iniciar</b>. ' +
       'Vai abrir uma janela preta — deixe ela aberta. A tela do programa abre sozinha.</div></div>';
     return;
   }
@@ -2693,7 +2202,7 @@
 
   // ------------------------------------------------------------ estado
   // Chave nova: nada dos ajustes da versao antiga vem junto
-  const LEMBRAR = 'cortador.automatico.v1';
+  const LEMBRAR = 'estudio.criativo.cortes.v1';
   let arquivo = null, duracaoVideo = 0, pastaSaida = null;
   let projetoAtual = null, processandoAgora = false;
   let trechoFluxo = null; // { inicio, fim, modo } marcado antes de gerar, so vale pro video escolhido
@@ -2718,7 +2227,7 @@
 
   // o que ele ajustou fica salvo - remarcar a webcam todo dia era um saco
   try {
-    const salvo = JSON.parse(localStorage.getItem(LEMBRAR) || 'null');
+    const salvo = JSON.parse(localStorage.getItem(LEMBRAR) || localStorage.getItem('cortador.automatico.v1') || 'null');
     if (salvo) {
       const rec = Object.assign(cfg.recorte, salvo.recorte || {});
       Object.assign(cfg, salvo);
@@ -2726,6 +2235,7 @@
       cfg.av = Object.assign({ formato: 'split', canto: 'se', tamanho: 'media', duracao: 30, auto: true, sens: 'media', clipDur: 30 }, salvo.av || {});
     }
   } catch (_) {}
+  cfg.motor = 'local'; // Migra preferências antigas para o processamento local.
   const guardar = () => { try { localStorage.setItem(LEMBRAR, JSON.stringify(cfg)); } catch (_) {} };
 
   const mmss = (s) => { s = Math.max(0, Math.round(s || 0)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
@@ -3669,7 +3179,7 @@
   $('discos').addEventListener('click', (e) => {
     const b = e.target.closest('button[data-raiz]');
     if (!b || b.getAttribute('aria-pressed') === 'true') return;
-    mudarPasta({ pasta: b.dataset.raiz + 'CortadorAutomatico' });
+    mudarPasta({ pasta: b.dataset.raiz + 'EstudioCriativoCortes' });
   });
   $('btnEscolherPasta').addEventListener('click', async () => {
     statusPasta('Escolha a pasta na janela do Windows...', '');
@@ -3808,26 +3318,24 @@
   function ajustarAoVivo() {
     if (!avAtivo) return;
     clearTimeout(ajusteAgendado);
-    ajusteAgendado = setTimeout(() => {
+    ajusteAgendado = setTimeout(async () => {
+      let identidade;
+      try { identidade = await window.identidadeUI.preparar(); } catch (e) { return erro(e.message); }
       postJson('/api/aovivo/ajustar', {
-        auto: cfg.av.auto, sensibilidade: cfg.av.sens, duracao: cfg.av.duracao,
+        identidade, auto: cfg.av.auto, sensibilidade: cfg.av.sens, duracao: cfg.av.duracao,
         formato: cfg.av.formato, recorte: recorteAoVivo(), textoFixo: textoAtual(),
-        usarIaPro: cfg.motor === 'ia',
       }).then(atualizarPreviaAoVivo).catch(() => {});
     }, 250);
   }
 
   // ------------------------------------------------------------ ao vivo: comecar e parar
   async function comecarAoVivo() {
+    let identidade;
+    try { identidade = await window.identidadeUI.preparar(); } catch (e) { return erro(e.message); }
     let url = $('avUrl').value.trim();
     if (!url) { $('avUrl').focus(); return erro('Cole o link do canal que está ao vivo.'); }
     if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
-    if (cfg.motor === 'ia' && estadoPro && estadoPro.configurado && !estadoPro.podeUsarLive) {
-      const msg = estadoPro.liveUsado && estadoPro.trialsRestantes > 0
-        ? 'Seu teste grátis de 15 minutos na Live já foi usado! Você ainda tem ' + estadoPro.trialsRestantes + ' teste(s) grátis para Vídeos — ou atualize o plano abaixo para usar IA na live sem limite.'
-        : 'Seus 3 testes grátis acabaram! Atualize o plano Pro abaixo para usar o Diretor IA na live (ou mude para o Motor Local grátis).';
-      return abrirModalPro(msg);
-    }
+    {}
     semErro();
     const b = $('btnAvComecar');
     b.disabled = true; b.textContent = 'Conectando...';
@@ -3836,15 +3344,11 @@
     let conectou = false;
     try {
       const r = await postJson('/api/aovivo/iniciar', {
-        url, formato: cfg.av.formato, recorte: recorteAoVivo(), duracao: cfg.av.duracao,
+        url, identidade, formato: cfg.av.formato, recorte: recorteAoVivo(), duracao: cfg.av.duracao,
         auto: cfg.av.auto !== false, sensibilidade: cfg.av.sens, idioma: 'pt',
         lerChat: cfg.av.lerChat !== false, textoFixo: textoAtual(), preparar: true,
-        usarIaPro: cfg.motor === 'ia',
       });
-      if (r.precisaUpgrade) {
-        abrirModalPro(r.erro || 'Atualize o plano Pro para usar o Diretor IA na live.');
-        return;
-      }
+      {}
       if (r.erro) throw new Error(r.erro);
       $('avChecagem').textContent = '';
       conectou = true;
@@ -3924,15 +3428,13 @@
     const b = $('btnAvClipar1');
     b.disabled = true;
     try {
+      const identidade = await window.identidadeUI.preparar();
       const r = await postJson('/api/aovivo/ajustar', {
+        identidade,
         clipando: true, auto: cfg.av.auto !== false, sensibilidade: cfg.av.sens, duracao: cfg.av.duracao,
         formato: cfg.av.formato, recorte: recorteAoVivo(), textoFixo: textoAtual(),
-        usarIaPro: cfg.motor === 'ia',
       });
-      if (r.precisaUpgrade) {
-        abrirModalPro(r.erro || 'Atualize o plano Pro para usar o Diretor IA na live.');
-        return;
-      }
+      {}
       if (r.erro) throw new Error(r.erro);
       const e = await fetch('/api/aovivo/estado').then((x) => x.json());
       abrirPainel(e);
@@ -4019,30 +3521,6 @@
         }
       } else if (d.tipo === 'clipe' || d.tipo === 'clipe-atualizado') {
         mostrarClipeAoVivo(d.clipe, d.tipo === 'clipe' && !d.antigo);
-      } else if (d.tipo === 'pro-estado') {
-        if (estadoPro) {
-          if (typeof d.trialsRestantes === 'number') estadoPro.trialsRestantes = Math.max(0, d.trialsRestantes);
-          if (typeof d.liveUsado === 'boolean') estadoPro.liveUsado = d.liveUsado;
-          if (typeof d.liveAtivo === 'boolean') estadoPro.liveAtivo = d.liveAtivo;
-          if (d.liveExpiraEm !== undefined) estadoPro.liveExpiraEm = d.liveExpiraEm;
-          estadoPro.podeUsarVideo = !!(estadoPro.ativo || estadoPro.trialsRestantes > 0);
-          estadoPro.podeUsarLive = !!(estadoPro.ativo || estadoPro.liveAtivo || (!estadoPro.liveUsado && estadoPro.trialsRestantes > 0));
-          estadoPro.podeUsar = !!(estadoPro.podeUsarVideo || estadoPro.podeUsarLive);
-          pintarMotorPro();
-        } else {
-          carregarEstadoPro(true);
-        }
-        if (d.iniciouLiveTrial) {
-          logAv('✨ Teste grátis de 15 minutos do Diretor IA Pro iniciado nesta live! Restam ' + d.trialsRestantes + ' teste(s) grátis para vídeos.', true);
-        } else if (d.usouTrial && !d.liveAtivo) {
-          logAv('✨ Diretor IA Pro usado! Restam ' + d.trialsRestantes + ' teste(s) grátis.', true);
-        }
-      } else if (d.tipo === 'pro-esgotado') {
-        cfg.motor = 'local';
-        guardar();
-        carregarEstadoPro(true);
-        logAv('⚠️ ' + d.msg, true);
-        abrirModalPro(d.msg || 'Seus 3 testes grátis acabaram! Atualize o plano para usar o Diretor IA Pro.');
       } else if (d.tipo === 'aviso') logAv(d.msg);
     };
     av.fonte.onerror = () => {
@@ -4107,13 +3585,7 @@
     if (d.chat && d.chat !== 'conectado') {
       $('avChat').textContent = { conectando: 'conectando...', reconectando: 'reconectando...', 'sem chat': 'não disponível', desligado: 'desligado' }[d.chat] || d.chat;
     }
-    if (d.iaLiveExpiraEm !== undefined && estadoPro && !estadoPro.ativo) {
-      estadoPro.liveExpiraEm = d.iaLiveExpiraEm;
-      estadoPro.liveAtivo = !!(d.iaLiveExpiraEm && new Date(d.iaLiveExpiraEm).getTime() > Date.now());
-      if (d.iaLiveExpiraEm) estadoPro.liveUsado = true;
-      estadoPro.podeUsarLive = !!(estadoPro.liveAtivo || (!estadoPro.liveUsado && estadoPro.trialsRestantes > 0));
-      pintarMotorPro();
-    }
+    {}
     if (d.msg) logAv(d.msg);
     if (parado && !av.parado) {
       av.parado = true;
@@ -4161,7 +3633,7 @@
   };
   function tiqueAv() {
     if (av.desde && !av.parado) $('avTempo').textContent = hmsAv((Date.now() - av.desde) / 1000);
-    if (estadoPro && estadoPro.liveExpiraEm && !estadoPro.ativo) pintarMotorPro();
+    {}
   }
 
   function atualizarQuadro() {
@@ -4215,7 +3687,7 @@
   let tituloOriginal = document.title, piscando = null;
   function piscarTitulo() {
     clearTimeout(piscando);
-    document.title = '✂ Clipe pronto! · Cortador Automático';
+    document.title = '✂ Clipe pronto! · Estúdio Criativo Cortes';
     piscando = setTimeout(() => { document.title = tituloOriginal; }, 5000);
   }
 
@@ -4271,14 +3743,12 @@
   $('btnAvParar').addEventListener('click', async () => {
     if (av.parado) return voltarAoComeco();
     const qtdClipesFeitos = Number($('avQtd').textContent) || 0;
-    const usouTrialLiveNestaSessao = !!(cfg.motor === 'ia' || (estadoPro && estadoPro.liveUsado));
+
     $('btnAvParar').disabled = true;
     try { await postJson('/api/aovivo/parar'); } catch (_) {}
     $('btnAvParar').disabled = false;
-    await carregarEstadoPro(true);
-    if (qtdClipesFeitos > 0 && usouTrialLiveNestaSessao && estadoPro && !estadoPro.ativo) {
-      setTimeout(() => sugerirUpgradeAposUso('live'), 800);
-    }
+
+    {}
   });
   $('btnAvPasta').addEventListener('click', () => { if (av.pasta) postJson('/api/abrir', { caminho: av.pasta }); });
   $('btnAvAjustar').addEventListener('click', async () => {
@@ -4331,19 +3801,12 @@
   };
   const ETAPAS = ['lendo', 'audio', 'transcricao', 'analise', 'cortando'];
 
-  function processar() {
+  async function processar() {
     if (!arquivo) return;
+    let identidade;
+    try { identidade = await window.identidadeUI.preparar(); } catch (e) { return erro(e.message); }
     const exato = !!(trechoFluxo && trechoFluxo.modo === 'exato');
-    if (!exato && cfg.motor === 'ia' && estadoPro) {
-      if (!estadoPro.configurado) {
-        abrirModalPro('O servidor do Diretor IA Pro está em ativação. Enquanto isso, você pode usar o Motor Local grátis!');
-        return;
-      }
-      if (!estadoPro.podeUsarVideo) {
-        abrirModalPro('Seus 3 testes grátis para vídeos acabaram! Desbloqueie o Cortador Pro em segundos no Pix ou Cartão para continuar usando a IA.');
-        return;
-      }
-    }
+    {}
     const faixa = cfg.duracao.split('-');
     const vel = VELOCIDADES[cfg.velocidade] || VELOCIDADES.equilibrado;
     const descricao = cfg.pedidos.concat([$('descricao').value.trim()]).filter(Boolean).join('. ');
@@ -4358,7 +3821,7 @@
     fetch('/api/processar', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        video: arquivo, formato, descricao, recorte: cfg.recorte,
+        video: arquivo, formato, descricao, recorte: cfg.recorte, identidade,
         quantidade: cfg.quantidade, minDur: Number(faixa[0]), maxDur: Number(faixa[1]),
         ordem: cfg.ordem, modelo: vel.modelo, qualidade: vel.qualidade,
         legendar: cfg.legenda && formato !== 'original',
@@ -4368,7 +3831,6 @@
         modoTrecho: trechoFluxo ? trechoFluxo.modo : null,
         idioma: 'pt',
         textoFixo: textoAtual(),
-        usarIaPro: cfg.motor === 'ia' && !exato,
         sessao: SESSAO,
       }),
     }).then((x) => x.json()).then((r) => {
@@ -4406,18 +3868,16 @@
       info: (d) => registrar('Vídeo de ' + d.duracaoTexto + ' · ' + d.largura + 'x' + d.altura),
       aviso: (d) => {
         registrar('• ' + d.msg);
-        if (/Diretor IA Pro/i.test(d.msg || '')) carregarEstadoPro(true);
+        {}
       },
       'clipe-pronto': (d) => $('clipesParciais').appendChild(cartao(d.clipe, true)),
       fim: async (d) => {
-        const usouIaNesteJob = cfg.motor === 'ia' && !(trechoFluxo && trechoFluxo.modo === 'exato');
+
         processandoAgora = false;
-        await carregarEstadoPro(true);
+
         await abrirProjeto(d.pasta, { recem: true, recado: d.recado, clipes: d.clipes });
-        atualizarCardSugestaoResultado(d.clipes);
-        if (usouIaNesteJob) {
-          setTimeout(() => sugerirUpgradeAposUso('video'), 1100);
-        }
+
+        {}
       },
       erro: (m) => { voltar(); erro(m); },
     });
@@ -4472,7 +3932,7 @@
         '<div style="display:flex; gap:6px; flex-wrap:wrap">' +
           '<span class="selo ' + c.rotulo.cor + '"><i data-lucide="' +
             (c.rotulo.cor === 'otimo' ? 'trophy' : 'flame') + '" class="i"></i> ' + esc(c.rotulo.texto) + '</span>' +
-          (c.geradoPorIa ? '<span class="selo otimo"><i data-lucide="sparkles" class="i"></i> IA Pro</span>' : '') +
+          ('') +
           (c.editado ? '<span class="selo editado"><i data-lucide="pencil" class="i"></i> Editado</span>' : '') +
           (c.leva > 1 ? '<span class="selo leva"><i data-lucide="layers" class="i"></i> ' + c.leva + 'ª leva</span>' : '') +
           (c.manual ? '<span class="selo manual"><i data-lucide="film" class="i"></i> Trecho escolhido</span>' : '') +
@@ -4481,7 +3941,7 @@
         '</div>' +
         '<div class="clipe-gancho">' + esc(c.titulo) + '</div>' +
         '<div class="clipe-meta"><i data-lucide="clock" class="i"></i><span class="tempos">' +
-          c.inicioTexto + ' → ' + c.fimTexto + ' · ' + c.duracao + 's · ' + c.tamanhoMb + ' MB</span></div>' +
+          c.inicioTexto + ' → ' + c.fimTexto + ' · ' + Math.round((c.duracaoFinal || c.duracao) * 10) / 10 + 's · ' + c.tamanhoMb + ' MB</span></div>' +
         (c.observacao ? '<div class="clipe-meta" style="color:var(--azul)"><i data-lucide="info" class="i"></i><span>' + esc(c.observacao) + '</span></div>' : '') +
 
         '<div class="clipe-acoes">' +
@@ -4753,7 +4213,7 @@
     const motivo = motivoSemEdicao();
     if (motivo) partes.push(motivo);
     $('resSub').textContent = partes.join(' · ');
-    if (typeof atualizarCardSugestaoResultado === 'function') atualizarCardSugestaoResultado(p.clipes);
+    {}
   }
 
   $('btnRelatorio').addEventListener('click', () => {
@@ -5801,7 +5261,7 @@
     $('autoUpdSelo').textContent = estadoRemoto && estadoRemoto.shaRemoto
       ? ('Git novo detectado · #' + estadoRemoto.shaRemoto + ' · v' + (estadoRemoto.versaoRemota || ''))
       : 'Nova atualização encontrada no GitHub';
-    $('autoUpdTitulo').textContent = 'Atualizando o Cortador Automático...';
+    $('autoUpdTitulo').textContent = 'Atualizando o Estúdio Criativo Cortes...';
     $('autoUpdResumo').textContent = (estadoRemoto && estadoRemoto.resumoVersao) || 'Sincronizando arquivos novos do GitHub...';
     marcarPassoAutoUpd(1, 24);
     $('modalAutoUpdate').hidden = false;
@@ -5838,55 +5298,14 @@
     }
   }
 
-  function aplicarAvisoRemoto() {
-    if (!estadoRemoto) return;
-    const av = estadoRemoto.aviso;
-    const ehConvitePro = av && av.botaoUrl === '#pro';
-    const jaAssinante = !!(estadoPro && estadoPro.ativo);
-    const jaTestouPro = !!(estadoPro && (estadoPro.usosFeitos > 0 || estadoPro.liveUsado || estadoPro.trialsRestantes < 3));
-    const bloqueadoPorFiltroPro = !!(av && av.soQuemTestouPro && !jaTestouPro);
-    const jaFechou = av && !av.fixo && lerDispensados().includes(av.id);
-    if (av && av.ativo !== false && !jaFechou && !(ehConvitePro && jaAssinante) && !bloqueadoPorFiltroPro) {
-      $('avisoRemoto').className = 'comunicado ' + (av.tipo || 'info');
-      $('avisoRemotoTitulo').textContent = av.titulo || '';
-      $('avisoRemotoTitulo').hidden = !av.titulo;
-      $('avisoRemotoTexto').textContent = av.texto || '';
-      const btn = $('avisoRemotoBtn');
-      if (av.botaoUrl && av.botaoTexto) {
-        btn.href = av.botaoUrl;
-        btn.textContent = av.botaoTexto;
-        if (ehConvitePro) {
-          btn.removeAttribute('target');
-          btn.className = 'btn principal p';
-          btn.onclick = (ev) => {
-            ev.preventDefault();
-            abrirModalPro(null, (estadoPro && estadoPro.conviteUpgrade) || {
-              titulo: av.titulo || '🔥 Oferta Exclusiva · Diretor IA Pro por R$ 19,99/mês!',
-              texto: av.texto || 'Exclusivo pra quem já baixou o app: libere o Diretor IA Pro por apenas R$ 19,99/mês (de R$ 24,90) no Pix ou Cartão.',
-            });
-          };
-        } else {
-          btn.setAttribute('target', '_blank');
-          btn.className = 'btn p';
-          btn.onclick = null;
-        }
-        btn.hidden = false;
-      } else {
-        btn.hidden = true;
-      }
-      $('btnFecharAvisoRemoto').hidden = !!av.fixo;
-      $('avisoRemoto').hidden = false;
-    } else {
-      $('avisoRemoto').hidden = true;
-    }
-  }
+  function aplicarAvisoRemoto() { $('avisoRemoto').hidden = true; }
 
   async function checarComunicados(forcar) {
     try {
       const r = await fetch('/api/comunicados' + (forcar ? '?forcar=1' : '')).then((x) => x.json());
       estadoRemoto = r;
       if (r.versaoAtual) {
-        $('txtVersaoAtual').textContent = 'v' + r.versaoAtual + (r.shaLocal ? ' (' + r.shaLocal + ')' : '');
+        $('txtVersaoAtual').textContent = r.rotulo || r.versaoAtual;
       }
 
       if (r.temAtualizacao) {
@@ -5911,7 +5330,7 @@
 
   $('btnChecarUpd').addEventListener('click', async () => {
     const st = $('statusUpdAjustes');
-    st.textContent = 'Buscando último commit no GitHub...';
+    st.textContent = 'Conferindo versão local...';
     st.className = 'pasta-status';
     const r = await checarComunicados(true);
     if (!r || r.offline) {
@@ -5922,7 +5341,7 @@
       st.className = 'pasta-status ok';
       abrir(false);
     } else {
-      st.textContent = 'Já está no último Git (v' + r.versaoAtual + (r.shaRemoto ? ' · #' + r.shaRemoto : '') + ').';
+      st.textContent = 'Edição personalizada ' + (r.rotulo || r.versaoAtual) + '. Atualizações do projeto original desativadas.';
       st.className = 'pasta-status ok';
     }
   });
@@ -5936,416 +5355,6 @@
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && !atualizandoAgora) checarComunicados(false);
   });
-
-  // ------------------------------------------------------------ cortador pro (ia + checkout infinitepay)
-  let estadoPro = null;
-  let timerPedidoPro = null;
-
-  function formatarRestanteLive(est) {
-    if (!est || !est.liveExpiraEm) return null;
-    const seg = Math.max(0, Math.ceil((new Date(est.liveExpiraEm).getTime() - Date.now()) / 1000));
-    if (seg <= 0) return null;
-    const m = Math.floor(seg / 60), s = String(seg % 60).padStart(2, '0');
-    return m + ':' + s;
-  }
-
-  function pintarMotorPro() {
-    const motorAtual = cfg.motor || 'local';
-    const est = estadoPro;
-    const restLiveTxt = formatarRestanteLive(est);
-    const liveEmAndamento = !!(est && !est.ativo && restLiveTxt);
-    if (est && !est.ativo && est.liveExpiraEm && !restLiveTxt) {
-      est.liveAtivo = false;
-      est.podeUsarLive = false;
-    }
-    const podeVideo = !est || !est.configurado || !!est.ativo || (est.podeUsarVideo != null ? est.podeUsarVideo : est.trialsRestantes > 0);
-    const podeLive = !est || !est.configurado || !!est.ativo || liveEmAndamento || (est.podeUsarLive != null ? est.podeUsarLive : (!est.liveUsado && est.trialsRestantes > 0));
-
-    document.querySelectorAll('#seletorMotor [data-motor]').forEach((b) => {
-      const m = b.dataset.motor;
-      b.setAttribute('aria-pressed', String(m === (motorAtual === 'ia' && !podeVideo ? 'local' : motorAtual)));
-    });
-    document.querySelectorAll('#seletorMotorLive [data-motor]').forEach((b) => {
-      const m = b.dataset.motor;
-      b.setAttribute('aria-pressed', String(m === (motorAtual === 'ia' && !podeLive ? 'local' : motorAtual)));
-    });
-
-    const btnTopo = $('btnTopoPro');
-    const txtTopo = $('txtTopoPro');
-    const selo = $('seloMotorIa');
-    const seloLive = $('seloMotorIaLive');
-    const subLive = $('motorIaLiveSub');
-
-    if (est && est.ativo) {
-      btnTopo.classList.add('ativo');
-      txtTopo.textContent = 'Pro ativo';
-      selo.textContent = 'Pro ativo';
-      selo.className = 'pilula-pro ativo';
-      if (seloLive) { seloLive.textContent = 'Pro ativo'; seloLive.className = 'pilula-pro ativo'; }
-      if (subLive) subLive.textContent = 'Plano Pro ativo · use na live inteira sem limite de tempo!';
-    } else if (est && est.configurado) {
-      btnTopo.classList.remove('ativo');
-      // Selo do modo Video
-      if (est.trialsRestantes > 0) {
-        const txtTrial = est.trialsRestantes + (est.trialsRestantes === 1 ? ' teste grátis' : ' testes grátis');
-        selo.textContent = txtTrial;
-        selo.className = 'pilula-pro';
-      } else {
-        selo.textContent = '0 grátis · Atualize o plano';
-        selo.className = 'pilula-pro';
-      }
-      // Selo do modo Live (ate 1 sessao de 15 min consumindo 1 dos 3 testes)
-      if (liveEmAndamento) {
-        if (seloLive) { seloLive.textContent = '⏱️ ' + restLiveTxt + ' restantes'; seloLive.className = 'pilula-pro ativo'; }
-        if (subLive) subLive.textContent = 'Teste grátis na live em andamento (' + restLiveTxt + ' de 15 min) · Plano Pro é ilimitado!';
-      } else if (!est.liveUsado && est.trialsRestantes > 0) {
-        if (seloLive) { seloLive.textContent = '1 live grátis · 15 min'; seloLive.className = 'pilula-pro'; }
-        if (subLive) subLive.textContent = 'Usa 1 dos seus ' + est.trialsRestantes + ' teste(s) grátis (vale por 15 min na live) · Assinante Pro usa sem limite!';
-      } else {
-        if (seloLive) { seloLive.textContent = '0 live grátis · Seja Pro'; seloLive.className = 'pilula-pro'; }
-        if (subLive) {
-          subLive.textContent = est.liveUsado && est.trialsRestantes > 0
-            ? 'Os 15 min grátis na live já foram usados (restam ' + est.trialsRestantes + ' para vídeos) · Atualize pro Plano Pro!'
-            : 'Seus 3 testes grátis chegaram a zero · Atualize o plano Pro para usar na live!';
-        }
-      }
-      // Botao do topo
-      if (liveEmAndamento) txtTopo.textContent = 'Pro · Live ' + restLiveTxt;
-      else if (est.trialsRestantes > 0) txtTopo.textContent = 'Pro · ' + est.trialsRestantes + ' grátis';
-      else txtTopo.textContent = 'Seja Pro';
-    } else {
-      btnTopo.classList.remove('ativo');
-      txtTopo.textContent = 'Seja Pro';
-      selo.textContent = 'Em breve';
-      if (seloLive) seloLive.textContent = 'Em breve';
-    }
-
-    // Barra de motor dentro do painel ao vivo
-    if ($('avStatusMotorTxt')) {
-      const usandoIa = motorAtual === 'ia' && podeLive;
-      if (usandoIa) {
-        const metaLive = est && est.ativo
-          ? ' · Plano Pro liberado (sem limite de tempo)'
-          : (liveEmAndamento ? ' · ⏱️ Teste grátis: <b>' + restLiveTxt + '</b> restantes (de 15 min)' : ' · 15 min de teste grátis ao começar');
-        $('avStatusMotorTxt').innerHTML = '<b>⚡ Diretor IA Pro ativo nesta live</b>' + metaLive;
-        $('btnAlternarIaLive').textContent = 'Voltar pro Motor Local';
-        $('btnAlternarIaLive').hidden = false;
-        $('btnUpgradeLive').hidden = !!(est && est.ativo);
-      } else {
-        const zerouLive = est && est.configurado && !podeLive;
-        $('avStatusMotorTxt').innerHTML = zerouLive
-          ? '<b>Motor Local ativo</b> · Teste de 15 min na live encerrado (atualize o plano Pro para usar IA na live)'
-          : '<b>Motor Local ativo nesta live</b> · Grátis e ilimitado';
-        $('btnAlternarIaLive').textContent = 'Ativar Diretor IA Pro';
-        $('btnAlternarIaLive').hidden = !!zerouLive;
-        $('btnUpgradeLive').hidden = !zerouLive;
-      }
-    }
-
-    if (est) {
-      if (typeof pintarProvedor === 'function' && est.provedor) {
-        pintarProvedor(est.provedor, est.temChavePropria);
-        if ($('inputModeloIa') && !$('inputModeloIa').value) $('inputModeloIa').value = est.modeloProprio || '';
-      }
-      aplicarAvisoRemoto();
-      if ($('proConviteBanner')) {
-        if (!est.ativo && est.conviteUpgrade) {
-          $('proConviteTitulo').textContent = est.conviteUpgrade.titulo || '✨ Convite Especial · Cortador Pro';
-          $('proConviteTexto').textContent = est.conviteUpgrade.texto || '';
-          $('proConviteBanner').hidden = false;
-        } else {
-          $('proConviteBanner').hidden = true;
-        }
-      }
-      $('proPainelAtivo').hidden = !est.ativo;
-      $('proPlanosWrap').hidden = !!est.ativo;
-      if (est.ativo) {
-        const validade = est.expiraEm ? new Date(est.expiraEm).toLocaleDateString('pt-BR') : '';
-        $('proAtivoPlano').textContent = '⚡ ' + (est.plano || 'Cortador Pro Ativo');
-        $('proAtivoMeta').textContent = (validade ? 'Válido até ' + validade + ' · ' : '') +
-          'Usos neste mês: ' + (est.usosMes || 0) + ' de ' + (est.limiteMes || 80) + ' vídeos';
-        $('proAtivoChave').textContent = est.chaveMascarada || '';
-      }
-      $('proPlanosLista').innerHTML = (est.planos || []).map((pl) =>
-        '<div class="pro-plano' + (pl.destaque ? ' destaque' : '') + '">' +
-          '<b>' + esc(pl.nome) + '</b>' +
-          (pl.precoAntes ? '<div style="font-size:12px; color:var(--texto3); text-decoration:line-through; margin-top:2px">' + esc(pl.precoAntes) + '</div>' : '') +
-          '<div class="preco">' + esc(pl.preco) + '</div>' +
-          '<small>' + esc(pl.detalhe || '') + '</small>' +
-          '<button type="button" class="btn ' + (pl.destaque ? 'principal' : '') + ' p" data-comprar-plano="' + esc(pl.id) + '" style="margin-top:8px">' +
-            '<i data-lucide="zap" class="i"></i> Desbloquear no Pix ou Cartão' +
-          '</button>' +
-        '</div>'
-      ).join('');
-      icones($('proPlanosLista'));
-    }
-  }
-
-  async function carregarEstadoPro(forcar) {
-    try {
-      estadoPro = await fetch('/api/pro/estado' + (forcar ? '?forcar=1' : '')).then((x) => x.json());
-      pintarMotorPro();
-      tentarMostrarConviteUpgrade();
-    } catch (_) {}
-  }
-
-  function atualizarCardSugestaoResultado(clipesLista) {
-    const card = $('cardSugestaoProResultado');
-    if (!card) return;
-    const lista = Array.isArray(clipesLista) ? clipesLista : ((projetoAtual && projetoAtual.clipes) || []);
-    const foiComIa = lista.some((c) => c && c.geradoPorIa);
-    // Mostra SOMENTE quando a pessoa usou os testes gratis do Diretor IA Pro (nunca incomoda no Motor Local)
-    if (!foiComIa || (estadoPro && estadoPro.ativo)) {
-      card.hidden = true;
-      return;
-    }
-    const rest = estadoPro ? Number(estadoPro.trialsRestantes || 0) : 0;
-    $('sugProResTitulo').textContent = '✨ Gostou da precisão do Diretor IA Pro nestes cortes?';
-    $('sugProResTexto').textContent = rest > 0
-      ? 'Resta(m) ' + rest + ' teste(s) grátis neste PC. Desbloqueie o Passe Pro no Pix ou Cartão para cortar até 80 vídeos/mês + lives inteiras sem limite de 15 minutos!'
-      : 'Você concluiu seus 3 testes grátis! Desbloqueie o Passe Pro agora no Pix ou Cartão (ativa sozinho na tela) para continuar usando sem parar.';
-    card.hidden = false;
-    icones(card);
-  }
-
-  function sugerirUpgradeAposUso(modoOrigem) {
-    if (!estadoPro || estadoPro.ativo) return;
-    const rest = Number(estadoPro.trialsRestantes || 0);
-    let titulo = '✨ Gostou dos cortes feitos pelo Diretor IA Pro?';
-    let texto = '';
-    if (modoOrigem === 'live') {
-      titulo = '⚡ Curtiu usar oteste grátis do Diretor IA Pro na Live?'.replace('oteste', 'o teste');
-      texto = 'No Passe Pro você usa o Diretor IA durante a live inteira (sem limite de 15 minutos) + até 80 vídeos por mês, com ativação automática na hora via Pix ou Cartão!';
-    } else if (rest <= 0) {
-      titulo = '🚀 Seus cortes ficaram prontos — e esse foi seu último teste grátis!';
-      texto = 'Gostou do resultado do Diretor IA Pro? Desbloqueie o Passe Pro agora no Pix ou Cartão (ativa sozinho aqui na tela) para continuar cortando vídeos e lives sem limites!';
-    } else {
-      titulo = '✨ Gostou dos cortes feitos pelo Diretor IA Pro?';
-      texto = 'Resta(m) ' + rest + ' teste(s) grátis neste PC! Já pode garantir o Passe Pro completo abaixo para cortar até 80 vídeos/mês e lives inteiras sem limite de 15 min.';
-    }
-    abrirModalPro(null, { titulo, texto });
-  }
-
-  if ($('btnSugProUpgrade')) {
-    $('btnSugProUpgrade').addEventListener('click', () => {
-      abrirModalPro(null, {
-        titulo: $('sugProResTitulo').textContent,
-        texto: $('sugProResTexto').textContent,
-      });
-    });
-  }
-
-  // ---- tela VIP de agradecimento especial ao assinar o Cortador Pro
-  function abrirBoasVindasVipPro(chaveReal) {
-    $('modalPro').hidden = true;
-    $('modalOferta20').hidden = true;
-    const ch = chaveReal || (estadoPro && estadoPro.chaveMascarada) || '';
-    if (ch) {
-      $('vipChaveTxt').textContent = ch;
-      $('vipChaveWrap').hidden = false;
-      $('btnVipCopiarChave').hidden = !chaveReal;
-    } else {
-      $('vipChaveWrap').hidden = true;
-    }
-    const val = estadoPro && estadoPro.expiraEm
-      ? 'Válido até ' + new Date(estadoPro.expiraEm).toLocaleDateString('pt-BR')
-      : 'Passe 30 dias ativo';
-    $('vipValidade').textContent = val;
-    try { localStorage.setItem('cortador_vip_boas_vindas_' + (ch || 'pro'), '1'); } catch (_) {}
-    $('modalBoasVindasPro').hidden = false;
-    icones($('modalBoasVindasPro'));
-  }
-
-  if ($('btnVipComecar')) {
-    $('btnVipComecar').addEventListener('click', () => {
-      $('modalBoasVindasPro').hidden = true;
-      cfg.motor = 'ia';
-      guardar();
-      pintarMotorPro();
-    });
-  }
-  if ($('btnVipCopiarChave')) {
-    $('btnVipCopiarChave').addEventListener('click', () => {
-      const txt = $('vipChaveTxt').textContent.trim();
-      if (!txt) return;
-      try { navigator.clipboard.writeText(txt); } catch (_) {}
-      $('btnVipCopiarChave').innerHTML = '<i data-lucide="check" class="i"></i> Copiada!';
-      icones($('btnVipCopiarChave'));
-      setTimeout(() => {
-        $('btnVipCopiarChave').innerHTML = '<i data-lucide="copy" class="i"></i> Copiar chave';
-        icones($('btnVipCopiarChave'));
-      }, 2200);
-    });
-  }
-  if ($('modalBoasVindasPro')) {
-    $('modalBoasVindasPro').addEventListener('click', (e) => {
-      if (e.target === $('modalBoasVindasPro')) $('modalBoasVindasPro').hidden = true;
-    });
-  }
-
-  // ---- promocao relampago unica ao abrir (de R$ 24,90 por R$ 20,00 - valida somente nesta mensagem)
-  const CHAVE_OFERTA_20 = 'cortador_oferta_24_por_20_v3';
-  function fecharOferta20() {
-    try { localStorage.setItem(CHAVE_OFERTA_20, '1'); } catch (_) {}
-    $('modalOferta20').hidden = true;
-  }
-  function tentarMostrarOferta20() {
-    if (!estadoPro || !estadoPro.configurado) return;
-    // Se ja e assinante Pro e ainda nao viu a carta VIP de agradecimento, mostra 1x!
-    if (estadoPro.ativo) {
-      const kVip = 'cortador_vip_boas_vindas_' + (estadoPro.chaveMascarada || 'pro');
-      try {
-        if (!localStorage.getItem(kVip) && $('dspFundo').hidden && $('modalAutoUpdate').hidden && $('modalPro').hidden) {
-          abrirBoasVindasVipPro(null);
-        }
-      } catch (_) {}
-      return;
-    }
-    try { if (localStorage.getItem(CHAVE_OFERTA_20)) return; } catch (_) { return; }
-    const algumAberto = !$('dspFundo').hidden || !$('modalTutorial').hidden || !$('modalNovidades').hidden || !$('modalAutoUpdate').hidden || !$('modalPro').hidden;
-    if (algumAberto || processandoAgora || avAtivo) return;
-    try { localStorage.setItem(CHAVE_OFERTA_20, '1'); } catch (_) {}
-    $('oferta20Status').textContent = '';
-    $('modalOferta20').hidden = false;
-    icones($('modalOferta20'));
-  }
-
-  if ($('btnFecharOferta20')) $('btnFecharOferta20').addEventListener('click', fecharOferta20);
-  if ($('btnFecharOferta20X')) $('btnFecharOferta20X').addEventListener('click', fecharOferta20);
-  if ($('btnGarantirOferta20')) {
-    $('btnGarantirOferta20').addEventListener('click', async () => {
-      const b = $('btnGarantirOferta20');
-      const st = $('oferta20Status');
-      b.disabled = true;
-      st.textContent = 'Gerando link promocional de R$ 20,00 na InfinitePay...';
-      st.className = 'pasta-status';
-      try {
-        const r = await postJson('/api/pro/checkout', { plano: 'mensal_promo' });
-        if (r.erro) throw new Error(r.erro);
-        $('modalOferta20').hidden = true;
-        $('modalPro').hidden = false;
-        statusPro('🔥 Link promocional de R$ 20,00 aberto! Conclua o Pix ou Cartão para ativar na hora.', 'ok');
-        $('btnReabrirCheckout').href = r.urlCheckout;
-        $('proPainelEspera').hidden = false;
-        window.open(r.urlCheckout, '_blank', 'noopener');
-        icones($('modalPro'));
-
-        clearInterval(timerPedidoPro);
-        timerPedidoPro = setInterval(async () => {
-          try {
-            const chk = await fetch('/api/pro/pedido?id=' + encodeURIComponent(r.pedidoId)).then((x) => x.json());
-            if (chk && chk.pago) {
-              clearInterval(timerPedidoPro);
-              timerPedidoPro = null;
-              $('proPainelEspera').hidden = true;
-              cfg.motor = 'ia';
-              guardar();
-              await carregarEstadoPro(true);
-              abrirBoasVindasVipPro(chk.chave || '');
-            }
-          } catch (_) {}
-        }, 3200);
-      } catch (err) {
-        st.textContent = err.message || 'Não consegui gerar o link agora.';
-        st.className = 'pasta-status ruim';
-      } finally {
-        b.disabled = false;
-      }
-    });
-  }
-
-  function tentarMostrarConviteUpgrade() {
-    tentarMostrarOferta20();
-    if (!$('modalOferta20').hidden) return;
-    if (!estadoPro || estadoPro.ativo || !estadoPro.conviteUpgrade) return;
-    const idConvite = 'pro_convite_visto_' + (estadoPro.conviteUpgrade.id || 'v1');
-    try {
-      if (localStorage.getItem(idConvite)) return;
-    } catch (_) { return; }
-    // Aguarda qualquer modal de 1a abertura terminar antes de exibir o convite
-    const algumAberto = !$('dspFundo').hidden || !$('modalTutorial').hidden || !$('modalNovidades').hidden || !$('modalAutoUpdate').hidden;
-    if (algumAberto || processandoAgora || avAtivo) return;
-    try { localStorage.setItem(idConvite, '1'); } catch (_) {}
-    abrirModalPro(null, estadoPro.conviteUpgrade);
-  }
-
-  function statusPro(msg, tipo) {
-    $('proStatusMsg').textContent = msg || '';
-    $('proStatusMsg').className = 'pasta-status' + (tipo ? ' ' + tipo : '');
-  }
-
-  function abrirModalPro(msgInicial, conviteObj) {
-    statusPro(msgInicial || '', msgInicial ? 'ruim' : '');
-    if ($('proConviteBanner')) {
-      const cv = conviteObj || (estadoPro && !estadoPro.ativo && estadoPro.conviteUpgrade);
-      if (cv && !msgInicial) {
-        $('proConviteTitulo').textContent = cv.titulo || '✨ Convite Especial · Cortador Pro';
-        $('proConviteTexto').textContent = cv.texto || '';
-        $('proConviteBanner').hidden = false;
-      }
-    }
-    $('modalPro').hidden = false;
-    carregarEstadoPro(true);
-    icones($('modalPro'));
-  }
-
-  function fecharModalPro() {
-    $('modalPro').hidden = true;
-    clearInterval(timerPedidoPro);
-    timerPedidoPro = null;
-  }
-
-  $('btnTopoPro').addEventListener('click', () => abrirModalPro());
-  $('btnFecharPro').addEventListener('click', fecharModalPro);
-  $('modalPro').addEventListener('click', (e) => { if (e.target === $('modalPro')) fecharModalPro(); });
-
-  function escolherMotorIaOuLocal(novoMotor, contexto) {
-    if (novoMotor === 'ia' && estadoPro && estadoPro.configurado) {
-      if (contexto === 'live' && !estadoPro.ativo && !estadoPro.podeUsarLive) {
-        cfg.motor = 'local';
-        guardar();
-        pintarMotorPro();
-        const msg = estadoPro.liveUsado && estadoPro.trialsRestantes > 0
-          ? 'Seu teste grátis de 15 minutos na Live já foi usado! Você ainda tem ' + estadoPro.trialsRestantes + ' teste(s) grátis para Vídeos — ou atualize o plano Pro abaixo para usar na live sem limite.'
-          : 'Seus 3 testes grátis acabaram! Atualize seu plano Pro abaixo para usar o Diretor IA na live e em vídeos.';
-        abrirModalPro(msg);
-        return;
-      }
-      if (contexto !== 'live' && !estadoPro.ativo && !estadoPro.podeUsarVideo) {
-        cfg.motor = 'local';
-        guardar();
-        pintarMotorPro();
-        abrirModalPro('Seus 3 testes grátis para vídeos acabaram! Atualize seu plano Pro abaixo para continuar usando o Diretor IA.');
-        return;
-      }
-    }
-    cfg.motor = novoMotor;
-    guardar();
-    pintarMotorPro();
-    resumo();
-    if (avAtivo) ajustarAoVivo();
-  }
-
-  $('seletorMotor').addEventListener('click', (e) => {
-    const b = e.target.closest('[data-motor]');
-    if (b) escolherMotorIaOuLocal(b.dataset.motor, 'video');
-  });
-  if ($('seletorMotorLive')) {
-    $('seletorMotorLive').addEventListener('click', (e) => {
-      const b = e.target.closest('[data-motor]');
-      if (b) escolherMotorIaOuLocal(b.dataset.motor, 'live');
-    });
-  }
-  if ($('btnAlternarIaLive')) {
-    $('btnAlternarIaLive').addEventListener('click', () => {
-      escolherMotorIaOuLocal(cfg.motor === 'ia' ? 'local' : 'ia', 'live');
-    });
-  }
-  if ($('btnUpgradeLive')) {
-    $('btnUpgradeLive').addEventListener('click', () => {
-      abrirModalPro('Atualize seu plano Pro para usar o Diretor IA tranquilamente em todas as suas lives e vídeos!');
-    });
-  }
 
   // ---- modal de Tutorial de Boas-Vindas (abre automaticamente na 1a vez que abre o app)
   const CHAVE_TUTORIAL = 'cortador_tutorial_v2';
@@ -6383,7 +5392,7 @@
     try {
       localStorage.setItem(CHAVE_TUTORIAL, '1');
     } catch (_) {}
-    setTimeout(tentarMostrarConviteUpgrade, 350);
+
   }
 
   $('tutBarraPassos').addEventListener('click', (e) => {
@@ -6422,7 +5431,7 @@
   function fecharNovidades() {
     $('modalNovidades').hidden = true;
     try { localStorage.setItem(CHAVE_NOVIDADES, '1'); } catch (_) {}
-    setTimeout(tentarMostrarConviteUpgrade, 350);
+
   }
   if ($('btnVerNovidades')) $('btnVerNovidades').addEventListener('click', () => { abrir(false); abrirNovidades(); });
   if ($('btnNovAbrirTutorial')) $('btnNovAbrirTutorial').addEventListener('click', () => { fecharNovidades(); abrirTutorial(0); });
@@ -6432,7 +5441,7 @@
 
   function verificarBoasVindasInicial() {
     try {
-      if (!$('dspFundo').hidden || !$('modalAutoUpdate').hidden || !$('modalPro').hidden || !$('modalOferta20').hidden) return;
+      if (!$('dspFundo').hidden || !$('modalAutoUpdate').hidden) return;
       if (!localStorage.getItem(CHAVE_TUTORIAL)) {
         abrirTutorial(0);
       } else if (!localStorage.getItem(CHAVE_NOVIDADES)) {
@@ -6442,145 +5451,58 @@
   }
   setTimeout(verificarBoasVindasInicial, 850);
 
-  $('proPlanosLista').addEventListener('click', async (e) => {
-    const b = e.target.closest('[data-comprar-plano]');
-    if (!b) return;
-    const plano = b.dataset.comprarPlano;
-    b.disabled = true;
-    statusPro('Gerando pagamento seguro na InfinitePay...', '');
-    try {
-      const r = await postJson('/api/pro/checkout', { plano });
-      if (r.erro) throw new Error(r.erro);
-      statusPro('', '');
-      $('btnReabrirCheckout').href = r.urlCheckout;
-      $('proPainelEspera').hidden = false;
-      window.open(r.urlCheckout, '_blank', 'noopener');
-
-      clearInterval(timerPedidoPro);
-      timerPedidoPro = setInterval(async () => {
-        try {
-          const chk = await fetch('/api/pro/pedido?id=' + encodeURIComponent(r.pedidoId)).then((x) => x.json());
-          if (chk && chk.pago) {
-            clearInterval(timerPedidoPro);
-            timerPedidoPro = null;
-            $('proPainelEspera').hidden = true;
-            cfg.motor = 'ia';
-            guardar();
-            await carregarEstadoPro(true);
-            abrirBoasVindasVipPro(chk.chave || '');
-          }
-        } catch (_) {}
-      }, 3200);
-    } catch (err) {
-      statusPro(err.message || 'Não consegui abrir o checkout agora.', 'ruim');
-    } finally {
-      b.disabled = false;
-    }
-  });
-
-  $('btnCancelarEspera').addEventListener('click', () => {
-    clearInterval(timerPedidoPro);
-    timerPedidoPro = null;
-    $('proPainelEspera').hidden = true;
-  });
-
-  $('btnAtivarChave').addEventListener('click', async () => {
-    const chave = $('inputChavePro').value.trim();
-    if (!chave) return $('inputChavePro').focus();
-    const b = $('btnAtivarChave');
-    b.disabled = true;
-    statusPro('Validando chave...', '');
-    try {
-      const r = await postJson('/api/pro/ativar', { chave });
-      if (r.erro) throw new Error(r.erro);
-      estadoPro = r;
-      cfg.motor = 'ia';
-      guardar();
-      $('inputChavePro').value = '';
-      pintarMotorPro();
-      abrirBoasVindasVipPro(chave);
-    } catch (err) {
-      statusPro(err.message || 'Chave inválida.', 'ruim');
-    } finally {
-      b.disabled = false;
-    }
-  });
-
-  // ---- qual IA analisa (Gemini nativo, ou chave propria do Claude/ChatGPT)
-  const NOMES_PROV = { gemini: 'Google Gemini', anthropic: 'Claude', openai: 'ChatGPT' };
-  const DICAS_PROV = {
-    anthropic: 'Crie em console.anthropic.com → API Keys. A cobrança vai na sua conta da Anthropic e não gasta da sua cota mensal do Pro.',
-    openai: 'Crie em platform.openai.com → API keys. A cobrança vai na sua conta da OpenAI e não gasta da sua cota mensal do Pro.',
-  };
-  let provEscolhido = 'gemini';
-
-  function pintarProvedor(prov, temChave) {
-    provEscolhido = prov || 'gemini';
-    document.querySelectorAll('#proProvedores [data-prov]').forEach((b) => {
-      b.setAttribute('aria-pressed', String(b.dataset.prov === provEscolhido));
-    });
-    const propria = provEscolhido !== 'gemini';
-    $('proChavePropriaWrap').hidden = !propria;
-    $('proChaveDica').textContent = DICAS_PROV[provEscolhido] || '';
-    $('inputChaveIa').placeholder = temChave ? 'Chave salva ••••  (cole outra pra trocar)' : 'Cole sua chave de API';
-    $('motorIaProvedorTxt').textContent = propria
-      ? 'Usando ' + NOMES_PROV[provEscolhido] + ' com a sua chave'
-      : 'Google Gemini nativo · ou conecte seu Claude / ChatGPT';
-  }
-
-  $('proProvedores').addEventListener('click', (e) => {
-    const b = e.target.closest('[data-prov]');
-    if (!b) return;
-    pintarProvedor(b.dataset.prov, estadoPro && estadoPro.provedor === b.dataset.prov && estadoPro.temChavePropria);
-    $('proProvedorMsg').textContent = '';
-  });
-
-  $('btnSalvarProvedor').addEventListener('click', async () => {
-    const b = $('btnSalvarProvedor');
-    const msg = $('proProvedorMsg');
-    b.disabled = true;
-    try {
-      const r = await postJson('/api/pro/provedor', {
-        provedor: provEscolhido,
-        chave: $('inputChaveIa').value.trim(),
-        modelo: $('inputModeloIa').value.trim(),
-      });
-      if (r.erro) throw new Error(r.erro);
-      $('inputChaveIa').value = '';
-      if (estadoPro) Object.assign(estadoPro, r);
-      pintarProvedor(r.provedor, r.temChavePropria);
-      msg.textContent = '✓ ' + NOMES_PROV[r.provedor] + ' salvo neste PC.';
-      msg.className = 'pasta-status ok';
-    } catch (err) {
-      msg.textContent = err.message || 'Não consegui salvar.';
-      msg.className = 'pasta-status ruim';
-    } finally {
-      b.disabled = false;
-    }
-  });
-
-  $('btnSairChavePro').addEventListener('click', async () => {
-    if (!confirm('Desconectar esta chave deste computador?')) return;
-    await postJson('/api/pro/sair', {});
-    await carregarEstadoPro(true);
-    statusPro('Chave desconectada.', '');
-  });
-
-  const _qsPreview = new URLSearchParams(location.search);
-  if (_qsPreview.get('oferta') === '1') {
-    setTimeout(() => { $('oferta20Status').textContent = ''; $('modalOferta20').hidden = false; icones($('modalOferta20')); }, 350);
-  } else if (_qsPreview.get('pro') === '1') {
-    setTimeout(() => abrirModalPro(), 350);
-  } else if (_qsPreview.get('vip') === '1') {
-    setTimeout(() => abrirBoasVindasVipPro('CORT-DEMO-1234-5678'), 350);
-  }
-
-  pintarMotorPro();
-  carregarEstadoPro(false);
-
+  window.contextoIdentidade = () => ({ video: avAtivo ? fonteAoVivo : arquivo, formato: avAtivo ? cfg.av.formato : formato, recorte: avAtivo ? recorteAoVivo() : cfg.recorte });
+  window.addEventListener('identidade-salva', ajustarAoVivo);
   resumo();
   icones();
 })();
 </script>
+<dialog id="dialogIdentidade" aria-labelledby="idTitulo">
+  <header class="id-cabecalho"><div><h2 id="idTitulo">Identidade do vídeo</h2><p>Sua assinatura visual em cada corte.</p></div><button type="button" class="btn p" id="idFechar" aria-label="Fechar identidade">✕</button></header>
+  <div class="id-corpo">
+    <div class="id-opcoes">
+      <fieldset><legend>Presets de identidade</legend>
+        <p class="id-ajuda">O app abre sem identidade. Carregue um preset para reutilizar seus arquivos e ajustes.</p>
+        <label for="idPreset">Presets salvos</label><select id="idPreset"><option value="">Selecione um preset</option></select>
+        <div class="id-linha"><button type="button" class="btn" id="idPresetCarregar">Carregar</button><button type="button" class="btn" id="idPresetExcluir">Excluir</button></div>
+        <label for="idPresetNome">Nome do novo preset</label><input id="idPresetNome" type="text" maxlength="80" placeholder="Ex.: Minha marca para Reels">
+        <button type="button" class="btn" id="idPresetSalvar">Salvar como preset</button>
+      </fieldset>
+      <fieldset><legend>Vinheta · 2 segundos</legend>
+        <label class="marcar"><input type="checkbox" id="idVinhetaAtiva"><span>Incluir uma vinheta em cada corte</span></label>
+        <input type="file" id="idArquivoVinheta" accept="video/mp4,video/quicktime,video/webm,.mov" aria-label="Enviar vídeo da vinheta">
+        <span class="id-arquivo" id="idNomeVinheta">Nenhuma vinheta escolhida</span>
+        <label for="idPosicaoVinheta">Onde colocar</label><select id="idPosicaoVinheta"><option value="inicio">No início do corte</option><option value="fim">No fim do corte</option></select>
+        <p class="id-ajuda">Usamos os primeiros 2 segundos, com o áudio da vinheta. O conteúdo original é preservado. MP4, MOV ou WebM de pelo menos 2s, até 100 MB.</p>
+        <video id="idVideoVinheta" controls preload="metadata" playsinline hidden></video>
+      </fieldset>
+      <fieldset><legend>Marca d’água</legend>
+        <label class="marcar"><input type="checkbox" id="idMarcaAtiva"><span>Mostrar minha marca nos cortes</span></label>
+        <input type="file" id="idArquivoMarca" accept="image/png,image/jpeg,image/webp" aria-label="Enviar imagem da marca d’água">
+        <span class="id-arquivo" id="idNomeMarca">Nenhuma imagem escolhida</span>
+        <p class="id-ajuda">PNG transparente é ideal. Também aceitamos JPG e WebP, até 10 MB.</p>
+        <div class="id-posicoes" role="group" aria-label="Posições da marca d’água">
+          <button class="btn p" type="button" data-id-pos="0,0" aria-label="Superior esquerda">↖</button><button class="btn p" type="button" data-id-pos="50,0" aria-label="Superior centro">↑</button><button class="btn p" type="button" data-id-pos="100,0" aria-label="Superior direita">↗</button>
+          <button class="btn p" type="button" data-id-pos="0,50" aria-label="Centro esquerda">←</button><button class="btn p" type="button" data-id-pos="50,50" aria-label="Centro">●</button><button class="btn p" type="button" data-id-pos="100,50" aria-label="Centro direita">→</button>
+          <button class="btn p" type="button" data-id-pos="0,100" aria-label="Inferior esquerda">↙</button><button class="btn p" type="button" data-id-pos="50,100" aria-label="Inferior centro">↓</button><button class="btn p" type="button" data-id-pos="100,100" aria-label="Inferior direita">↘</button>
+        </div>
+        <label class="id-linha" for="idX">Horizontal<input id="idX" type="range" min="0" max="100" value="100"><output for="idX" id="idXValor">100%</output></label>
+        <label class="id-linha" for="idY">Vertical<input id="idY" type="range" min="0" max="100" value="100"><output for="idY" id="idYValor">100%</output></label>
+        <label class="id-linha" for="idTamanho">Tamanho<input id="idTamanho" type="range" min="5" max="45" value="18"><output for="idTamanho" id="idTamanhoValor">18%</output></label>
+        <label class="id-linha" for="idOpacidade">Opacidade<input id="idOpacidade" type="range" min="10" max="100" value="75"><output for="idOpacidade" id="idOpacidadeValor">75%</output></label>
+        <label class="id-linha" for="idMargem">Margem<input id="idMargem" type="range" min="0" max="10" value="3"><output for="idMargem" id="idMargemValor">3%</output></label>
+        <label class="marcar"><input type="checkbox" id="idNaVinheta"><span>Mostrar a marca também na vinheta</span></label>
+      </fieldset>
+    </div>
+    <div class="id-preview-col"><b>Prévia da marca</b><p class="id-ajuda">Arraste a imagem ou use os controles de posição.</p>
+      <div class="id-preview" id="idPreview"><img id="idPreviewFundo" alt="Prévia do enquadramento" hidden><img id="idPreviewLogo" alt="Marca d’água: arraste para posicionar ou use as setas do teclado" tabindex="0" draggable="false" hidden></div>
+      <p class="id-ajuda" id="idPreviewNota">Prévia ilustrativa em 9:16. A posição é proporcional ao formato exportado.</p>
+      <p class="id-ajuda">A vinheta é ajustada sem distorção, com barras quando necessário. As legendas aparecem somente no conteúdo.</p>
+    </div>
+  </div>
+  <footer class="id-rodape"><span id="idStatus" role="status" aria-live="polite">As escolhas valem nesta abertura do app. Salve um preset para reutilizá-las.</span><button class="btn" id="idResetar" type="button" title="Limpar anexos e restaurar os parâmetros">Resetar identidade</button><button class="btn" id="idCancelar" type="button">Cancelar</button><button class="btn principal" id="idSalvar" type="button">Salvar identidade</button></footer>
+</dialog>
+
+<script src="/ui/identidade.js"></script>
 </body>
 </html>
