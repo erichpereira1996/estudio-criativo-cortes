@@ -117,6 +117,17 @@
   .publicar-modal { max-width:520px; }
   .publicar-modal .campo, .publicar-modal textarea, .publicar-modal select { width:100%; }
   .publicar-status { min-height:1.3em; color:var(--texto2); font-size:var(--t5); }
+  .pub-tutorial { max-width:640px; }
+  .pub-tutorial ol { margin:10px 0 0 20px; color:var(--texto2); font-size:var(--t5); line-height:1.55; }
+  .pub-tutorial li + li { margin-top:6px; }
+  .pub-tutorial a { color:var(--marca-claro); }
+  .pub-tut-bloco { margin-top:15px; padding:14px; border-radius:14px; border:1px solid var(--linha2); background:rgba(255,255,255,.025); }
+  .pub-tut-bloco h3 { display:flex; align-items:center; gap:7px; font-size:var(--t3); }
+  .pub-tut-youtube { border-color:rgba(255,95,95,.3); background:rgba(255,70,70,.06); }
+  .pub-tut-youtube h3 { color:#ff9a9a; }
+  .pub-tut-tiktok { border-color:rgba(70,220,200,.3); background:rgba(70,220,200,.05); }
+  .pub-tut-tiktok h3 { color:#8be9dc; }
+  .pub-tut-link { display:inline-block; margin-top:10px; font-size:var(--t6); font-weight:700; }
   @media (max-width: 700px) { .topo { flex-wrap: wrap; } .topo h1 { display: none; } }
 
   /* ---------------------------------------------------------- link no topo */
@@ -2048,6 +2059,7 @@
     <div class="grupo" id="grupoPublicacao">
       <h4><i data-lucide="send" class="i"></i> Publicação direta</h4>
       <div class="dica" style="margin-bottom:10px">Conecte suas contas por OAuth para enviar os cortes sem sair do app. Senhas não são armazenadas.</div>
+      <button class="btn p" id="btnAjudaPublicacao" type="button" style="margin-bottom:12px"><i data-lucide="circle-help" class="i"></i> Como conseguir os dados e conectar</button>
       <div class="publicacao-plataformas">
         <div class="publicacao-conta"><span class="publicacao-dot" id="pubDotYoutube"></span><b>YouTube Shorts</b><span id="pubStatusYoutube">Não configurado</span></div>
         <div class="publicacao-acoes"><input class="campo" id="pubYoutubeClientId" placeholder="Client ID do YouTube"><input class="campo" id="pubYoutubeClientSecret" type="password" placeholder="Client Secret do YouTube"><button class="btn p" id="btnConectarYoutube" type="button">Conectar YouTube</button></div>
@@ -3280,6 +3292,12 @@
       } catch (e) { $('pubStatus').textContent = e.message || 'Não consegui publicar este corte.'; }
       finally { b.disabled = false; }
     });
+    const abrirTutorialPublicacao = () => { $('modalTutorialPublicacao').hidden = false; icones($('modalTutorialPublicacao')); };
+    const fecharTutorialPublicacao = () => { $('modalTutorialPublicacao').hidden = true; };
+    $('btnAjudaPublicacao').addEventListener('click', abrirTutorialPublicacao);
+    $('btnFecharTutPublicacao').addEventListener('click', fecharTutorialPublicacao);
+    $('btnFecharTutPublicacao2').addEventListener('click', fecharTutorialPublicacao);
+    $('modalTutorialPublicacao').addEventListener('click', (e) => { if (e.target === $('modalTutorialPublicacao')) fecharTutorialPublicacao(); });
   }, 0);
   carregarPublicacao();
 
@@ -5724,6 +5742,15 @@
     <select class="campo" id="pubPrivacidade"><option value="private">Privado</option><option value="public">Público</option></select>
     <div class="publicar-status" id="pubStatus"></div>
     <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px"><button class="btn p" id="btnCancelarPublicar" type="button">Cancelar</button><button class="btn principal" id="btnConfirmarPublicar" type="button"><i data-lucide="send" class="i"></i> Publicar agora</button></div>
+  </div>
+</div>
+<div class="dsp-fundo" id="modalTutorialPublicacao" hidden role="dialog" aria-modal="true" aria-labelledby="pubTutTitulo">
+  <div class="dsp-caixa publicar-modal pub-tutorial">
+    <div style="display:flex;align-items:flex-start;gap:12px"><div style="flex:1"><span class="selo-info">Guia de conexão</span><h2 id="pubTutTitulo" style="margin-top:8px">Como conectar suas contas</h2></div><button class="btn p" id="btnFecharTutPublicacao" type="button" aria-label="Fechar"><i data-lucide="x" class="i"></i></button></div>
+    <p class="dica">Você só precisa fazer este cadastro uma vez. O app abre a autorização no navegador e não recebe sua senha.</p>
+    <section class="pub-tut-bloco pub-tut-youtube"><h3><i data-lucide="youtube" class="i"></i> YouTube Shorts</h3><ol><li>Abra o <a href="https://console.cloud.google.com/" target="_blank" rel="noreferrer">Google Cloud Console</a> e crie ou selecione um projeto.</li><li>Em <b>APIs e serviços → Biblioteca</b>, ative <b>YouTube Data API v3</b>.</li><li>Em <b>Credenciais → Criar credenciais → ID do cliente OAuth</b>, escolha <b>Aplicativo para computador</b>.</li><li>Copie o <b>Client ID</b> e o <b>Client Secret</b> para os dois campos do YouTube.</li><li>Clique em <b>Conectar YouTube</b>, escolha sua conta e aceite a permissão de envio.</li></ol><a class="pub-tut-link" href="https://developers.google.com/youtube/data/guides/authentication" target="_blank" rel="noreferrer">Abrir tutorial oficial do YouTube</a></section>
+    <section class="pub-tut-bloco pub-tut-tiktok"><h3><i data-lucide="music-2" class="i"></i> TikTok</h3><ol><li>Abra o <a href="https://developers.tiktok.com/" target="_blank" rel="noreferrer">TikTok for Developers</a> e crie um app.</li><li>Adicione o produto <b>Content Posting API</b> e habilite o <b>Direct Post</b>.</li><li>Na área <b>Credentials</b>, copie <b>Client Key</b> e <b>Client Secret</b>.</li><li>Cole os dados nos campos do TikTok e clique em <b>Conectar TikTok</b>.</li><li>Autorize o app. A publicação pode ficar privada até o TikTok auditar o aplicativo.</li></ol><a class="pub-tut-link" href="https://developers.tiktok.com/docs/en/getting-started-create-an-app" target="_blank" rel="noreferrer">Abrir tutorial oficial do TikTok</a></section>
+    <div style="display:flex;justify-content:flex-end;margin-top:14px"><button class="btn principal" id="btnFecharTutPublicacao2" type="button">Entendi</button></div>
   </div>
 </div>
 </body>
