@@ -358,6 +358,9 @@ async function processar(opcoes, avisar) {
   const emitir = (pct, etapa, msg) => avisar({ tipo: 'progresso', pct: Math.round(pct * 10) / 10, etapa, msg });
   const { info, assinatura, jsonTranscricao, transcricao, analiseApi, energia, picos } =
     await prepararAnalise(video, opcoes, emitir, avisar);
+  if (opcoes.duracaoPorAssunto && !analiseApi) {
+    throw new Error('Para usar “Por assunto · IA”, conecte o Gateway e tente novamente.');
+  }
 
   // A descricao escrita manda no perfil, a nao ser que a pessoa tenha
   // escolhido um explicitamente na tela.
@@ -383,6 +386,16 @@ async function processar(opcoes, avisar) {
   if (exato) {
     emitir(64, 'analise', 'Montando o corte de ' + mmss(trecho.inicio) + ' a ' + mmss(trecho.fim) + '...');
     cortes = [corteDoTrecho(transcricao, energia, trecho, { momentos: picos, perfil: perfilFinal, intencao: intencao, sessao: sessao.id })];
+  } else if (opcoes.duracaoPorAssunto && analiseApi && analiseApi.momentos && analiseApi.momentos.length) {
+    emitir(64, 'analise', 'Montando cortes com começo e fim definidos pelo assunto...');
+    cortes = cortesPorAssunto(transcricao, energia, analiseApi.momentos, {
+      quantidade: opcoes.quantidade || 8,
+      momentos: picos,
+      perfil: perfilFinal,
+      intencao,
+      sessao: sessao.id,
+      trecho,
+    });
   } else {
     emitir(64, 'analise', trecho
       ? 'Procurando os melhores momentos entre ' + mmss(trecho.inicio) + ' e ' + mmss(trecho.fim) + '...'
@@ -519,6 +532,31 @@ function aplicarAnaliseApi(cortes, analise, avisar) {
     aplicados++;
   }
   if (aplicados && avisar) avisar({ tipo: 'aviso', msg: 'O Gateway analisou a transcrição e destacou ' + aplicados + ' corte' + (aplicados === 1 ? '' : 's') + '.' });
+}
+
+/** Cria cortes usando os limites semânticos sugeridos pelo Gateway. */
+function cortesPorAssunto(transcricao, energia, momentos, opcoes) {
+  const limite = opcoes.trecho;
+  const candidatos = momentos.slice().sort((a, b) => (b.pontuacao || 0) - (a.pontuacao || 0));
+  const escolhidos = [];
+  for (const m of candidatos) {
+    let inicio = Math.max(0, Number(m.inicio) || 0);
+    let fim = Math.max(inicio, Number(m.fim) || inicio);
+    if (limite) { inicio = Math.max(inicio, limite.inicio); fim = Math.min(fim, limite.fim); }
+    if (fim - inicio < 3) continue;
+    const sobrepoe = escolhidos.some((c) => {
+      const inter = Math.max(0, Math.min(c.fim, fim) - Math.max(c.inicio, inicio));
+      return inter / Math.max(1, Math.min(c.fim - c.inicio, fim - inicio)) > 0.5;
+    });
+    if (sobrepoe) continue;
+    const corte = corteDoTrecho(transcricao, energia, { inicio, fim }, opcoes);
+    corte.manual = false;
+    corte.duracaoPorAssunto = true;
+    corte.motivos = (corte.motivos || []).concat([{ fator: 'Tempo decidido pelo assunto', pontos: 0, detalhe: m.motivo || 'A IA definiu o começo e o fim do tema.' }]);
+    escolhidos.push(corte);
+    if (escolhidos.length >= (opcoes.quantidade || 8)) break;
+  }
+  return escolhidos;
 }
 
 function semPalavras(c) {
@@ -1164,4 +1202,4 @@ function explicarPoucosNovos(sairam, pedidos, jaTinha, d, minAtual, trecho) {
   return { titulo, detalhe, sugestao };
 }
 
-module.exports = { chavesDasPalavras, processar, refazerClipe, extrairMais, assinaturaDoArquivo, transcrever, fontsdirRelativo, acharPython, fonteDoClipe };
+module.exports = { chavesDasPalavras, processar, refazerClipe, extrairMais, assinaturaDoArquivo, transcrever, fontsdirRelativo, acharPython, fonteDoClipe, cortesPorAssunto };

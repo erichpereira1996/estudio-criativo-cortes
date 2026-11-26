@@ -1372,9 +1372,10 @@
         <button class="chip" data-dur="18-40" aria-pressed="false">Curto · 20 a 40s</button>
         <button class="chip" data-dur="28-62" aria-pressed="true">Médio · 30s a 1min</button>
         <button class="chip" data-dur="45-62" aria-pressed="false">Longo · 45s a 1min</button>
+        <button class="chip" data-dur="assunto" aria-pressed="false">Por assunto · IA</button>
       </div>
       <div style="font-size:var(--t6); color:var(--texto3); margin-top:10px; line-height:1.5">
-        Corte curto costuma ser assistido até o fim — e isso conta mais que a duração.
+        Corte curto costuma ser assistido até o fim — ou deixe a IA decidir o começo e o fim conforme o assunto.
       </div>
     </div>
 
@@ -2325,7 +2326,7 @@
     }
     $('btnAvancar').disabled = false;
     const nomeF = { split: 'Rosto + jogo', foco: 'Só uma área', vertical: 'Tela cheia', original: 'Sem mexer' }[formato];
-    const dur = { '18-40': '20 a 40s', '28-62': '30s a 1min', '45-62': '45s a 1min' }[cfg.duracao];
+    const dur = { '18-40': '20 a 40s', '28-62': '30s a 1min', '45-62': '45s a 1min', assunto: 'tempo decidido pela IA' }[cfg.duracao];
     const partes = [nomeF];
     if (trechoFluxo) partes.push('trecho ' + mmss(trechoFluxo.inicio) + '–' + mmss(trechoFluxo.fim));
     partes.push(trechoFluxo && trechoFluxo.modo === 'exato'
@@ -3865,7 +3866,8 @@
     try { identidade = await window.identidadeUI.preparar(); } catch (e) { return erro(e.message); }
     const exato = !!(trechoFluxo && trechoFluxo.modo === 'exato');
     {}
-    const faixa = cfg.duracao.split('-');
+    const porAssunto = cfg.duracao === 'assunto';
+    const faixa = porAssunto ? ['3', '600'] : cfg.duracao.split('-');
     const vel = VELOCIDADES[cfg.velocidade] || VELOCIDADES.equilibrado;
     const descricao = cfg.pedidos.concat([$('descricao').value.trim()]).filter(Boolean).join('. ');
 
@@ -3881,6 +3883,7 @@
       body: JSON.stringify({
         video: arquivo, formato, descricao, recorte: cfg.recorte, identidade,
         quantidade: cfg.quantidade, minDur: Number(faixa[0]), maxDur: Number(faixa[1]),
+        duracaoPorAssunto: porAssunto,
         ordem: cfg.ordem, modelo: vel.modelo, qualidade: vel.qualidade,
         legendar: cfg.legenda && formato !== 'original',
         textoGancho: cfg.gancho, tamanhoLegenda: cfg.tamLegenda,
@@ -4794,7 +4797,8 @@
 
   // Antes de gerar, quem manda na duracao e a etapa 3; num projeto, os botoes do editor
   function duracaoDosCortes() {
-    return ed.contexto === 'fluxo' ? cfg.duracao : ed.dur;
+    const valor = ed.contexto === 'fluxo' ? cfg.duracao : ed.dur;
+    return valor === 'assunto' ? '28-62' : valor;
   }
 
   function pintarBotaoTrecho() {
