@@ -218,7 +218,7 @@
   .cartao + .cartao { margin-top: 14px; }
 
   /* ---------------------------------------------------------- controles */
-  input[type=text], input[type=password], input[type=number], select, textarea {
+  input[type=text], input[type=password], input[type=number], input[type=url], input:not([type]), select, textarea, .campo {
     width: 100%; padding: 12px 14px; border-radius: var(--raio);
     background: rgba(255,255,255,.025); color: var(--texto);
     border: 1px solid var(--linha2); font: inherit; font-size: var(--t4);
@@ -3240,22 +3240,26 @@
     icones($('modalPublicar'));
     carregarPublicacao();
   }
-  $('btnSalvarPublicacao').addEventListener('click', () => salvarPublicacao().catch((e) => { $('pubConfigStatus').textContent = e.message; }));
-  $('btnConectarYoutube').addEventListener('click', () => conectarPublicacao('youtube'));
-  $('btnConectarTiktok').addEventListener('click', () => conectarPublicacao('tiktok'));
-  $('btnFecharPublicar').addEventListener('click', fecharPublicacao);
-  $('btnCancelarPublicar').addEventListener('click', fecharPublicacao);
-  $('modalPublicar').addEventListener('click', (e) => { if (e.target === $('modalPublicar')) fecharPublicacao(); });
-  $('btnConfirmarPublicar').addEventListener('click', async () => {
-    if (!cortePublicar) return;
-    const b = $('btnConfirmarPublicar'); b.disabled = true; $('pubStatus').textContent = 'Enviando vídeo...';
-    try {
-      const r = await postJson('/api/publicar', { plataforma: $('pubPlataforma').value, arquivo: cortePublicar.arquivo, titulo: $('pubTituloCampo').value, descricao: $('pubDescricaoCampo').value, privacidade: $('pubPrivacidade').value });
-      if (r.erro) throw new Error(r.erro);
-      $('pubStatus').textContent = r.url ? 'Publicado com sucesso: ' + r.url : 'Enviado com sucesso. O processamento da plataforma pode levar alguns minutos.';
-    } catch (e) { $('pubStatus').textContent = e.message || 'Não consegui publicar este corte.'; }
-    finally { b.disabled = false; }
-  });
+  // O modal fica depois deste script no HTML; aguarde o parser terminar antes
+  // de registrar os eventos, para não interromper o restante da interface.
+  setTimeout(() => {
+    $('btnSalvarPublicacao').addEventListener('click', () => salvarPublicacao().catch((e) => { $('pubConfigStatus').textContent = e.message; }));
+    $('btnConectarYoutube').addEventListener('click', () => conectarPublicacao('youtube'));
+    $('btnConectarTiktok').addEventListener('click', () => conectarPublicacao('tiktok'));
+    $('btnFecharPublicar').addEventListener('click', fecharPublicacao);
+    $('btnCancelarPublicar').addEventListener('click', fecharPublicacao);
+    $('modalPublicar').addEventListener('click', (e) => { if (e.target === $('modalPublicar')) fecharPublicacao(); });
+    $('btnConfirmarPublicar').addEventListener('click', async () => {
+      if (!cortePublicar) return;
+      const b = $('btnConfirmarPublicar'); b.disabled = true; $('pubStatus').textContent = 'Enviando vídeo...';
+      try {
+        const r = await postJson('/api/publicar', { plataforma: $('pubPlataforma').value, arquivo: cortePublicar.arquivo, titulo: $('pubTituloCampo').value, descricao: $('pubDescricaoCampo').value, privacidade: $('pubPrivacidade').value });
+        if (r.erro) throw new Error(r.erro);
+        $('pubStatus').textContent = r.url ? 'Publicado com sucesso: ' + r.url : 'Enviado com sucesso. O processamento da plataforma pode levar alguns minutos.';
+      } catch (e) { $('pubStatus').textContent = e.message || 'Não consegui publicar este corte.'; }
+      finally { b.disabled = false; }
+    });
+  }, 0);
   carregarPublicacao();
 
   // ------------------------------------------------------------ onde salvar
