@@ -48,3 +48,7 @@ ao-vivo/
 *.p12
 *.pfx
 *.log
+
+# Prévia local do instalador
+instalador/previa/
+
