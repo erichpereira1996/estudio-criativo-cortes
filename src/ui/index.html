@@ -3280,7 +3280,7 @@
   }
   // O modal fica depois deste script no HTML; aguarde o parser terminar antes
   // de registrar os eventos, para não interromper o restante da interface.
-  setTimeout(() => {
+  document.addEventListener('DOMContentLoaded', () => {
     $('btnSalvarPublicacao').addEventListener('click', () => salvarPublicacao().catch((e) => { $('pubConfigStatus').textContent = e.message; }));
     $('btnConectarYoutube').addEventListener('click', () => conectarPublicacao('youtube'));
     $('btnConectarTiktok').addEventListener('click', () => conectarPublicacao('tiktok'));
@@ -3306,7 +3306,7 @@
       if (e.target.closest('#btnFecharTutPublicacao, #btnFecharTutPublicacao2')) fecharTutorialPublicacao();
       const modal = $('modalTutorialPublicacao'); if (modal && e.target === modal) fecharTutorialPublicacao();
     });
-  }, 0);
+  }, { once: true });
   carregarPublicacao();
 
   // ------------------------------------------------------------ onde salvar

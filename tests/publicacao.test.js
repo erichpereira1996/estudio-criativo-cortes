@@ -20,5 +20,7 @@ test('redirect OAuth usa callback local da plataforma', () => {
 test('painel de publicação não interrompe os eventos do painel de ajustes', () => {
   const html = fs.readFileSync(path.join(__dirname, '..', 'src', 'ui', 'index.html'), 'utf8');
   assert.match(html, /input\[type=url\][^\n]+\.campo/);
-  assert.match(html, /setTimeout\(\(\) => \{\s*\$\('btnSalvarPublicacao'\)/);
+  assert.match(html, /DOMContentLoaded/);
+  assert.doesNotMatch(html, /setTimeout\(\(\) => \{\s*\$\('btnSalvarPublicacao'\)/);
+  assert.match(html, /btnAjudaPublicacao/);
 });
