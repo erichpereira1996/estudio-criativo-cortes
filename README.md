@@ -2,7 +2,7 @@
 
 **Cortes de vídeos e lives com processamento local, identidade visual e instalador completo para Windows.**
 
-Edição personalizada mantida por **@erichpereira22**. A versão publicada atualmente é **v1.1.1**.
+Edição personalizada mantida por **@erichpereira22**. A versão publicada atualmente é **v1.2.1**.
 
 ![Painel de identidade do vídeo](docs/telas/identidade.png)
 
@@ -68,9 +68,9 @@ A identidade começa limpa quando o app é aberto ou recarregado. Projetos já e
 
 A versão usa [Versionamento Semântico](https://semver.org/lang/pt-BR/) no formato `vMAJOR.MINOR.PATCH`.
 
-- `PATCH`: correção compatível, como `v1.1.1` → `v1.1.2`.
-- `MINOR`: nova função compatível, como `v1.1.1` → `v1.2.0`.
-- `MAJOR`: mudança incompatível, como `v1.1.1` → `v2.0.0`.
+- `PATCH`: correção compatível, como `v1.2.1` → `v1.1.2`.
+- `MINOR`: nova função compatível, como `v1.2.1` → `v1.2.0`.
+- `MAJOR`: mudança incompatível, como `v1.2.1` → `v2.0.0`.
 
 O número mostrado no app, o instalador e o pacote vêm de `package.json`. O app verifica automaticamente a Release estável mais recente ao abrir, ao voltar para o foco e periodicamente. Se houver uma versão nova, ele baixa o instalador, fecha o programa, instala a atualização e abre novamente. As atualizações publicadas ficam na página de [Releases](https://github.com/erichpereira1996/estudio-criativo-cortes/releases). Baixe o instalador da versão desejada e execute-o sobre a instalação existente; seus cortes e presets são preservados.
 

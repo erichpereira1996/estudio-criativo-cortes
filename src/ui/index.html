@@ -5259,7 +5259,7 @@
     $('barraAtualizar').hidden = true;
     $('autoUpdAcoes').hidden = true;
     $('autoUpdSelo').textContent = estadoRemoto && estadoRemoto.shaRemoto
-      ? ('Release detectada · #' + estadoRemoto.shaRemoto + ' · v' + (estadoRemoto.versaoRemota || ''))
+      ? ('Release detectada · ' + (estadoRemoto.versaoRemota || ''))
       : 'Nova atualização encontrada no GitHub';
     $('autoUpdTitulo').textContent = 'Atualizando o Estúdio Criativo Cortes...';
     $('autoUpdResumo').textContent = (estadoRemoto && estadoRemoto.resumoVersao) || 'Sincronizando arquivos novos do GitHub...';
@@ -5309,7 +5309,10 @@
       }
 
       if (r.temAtualizacao) {
-        executarAtualizacao();
+        $('updTitulo').textContent = 'Nova versão ' + (r.rotuloRemoto || ('v' + r.versaoRemota)) + ' disponível';
+        $('updResumo').textContent = r.resumoVersao ? r.resumoVersao.split('\n')[0] : 'Uma atualização está disponível no GitHub.';
+        $('barraAtualizar').hidden = false;
+        icones($('barraAtualizar'));
       } else {
         $('barraAtualizar').hidden = true;
       }

@@ -58,7 +58,7 @@ async function consultar(forcar = false) {
     const tem = cmp === 1;
     const precisa = tem && (!INSTALADO || !info.urlInstalador);
     const resultado = {
-      rotulo: rotulo(), versaoAtual: version, versaoRemota: info.versaoRemota,
+      rotulo: rotulo(), versaoAtual: version, versaoRemota: info.versaoRemota, rotuloRemoto: info.rotuloRemoto,
       shaLocal: '', shaRemoto: info.tag, temAtualizacao: tem, obrigatoria: false,
       motivoAtualizacao: tem ? 'Nova Release disponível no GitHub.' : '',
       resumoVersao: info.resumoVersao, precisaInstalador: precisa,
