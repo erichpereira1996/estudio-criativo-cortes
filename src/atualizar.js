@@ -110,6 +110,13 @@ async function baixarComTentativas(url, destino, esperado, minimo) {
 function caminhoLancador() {
   return path.resolve(path.dirname(process.execPath), '..', '..', 'EstudioCriativoCortes.exe');
 }
+function scriptPowerShellAtualizacao() {
+  return "param([string]$Zip, [string]$App)\n$ErrorActionPreference = 'Stop'\nExpand-Archive -LiteralPath $Zip -DestinationPath $App -Force\n";
+}
+function scriptAtualizacaoLeve(zip, app, launcher, ps1) {
+  const q = p => '"' + String(p).replaceAll('"', '""') + '"';
+  return '@echo off\r\ntimeout /t 2 /nobreak >nul\r\npowershell.exe -NoProfile -ExecutionPolicy Bypass -File ' + q(ps1) + ' ' + q(zip) + ' ' + q(app) + '\r\nif errorlevel 1 exit /b 1\r\nstart "" ' + q(launcher) + '\r\n';
+}
 async function aplicarAtualizacao() {
   if (!INSTALADO) throw new Error('Esta cópia foi iniciada pelo código-fonte. Baixe o instalador pela Release para atualizar.');
   const estado = await consultar(true);
@@ -124,8 +131,9 @@ async function aplicarAtualizacao() {
     const zip = path.join(pasta, NOME_PACOTE);
     await baixarComTentativas(estado.urlPacote, zip, estado.tamanhoPacote, 10 * 1024);
     const app = path.resolve(path.dirname(process.execPath), '..', '..', 'app');
-    const comando = "$ErrorActionPreference='Stop'; Expand-Archive -LiteralPath '" + zip.replaceAll("'", "''") + "' -DestinationPath '" + app.replaceAll("'", "''") + "' -Force";
-    fs.writeFileSync(cmd, '@echo off\r\ntimeout /t 2 /nobreak >nul\r\npowershell.exe -NoProfile -ExecutionPolicy Bypass -Command "' + comando.replaceAll('"', '\\"') + '"\r\nif errorlevel 1 exit /b 1\r\nstart "" ' + esc(launcher) + '\r\n', 'utf8');
+    const ps1 = path.join(pasta, 'aplicar-atualizacao.ps1');
+    fs.writeFileSync(ps1, scriptPowerShellAtualizacao(), 'utf8');
+    fs.writeFileSync(cmd, scriptAtualizacaoLeve(zip, app, launcher, ps1), 'utf8');
   } else {
     const exe = path.join(pasta, NOME_INSTALADOR);
     await baixarComTentativas(estado.urlInstalador, exe, estado.tamanhoInstalador, 10 * 1024 * 1024);
@@ -134,4 +142,4 @@ async function aplicarAtualizacao() {
   spawn('cmd.exe', ['/d', '/c', 'start', '"Atualização"', '/min', esc(cmd)], { detached: true, stdio: 'ignore', windowsHide: true }).unref();
   return { ok: true, atualizado: true, versaoRemota: estado.versaoRemota, rotulo: rotulo(estado.versaoRemota) };
 }
-module.exports = { REPOSITORIO, versaoLocal, semver, compararVersoes, releaseInfo, checarRemoto, aplicarAtualizacao, tamanhoValido };
+module.exports = { REPOSITORIO, versaoLocal, semver, compararVersoes, releaseInfo, checarRemoto, aplicarAtualizacao, tamanhoValido, scriptAtualizacaoLeve };
