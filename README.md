@@ -45,6 +45,12 @@ O modo API pode melhorar a escolha dos momentos e a criação de títulos, mas d
 
 Para usar a duração semântica, selecione **Por assunto · IA** na etapa de geração. O Gateway sugere limites com base no assunto de cada trecho; o app valida sobreposição e duração mínima antes de renderizar. Sem API conectada, essa opção solicita a conexão em vez de substituir silenciosamente a decisão da IA por uma duração fixa.
 
+### Publicação direta (opcional)
+
+Cada cartão de corte agora tem o botão **Publicar**. Na primeira utilização, abra **Ajustes → Publicação direta**, informe as credenciais OAuth do seu app no YouTube ou TikTok e clique em **Conectar**. A autorização acontece no navegador; o Estúdio não recebe sua senha. Depois, escolha título, legenda, hashtags e privacidade e envie o MP4 direto da pasta de saída.
+
+O YouTube usa a permissão `youtube.upload` para Shorts. O TikTok usa o Content Posting API e exige aprovação do escopo `video.publish`; contas de apps ainda não auditados podem ficar limitadas a publicações privadas. As credenciais e tokens ficam somente no perfil local do usuário e nunca são enviados ao Gateway de análise.
+
 ### Primeira abertura
 
 1. Abra **Estúdio Criativo Cortes** pelo atalho.

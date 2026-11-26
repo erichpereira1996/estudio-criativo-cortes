@@ -108,6 +108,15 @@
   .status-api.api-configurada .status-api-ponto { background: #ffd04d; }
   .status-api.api-indisponivel { border-color: rgba(255,105,115,.4); color: #ff9aa2; }
   .status-api.api-indisponivel .status-api-ponto { background: #ff5964; }
+  .publicacao-plataformas { display:grid; gap:10px; }
+  .publicacao-conta { display:flex; align-items:center; gap:8px; font-size:var(--t5); color:var(--texto2); }
+  .publicacao-conta b { flex:1; color:var(--texto); }
+  .publicacao-dot { width:8px; height:8px; border-radius:50%; background:var(--texto3); }
+  .publicacao-dot.on { background:var(--verde); box-shadow:0 0 9px var(--verde); }
+  .publicacao-acoes { display:flex; gap:7px; flex-wrap:wrap; }
+  .publicar-modal { max-width:520px; }
+  .publicar-modal .campo, .publicar-modal textarea, .publicar-modal select { width:100%; }
+  .publicar-status { min-height:1.3em; color:var(--texto2); font-size:var(--t5); }
   @media (max-width: 700px) { .topo { flex-wrap: wrap; } .topo h1 { display: none; } }
 
   /* ---------------------------------------------------------- link no topo */
@@ -2015,6 +2024,19 @@
       </div>
     </div>
 
+    <div class="grupo" id="grupoPublicacao">
+      <h4><i data-lucide="send" class="i"></i> Publicação direta</h4>
+      <div class="dica" style="margin-bottom:10px">Conecte suas contas por OAuth para enviar os cortes sem sair do app. Senhas não são armazenadas.</div>
+      <div class="publicacao-plataformas">
+        <div class="publicacao-conta"><span class="publicacao-dot" id="pubDotYoutube"></span><b>YouTube Shorts</b><span id="pubStatusYoutube">Não configurado</span></div>
+        <div class="publicacao-acoes"><input class="campo" id="pubYoutubeClientId" placeholder="Client ID do YouTube"><input class="campo" id="pubYoutubeClientSecret" type="password" placeholder="Client Secret do YouTube"><button class="btn p" id="btnConectarYoutube" type="button">Conectar YouTube</button></div>
+        <div class="publicacao-conta"><span class="publicacao-dot" id="pubDotTiktok"></span><b>TikTok</b><span id="pubStatusTiktok">Não configurado</span></div>
+        <div class="publicacao-acoes"><input class="campo" id="pubTiktokClientKey" placeholder="Client Key do TikTok"><input class="campo" id="pubTiktokClientSecret" type="password" placeholder="Client Secret do TikTok"><button class="btn p" id="btnConectarTiktok" type="button">Conectar TikTok</button></div>
+      </div>
+      <button class="btn p" id="btnSalvarPublicacao" type="button" style="margin-top:10px">Salvar configurações de publicação</button>
+      <div class="pasta-status" id="pubConfigStatus"></div>
+    </div>
+
     <div class="grupo">
       <h4><i data-lucide="refresh-cw" class="i"></i> Versão e atualizações</h4>
       <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap">
@@ -3172,6 +3194,70 @@
     setTimeout(() => $('grupoApi')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
   });
 
+  // ------------------------------------------------------------ publicação direta
+  let cortePublicar = null;
+  let timerPublicacao = null;
+  function pintarPublicacao(r) {
+    const nomes = [['youtube', 'Youtube'], ['tiktok', 'Tiktok']];
+    nomes.forEach(([p, sufixo]) => {
+      const d = r && r[p] || {};
+      const ligado = !!d.conectado;
+      $('pubDot' + sufixo).classList.toggle('on', ligado);
+      $('pubStatus' + sufixo).textContent = ligado ? 'Conectado' : (d.configurado ? 'Pronto para conectar' : 'Não configurado');
+      if (p === 'youtube') $('pubYoutubeClientId').value = d.clientId || '';
+      if (p === 'tiktok') $('pubTiktokClientKey').value = d.clientKey || '';
+    });
+  }
+  async function carregarPublicacao() {
+    try { const r = await fetch('/api/publicacao-config').then((x) => x.json()); pintarPublicacao(r); return r; } catch (_) { return null; }
+  }
+  async function salvarPublicacao() {
+    const r = await postJson('/api/publicacao-config', { youtube: { clientId: $('pubYoutubeClientId').value, clientSecret: $('pubYoutubeClientSecret').value }, tiktok: { clientKey: $('pubTiktokClientKey').value, clientSecret: $('pubTiktokClientSecret').value } });
+    if (r.erro) throw new Error(r.erro);
+    pintarPublicacao(r); $('pubConfigStatus').textContent = 'Configurações salvas.';
+    return r;
+  }
+  async function conectarPublicacao(plataforma) {
+    try {
+      await salvarPublicacao();
+      const r = await fetch('/api/publicacao/oauth/' + plataforma).then((x) => x.json());
+      if (r.erro) throw new Error(r.erro);
+      window.open(r.url, '_blank', 'noopener,noreferrer');
+      $('pubConfigStatus').textContent = 'Autorize a conta na janela aberta e volte para cá.';
+      clearInterval(timerPublicacao);
+      timerPublicacao = setInterval(carregarPublicacao, 2500);
+      setTimeout(() => clearInterval(timerPublicacao), 10 * 60 * 1000);
+    } catch (e) { $('pubConfigStatus').textContent = e.message || 'Não consegui iniciar a conexão.'; }
+  }
+  function fecharPublicacao() { $('modalPublicar').hidden = true; cortePublicar = null; }
+  function abrirPublicacao(c) {
+    cortePublicar = c;
+    $('pubTituloCampo').value = c.titulo || '';
+    $('pubDescricaoCampo').value = c.legendaPost || (c.seo && c.seo.shorts) || '';
+    $('pubPrivacidade').value = 'private';
+    $('pubStatus').textContent = '';
+    $('modalPublicar').hidden = false;
+    icones($('modalPublicar'));
+    carregarPublicacao();
+  }
+  $('btnSalvarPublicacao').addEventListener('click', () => salvarPublicacao().catch((e) => { $('pubConfigStatus').textContent = e.message; }));
+  $('btnConectarYoutube').addEventListener('click', () => conectarPublicacao('youtube'));
+  $('btnConectarTiktok').addEventListener('click', () => conectarPublicacao('tiktok'));
+  $('btnFecharPublicar').addEventListener('click', fecharPublicacao);
+  $('btnCancelarPublicar').addEventListener('click', fecharPublicacao);
+  $('modalPublicar').addEventListener('click', (e) => { if (e.target === $('modalPublicar')) fecharPublicacao(); });
+  $('btnConfirmarPublicar').addEventListener('click', async () => {
+    if (!cortePublicar) return;
+    const b = $('btnConfirmarPublicar'); b.disabled = true; $('pubStatus').textContent = 'Enviando vídeo...';
+    try {
+      const r = await postJson('/api/publicar', { plataforma: $('pubPlataforma').value, arquivo: cortePublicar.arquivo, titulo: $('pubTituloCampo').value, descricao: $('pubDescricaoCampo').value, privacidade: $('pubPrivacidade').value });
+      if (r.erro) throw new Error(r.erro);
+      $('pubStatus').textContent = r.url ? 'Publicado com sucesso: ' + r.url : 'Enviado com sucesso. O processamento da plataforma pode levar alguns minutos.';
+    } catch (e) { $('pubStatus').textContent = e.message || 'Não consegui publicar este corte.'; }
+    finally { b.disabled = false; }
+  });
+  carregarPublicacao();
+
   // ------------------------------------------------------------ onde salvar
   let armazenamento = null;
   function statusPasta(msg, tipo) { $('pastaStatus').textContent = msg || ''; $('pastaStatus').className = 'pasta-status' + (tipo ? ' ' + tipo : ''); }
@@ -4044,6 +4130,7 @@
 
         '<div class="clipe-acoes">' +
           '<a class="btn p" href="' + src + '" download="' + esc(c.nomeArquivo) + '"><i data-lucide="download" class="i"></i> Baixar</a>' +
+          '<button class="btn p abrir-publicacao" type="button" title="Publicar este corte"><i data-lucide="send" class="i"></i> Publicar</button>' +
           '<button class="btn p" data-copiar="' + esc(c.legendaPost || c.titulo) + '" title="Título e hashtags, pronto pra colar no post"><i data-lucide="copy" class="i"></i> Legenda</button>' +
           editar +
           (editar ? '<button class="btn p abrir-som"' + (podeEditarClipe(c) ? '' : ' disabled') + ' title="O som está fora de tempo com a imagem? Ajuste só esse clipe"><i data-lucide="audio-lines" class="i"></i> Áudio atrasado?</button>' : '') +
@@ -4083,6 +4170,8 @@
 
     const btnEditar = div.querySelector('.abrir-editor');
     if (btnEditar) btnEditar.addEventListener('click', () => abrirEditor(c, pastaDoClipe || (projetoAtual && projetoAtual.pasta)));
+    const btnPublicar = div.querySelector('.abrir-publicacao');
+    if (btnPublicar) btnPublicar.addEventListener('click', () => abrirPublicacao(c));
 
     // "O audio esta atrasado": refaz so esse clipe com o som deslocado
     const btnSom = div.querySelector('.abrir-som');
@@ -5594,5 +5683,23 @@
 </dialog>
 
 <script src="/ui/identidade.js"></script>
+<div class="dsp-fundo" id="modalPublicar" hidden role="dialog" aria-modal="true" aria-labelledby="pubTitulo">
+  <div class="dsp-caixa publicar-modal">
+    <div style="display:flex;align-items:flex-start;gap:12px">
+      <div style="flex:1"><span class="selo-info">Publicação direta</span><h2 id="pubTitulo" style="margin-top:8px">Publicar corte</h2></div>
+      <button class="btn p" id="btnFecharPublicar" type="button" aria-label="Fechar"><i data-lucide="x" class="i"></i></button>
+    </div>
+    <label class="rot" for="pubPlataforma">Onde publicar</label>
+    <select class="campo" id="pubPlataforma"><option value="youtube">YouTube Shorts</option><option value="tiktok">TikTok</option></select>
+    <label class="rot" for="pubTituloCampo" style="margin-top:12px">Título</label>
+    <input class="campo" id="pubTituloCampo" maxlength="100" placeholder="Título do corte">
+    <label class="rot" for="pubDescricaoCampo" style="margin-top:12px">Legenda / descrição</label>
+    <textarea class="campo" id="pubDescricaoCampo" rows="4" maxlength="2200" placeholder="Escreva a legenda e as hashtags"></textarea>
+    <label class="rot" for="pubPrivacidade" style="margin-top:12px">Privacidade</label>
+    <select class="campo" id="pubPrivacidade"><option value="private">Privado</option><option value="public">Público</option></select>
+    <div class="publicar-status" id="pubStatus"></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px"><button class="btn p" id="btnCancelarPublicar" type="button">Cancelar</button><button class="btn principal" id="btnConfirmarPublicar" type="button"><i data-lucide="send" class="i"></i> Publicar agora</button></div>
+  </div>
+</div>
 </body>
 </html>

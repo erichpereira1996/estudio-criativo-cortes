@@ -25,6 +25,7 @@ const aovivo = require('./aovivo');
 const identidade = require('./identidade');
 const versao = require('./versao');
 const api = require('./api');
+const publicacao = require('./publicacao');
 
 // Um erro solto em algum canto (um ffmpeg que sumiu, uma conexao que caiu)
 // nao pode derrubar o programa inteiro: a janela ficaria dando "Failed to fetch"
@@ -1006,6 +1007,39 @@ const servidor = http.createServer(async (req, res) => {
     }
 
     // ---------------------------------------------------------- processamento API/local
+    if (rota === '/api/publicacao-config' && req.method === 'GET') {
+      return json(res, 200, publicacao.resumo());
+    }
+    if (rota === '/api/publicacao-config' && req.method === 'POST') {
+      try { return json(res, 200, publicacao.salvarConfig(await lerCorpo(req))); }
+      catch (e) { return json(res, 400, { erro: e.message }); }
+    }
+    if (rota.startsWith('/api/publicacao/oauth/') && req.method === 'GET') {
+      const partes = rota.split('/').filter(Boolean);
+      const plataforma = partes[3];
+      try {
+        if (partes[4] === 'callback') {
+          const codigo = url.searchParams.get('code');
+          const erroOauth = url.searchParams.get('error');
+          if (erroOauth) throw new Error('Autorização cancelada: ' + erroOauth);
+          if (!codigo) throw new Error('O provedor não devolveu o código de autorização.');
+          await publicacao.callback(plataforma, codigo, url.searchParams.get('state'), req.headers.host);
+          res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
+          return res.end('<!doctype html><meta charset="utf-8"><title>Conta conectada</title><style>body{font:16px system-ui;background:#101210;color:#eee;display:grid;place-items:center;height:100vh}main{padding:28px;border:1px solid #9cff12;border-radius:16px;text-align:center}b{color:#9cff12}</style><main><h2>Conta conectada</h2><p>Você já pode fechar esta aba e voltar ao Estúdio Criativo Cortes.</p></main>');
+        }
+        return json(res, 200, publicacao.iniciarOAuth(plataforma, req.headers.host));
+      } catch (e) { return json(res, 400, { erro: e.message }); }
+    }
+    if (rota === '/api/publicar' && req.method === 'POST') {
+      try {
+        const corpo = await lerCorpo(req);
+        const arquivo = dentroDaSaida(corpo.arquivo);
+        if (!arquivo || !fs.existsSync(arquivo)) return json(res, 400, { erro: 'O vídeo precisa estar na pasta de saída.' });
+        return json(res, 200, await publicacao.publicar(String(corpo.plataforma || ''), arquivo, {
+          titulo: String(corpo.titulo || '').trim(), descricao: String(corpo.descricao || '').trim(), privacidade: String(corpo.privacidade || 'private'),
+        }));
+      } catch (e) { return json(res, 400, { erro: e.message || 'Não consegui publicar o corte.' }); }
+    }
     if (rota === '/api/api-config' && req.method === 'GET') {
       return json(res, 200, api.resumo());
     }
