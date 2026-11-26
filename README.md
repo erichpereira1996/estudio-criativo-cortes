@@ -76,17 +76,6 @@ O número mostrado no app, o instalador e o pacote vêm de `package.json`. O app
 
 Para desenvolver sem o instalador:
 
-1. Instale Node.js 20 ou superior, Python 3.12, FFmpeg, FFprobe e yt-dlp.
-2. Clone o repositório:
-
-   ```powershell
-   git clone https://github.com/erichpereira1996/estudio-criativo-cortes.git
-   cd estudio-criativo-cortes
-   ```
-
-3. Execute `instalar.bat` para preparar o ambiente de transcrição.
-4. Execute `iniciar.bat` ou `npm start`.
-
 Para validar as mudanças, configure `FFMPEG_PATH` e `FFPROBE_PATH` quando necessário e execute:
 
 ```powershell
