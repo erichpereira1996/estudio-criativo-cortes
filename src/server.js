@@ -284,13 +284,17 @@ function janelaDoWindows(linhasDoDialogo, propriedade) {
   return new Promise((resolve) => {
     const script = [
       'Add-Type -AssemblyName System.Windows.Forms | Out-Null',
+      'Add-Type -TypeDefinition \'using System; using System.Runtime.InteropServices; public static class FocoEstudio { [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h); }\'',
     ].concat(linhasDoDialogo, [
       '$t = New-Object System.Windows.Forms.Form',
+      '$t.StartPosition = [System.Windows.Forms.FormStartPosition]::CenterScreen',
+      '$t.ShowInTaskbar = $true',
       '$t.TopMost = $true',
+      '$t.Add_Shown({ [FocoEstudio]::SetForegroundWindow($t.Handle); $t.Activate(); $t.BringToFront() })',
       'if ($d.ShowDialog($t) -eq [System.Windows.Forms.DialogResult]::OK) { Write-Output ("OK:" + [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($d.' + propriedade + '))) } else { Write-Output "CANCELOU" }',
       '$t.Dispose()',
     ]).join('; ');
-    execFile(POWERSHELL, ['-NoProfile', '-STA', '-Command', script],
+    execFile(POWERSHELL, ['-NoProfile', '-STA', '-WindowStyle', 'Normal', '-Command', script],
       { windowsHide: true, timeout: 300000 },
       (erro, saida) => {
         const texto = String(saida || '').trim();
