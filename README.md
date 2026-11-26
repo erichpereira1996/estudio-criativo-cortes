@@ -2,7 +2,7 @@
 
 **Cortes de vídeos e lives com processamento local, identidade visual e instalador completo para Windows.**
 
-Edição personalizada mantida por **@erichpereira22**. A próxima versão publicada será **v1.3.0**.
+Edição personalizada mantida por **@erichpereira22**. A versão publicada atualmente é **v1.3.0**.
 
 ## O que o app faz
 
