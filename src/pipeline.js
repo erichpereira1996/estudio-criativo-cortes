@@ -11,7 +11,7 @@ const path = require('path');
 const media = require('./media');
 const legenda = require('./legenda');
 const momentos = require('./momentos');
-const { encontrarCortes, diagnosticarCortes, corteDoTrecho, achatarPalavras, mmss } = require('./score');
+const { encontrarCortes, diagnosticarCortes, corteDoTrecho, achatarPalavras, montarFrases, mmss } = require('./score');
 const { gerarCopy, gerarGanchoDeTela } = require('./copy');
 const { interpretar } = require('./intencao');
 const sessoes = require('./sessoes');
@@ -537,13 +537,15 @@ function aplicarAnaliseApi(cortes, analise, avisar) {
 /** Cria cortes usando os limites semânticos sugeridos pelo Gateway. */
 function cortesPorAssunto(transcricao, energia, momentos, opcoes) {
   const limite = opcoes.trecho;
+  const frases = montarFrases(achatarPalavras(transcricao));
   const candidatos = momentos.slice().sort((a, b) => (b.pontuacao || 0) - (a.pontuacao || 0));
   const escolhidos = [];
   for (const m of candidatos) {
-    let inicio = Math.max(0, Number(m.inicio) || 0);
-    let fim = Math.max(inicio, Number(m.fim) || inicio);
+    const ajustado = expandirAssunto(m, frases, Number(transcricao.duracao) || Infinity);
+    let inicio = ajustado.inicio;
+    let fim = ajustado.fim;
     if (limite) { inicio = Math.max(inicio, limite.inicio); fim = Math.min(fim, limite.fim); }
-    if (fim - inicio < 3) continue;
+    if (fim - inicio < 20) continue;
     const sobrepoe = escolhidos.some((c) => {
       const inter = Math.max(0, Math.min(c.fim, fim) - Math.max(c.inicio, inicio));
       return inter / Math.max(1, Math.min(c.fim - c.inicio, fim - inicio)) > 0.5;
@@ -557,6 +559,29 @@ function cortesPorAssunto(transcricao, energia, momentos, opcoes) {
     if (escolhidos.length >= (opcoes.quantidade || 8)) break;
   }
   return escolhidos;
+}
+
+function expandirAssunto(momento, frases, duracaoVideo) {
+  let inicio = Math.max(0, Number(momento.inicio) || 0);
+  let fim = Math.max(inicio, Number(momento.fim) || inicio);
+  if (!frases.length) return { inicio, fim };
+  let a = frases.findIndex((f) => f.fim > inicio);
+  if (a < 0) a = frases.length - 1;
+  let b = a;
+  while (b < frases.length && frases[b].inicio < fim) b++;
+  b = Math.max(a, b - 1);
+  // Expande ao redor do assunto até ter contexto suficiente. Prefere incluir
+  // o fechamento depois do ponto indicado, depois busca o contexto anterior.
+  while ((frases[b].fim - frases[a].inicio < 20 || !frases[b].terminaFirme) && (a > 0 || b + 1 < frases.length)) {
+    if (b + 1 < frases.length && (frases[b].fim - frases[a].inicio < 20 || !frases[b].terminaFirme)) b++;
+    else if (a > 0) a--;
+    else break;
+    if (frases[b].fim - frases[a].inicio >= 120) break;
+  }
+  inicio = frases[a].inicio;
+  fim = frases[b].fim;
+  if (fim - inicio > 120) fim = Math.min(duracaoVideo, inicio + 120);
+  return { inicio, fim };
 }
 
 function semPalavras(c) {

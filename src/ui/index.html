@@ -1372,7 +1372,7 @@
         <button class="chip" data-dur="18-40" aria-pressed="false">Curto · 20 a 40s</button>
         <button class="chip" data-dur="28-62" aria-pressed="true">Médio · 30s a 1min</button>
         <button class="chip" data-dur="45-62" aria-pressed="false">Longo · 45s a 1min</button>
-        <button class="chip" data-dur="assunto" aria-pressed="false">Por assunto · IA</button>
+        <button class="chip" data-dur="assunto" aria-pressed="false">Por assunto · IA · 20s+</button>
       </div>
       <div style="font-size:var(--t6); color:var(--texto3); margin-top:10px; line-height:1.5">
         Corte curto costuma ser assistido até o fim — ou deixe a IA decidir o começo e o fim conforme o assunto.
@@ -3867,7 +3867,7 @@
     const exato = !!(trechoFluxo && trechoFluxo.modo === 'exato');
     {}
     const porAssunto = cfg.duracao === 'assunto';
-    const faixa = porAssunto ? ['3', '600'] : cfg.duracao.split('-');
+    const faixa = porAssunto ? ['20', '120'] : cfg.duracao.split('-');
     const vel = VELOCIDADES[cfg.velocidade] || VELOCIDADES.equilibrado;
     const descricao = cfg.pedidos.concat([$('descricao').value.trim()]).filter(Boolean).join('. ');
 

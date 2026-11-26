@@ -163,6 +163,8 @@ function normalizarAnalise(resposta, duracao) {
       fim: Math.min(numero(duracao, Infinity), Math.max(0, numero(m.fim ?? m.end, 0))),
       pontuacao: Math.max(0, Math.min(100, numero(m.pontuacao ?? m.score, 0))),
       motivo: String(m.motivo || m.reason || '').slice(0, 240),
+      assunto: String(m.assunto || m.topic || '').slice(0, 160),
+      fechamento: m.fechamento !== false && m.closure !== false,
     })).filter((m) => m.fim > m.inicio),
     titulos: Array.isArray(obj.titulos) ? obj.titulos.map((t) => String(t).slice(0, 120)).filter(Boolean).slice(0, 10) : [],
   };
@@ -174,10 +176,10 @@ async function analisar(transcricao, duracao, config, aoProgredir) {
   const entrada = textoDaTranscricao(transcricao);
   if (!entrada) throw new Error('A transcrição local não trouxe texto para analisar.');
   const prompt = [
-    'Analise a transcrição abaixo para criar cortes curtos de vídeo.',
+    'Analise a transcrição abaixo para criar cortes completos por assunto.',
     'Responda SOMENTE JSON válido, sem markdown, neste formato:',
-    '{"resumo":"...","momentos":[{"inicio":0,"fim":10,"pontuacao":0,"motivo":"..."}],"titulos":["..."]}',
-    'Escolha até 12 momentos com começo e fim em segundos, priorizando gancho, virada, emoção, surpresa e conclusão. Não invente tempos fora da transcrição.',
+    '{"resumo":"...","momentos":[{"assunto":"...","inicio":0,"fim":40,"pontuacao":0,"motivo":"...","fechamento":true}],"titulos":["..."]}',
+    'Escolha até 12 assuntos completos, com no mínimo 20 segundos e no máximo 120 segundos. Comece antes da explicação e termine somente depois da conclusão. Não corte no meio de uma ideia, não trate troca de diálogo como novo assunto e não invente tempos fora da transcrição.',
     'Duração total: ' + Number(duracao || 0).toFixed(2) + ' segundos.',
     'TRANSCRIÇÃO:\n' + entrada,
   ].join('\n');

@@ -36,7 +36,7 @@ test('cortes por assunto respeitam limites semânticos e removem sobreposição'
   const cortes = cortesPorAssunto(transcricao, Array(31).fill(0.5), [
     { inicio: 0, fim: 12, pontuacao: 90 }, { inicio: 2, fim: 11, pontuacao: 80 }, { inicio: 18, fim: 29, pontuacao: 70 },
   ], { quantidade: 3, momentos: [], perfil: 'fala', sessao: 'fala' });
-  assert.equal(cortes.length, 2);
+  assert.equal(cortes.length, 1);
   assert.equal(cortes[0].duracaoPorAssunto, true);
-  assert.equal(cortes[1].inicio, 18);
+  assert.ok(cortes[0].duracao >= 20);
 });
