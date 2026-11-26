@@ -1093,7 +1093,6 @@
     <span class="status-api-ponto" aria-hidden="true"></span><span data-status-api-text>API não configurada</span>
   </button>
   <span class="versao-app" data-versao-app aria-label="Versão do programa">…</span>
-  <button class="btn p" type="button" data-abrir-identidade><i data-lucide="stamp" class="i"></i> Identidade</button>
   <form class="link-topo" id="formLinkTopo" autocomplete="off">
     <i data-lucide="link-2" class="i"></i>
     <input type="text" id="linkTopo" placeholder="Cole aqui o link da live ou do vídeo · Kick, Twitch ou YouTube" aria-label="Link da live ou do vídeo">
@@ -1101,6 +1100,7 @@
   </form>
 
   <button class="btn p" id="btnProjetos"><i data-lucide="folder-kanban" class="i"></i> Projetos</button>
+  <button class="btn p" type="button" data-abrir-identidade><i data-lucide="stamp" class="i"></i> Identidade</button>
   <button class="btn p" id="btnAjustes"><i data-lucide="settings-2" class="i"></i> Ajustes</button>
 </div>
 
@@ -2065,6 +2065,8 @@
         <div class="publicacao-acoes"><input class="campo" id="pubYoutubeClientId" placeholder="Client ID do YouTube"><input class="campo" id="pubYoutubeClientSecret" type="password" placeholder="Client Secret do YouTube"><button class="btn p" id="btnConectarYoutube" type="button">Conectar YouTube</button></div>
         <div class="publicacao-conta"><span class="publicacao-dot" id="pubDotTiktok"></span><b>TikTok</b><span id="pubStatusTiktok">Não configurado</span></div>
         <div class="publicacao-acoes"><input class="campo" id="pubTiktokClientKey" placeholder="Client Key do TikTok"><input class="campo" id="pubTiktokClientSecret" type="password" placeholder="Client Secret do TikTok"><button class="btn p" id="btnConectarTiktok" type="button">Conectar TikTok</button></div>
+        <div class="publicacao-conta"><span class="publicacao-dot" id="pubDotInstagram"></span><b>Instagram Reels</b><span id="pubStatusInstagram">Não configurado</span></div>
+        <div class="publicacao-acoes"><input class="campo" id="pubInstagramClientId" placeholder="App ID do Instagram"><input class="campo" id="pubInstagramClientSecret" type="password" placeholder="Client Secret do Instagram"><button class="btn p" id="btnConectarInstagram" type="button">Conectar Instagram</button><span class="dica">Para publicar Reels, informe uma URL pública do MP4 no momento do envio.</span></div>
       </div>
       <button class="btn p" id="btnSalvarPublicacao" type="button" style="margin-top:10px">Salvar configurações de publicação</button>
       <div class="pasta-status" id="pubConfigStatus"></div>
@@ -3231,7 +3233,7 @@
   let cortePublicar = null;
   let timerPublicacao = null;
   function pintarPublicacao(r) {
-    const nomes = [['youtube', 'Youtube'], ['tiktok', 'Tiktok']];
+    const nomes = [['youtube', 'Youtube'], ['tiktok', 'Tiktok'], ['instagram', 'Instagram']];
     nomes.forEach(([p, sufixo]) => {
       const d = r && r[p] || {};
       const ligado = !!d.conectado;
@@ -3239,13 +3241,14 @@
       $('pubStatus' + sufixo).textContent = ligado ? 'Conectado' : (d.configurado ? 'Pronto para conectar' : 'Não configurado');
       if (p === 'youtube') $('pubYoutubeClientId').value = d.clientId || '';
       if (p === 'tiktok') $('pubTiktokClientKey').value = d.clientKey || '';
+      if (p === 'instagram') $('pubInstagramClientId').value = d.clientId || '';
     });
   }
   async function carregarPublicacao() {
     try { const r = await fetch('/api/publicacao-config').then((x) => x.json()); pintarPublicacao(r); return r; } catch (_) { return null; }
   }
   async function salvarPublicacao() {
-    const r = await postJson('/api/publicacao-config', { youtube: { clientId: $('pubYoutubeClientId').value, clientSecret: $('pubYoutubeClientSecret').value }, tiktok: { clientKey: $('pubTiktokClientKey').value, clientSecret: $('pubTiktokClientSecret').value } });
+    const r = await postJson('/api/publicacao-config', { youtube: { clientId: $('pubYoutubeClientId').value, clientSecret: $('pubYoutubeClientSecret').value }, tiktok: { clientKey: $('pubTiktokClientKey').value, clientSecret: $('pubTiktokClientSecret').value }, instagram: { clientId: $('pubInstagramClientId').value, clientSecret: $('pubInstagramClientSecret').value } });
     if (r.erro) throw new Error(r.erro);
     pintarPublicacao(r); $('pubConfigStatus').textContent = 'Configurações salvas.';
     return r;
@@ -3268,6 +3271,8 @@
     $('pubTituloCampo').value = c.titulo || '';
     $('pubDescricaoCampo').value = c.legendaPost || (c.seo && c.seo.shorts) || '';
     $('pubPrivacidade').value = 'private';
+    $('pubUrlPublica').value = '';
+    $('pubUrlPublicaWrap').hidden = $('pubPlataforma').value !== 'instagram';
     $('pubStatus').textContent = '';
     $('modalPublicar').hidden = false;
     icones($('modalPublicar'));
@@ -3279,6 +3284,8 @@
     $('btnSalvarPublicacao').addEventListener('click', () => salvarPublicacao().catch((e) => { $('pubConfigStatus').textContent = e.message; }));
     $('btnConectarYoutube').addEventListener('click', () => conectarPublicacao('youtube'));
     $('btnConectarTiktok').addEventListener('click', () => conectarPublicacao('tiktok'));
+    $('btnConectarInstagram').addEventListener('click', () => conectarPublicacao('instagram'));
+    $('pubPlataforma').addEventListener('change', () => { $('pubUrlPublicaWrap').hidden = $('pubPlataforma').value !== 'instagram'; });
     $('btnFecharPublicar').addEventListener('click', fecharPublicacao);
     $('btnCancelarPublicar').addEventListener('click', fecharPublicacao);
     $('modalPublicar').addEventListener('click', (e) => { if (e.target === $('modalPublicar')) fecharPublicacao(); });
@@ -3286,18 +3293,19 @@
       if (!cortePublicar) return;
       const b = $('btnConfirmarPublicar'); b.disabled = true; $('pubStatus').textContent = 'Enviando vídeo...';
       try {
-        const r = await postJson('/api/publicar', { plataforma: $('pubPlataforma').value, arquivo: cortePublicar.arquivo, titulo: $('pubTituloCampo').value, descricao: $('pubDescricaoCampo').value, privacidade: $('pubPrivacidade').value });
+        const r = await postJson('/api/publicar', { plataforma: $('pubPlataforma').value, arquivo: cortePublicar.arquivo, titulo: $('pubTituloCampo').value, descricao: $('pubDescricaoCampo').value, privacidade: $('pubPrivacidade').value, videoUrl: $('pubUrlPublica').value.trim() });
         if (r.erro) throw new Error(r.erro);
         $('pubStatus').textContent = r.url ? 'Publicado com sucesso: ' + r.url : 'Enviado com sucesso. O processamento da plataforma pode levar alguns minutos.';
       } catch (e) { $('pubStatus').textContent = e.message || 'Não consegui publicar este corte.'; }
       finally { b.disabled = false; }
     });
-    const abrirTutorialPublicacao = () => { $('modalTutorialPublicacao').hidden = false; icones($('modalTutorialPublicacao')); };
-    const fecharTutorialPublicacao = () => { $('modalTutorialPublicacao').hidden = true; };
-    $('btnAjudaPublicacao').addEventListener('click', abrirTutorialPublicacao);
-    $('btnFecharTutPublicacao').addEventListener('click', fecharTutorialPublicacao);
-    $('btnFecharTutPublicacao2').addEventListener('click', fecharTutorialPublicacao);
-    $('modalTutorialPublicacao').addEventListener('click', (e) => { if (e.target === $('modalTutorialPublicacao')) fecharTutorialPublicacao(); });
+    const abrirTutorialPublicacao = () => { const modal = $('modalTutorialPublicacao'); if (!modal) return; modal.hidden = false; icones(modal); };
+    const fecharTutorialPublicacao = () => { const modal = $('modalTutorialPublicacao'); if (modal) modal.hidden = true; };
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('#btnAjudaPublicacao')) abrirTutorialPublicacao();
+      if (e.target.closest('#btnFecharTutPublicacao, #btnFecharTutPublicacao2')) fecharTutorialPublicacao();
+      const modal = $('modalTutorialPublicacao'); if (modal && e.target === modal) fecharTutorialPublicacao();
+    });
   }, 0);
   carregarPublicacao();
 
@@ -5733,7 +5741,8 @@
       <button class="btn p" id="btnFecharPublicar" type="button" aria-label="Fechar"><i data-lucide="x" class="i"></i></button>
     </div>
     <label class="rot" for="pubPlataforma">Onde publicar</label>
-    <select class="campo" id="pubPlataforma"><option value="youtube">YouTube Shorts</option><option value="tiktok">TikTok</option></select>
+    <select class="campo" id="pubPlataforma"><option value="youtube">YouTube Shorts</option><option value="tiktok">TikTok</option><option value="instagram">Instagram Reels</option></select>
+    <div id="pubUrlPublicaWrap" hidden><label class="rot" for="pubUrlPublica">URL pública do vídeo (Instagram)</label><input class="campo" id="pubUrlPublica" type="url" placeholder="https://seu-site.com/corte.mp4"><div class="dica">O Instagram precisa conseguir acessar o MP4 por uma URL pública HTTPS. Arquivos locais não podem ser enviados diretamente pela API.</div></div>
     <label class="rot" for="pubTituloCampo" style="margin-top:12px">Título</label>
     <input class="campo" id="pubTituloCampo" maxlength="100" placeholder="Título do corte">
     <label class="rot" for="pubDescricaoCampo" style="margin-top:12px">Legenda / descrição</label>
@@ -5750,6 +5759,7 @@
     <p class="dica">Você só precisa fazer este cadastro uma vez. O app abre a autorização no navegador e não recebe sua senha.</p>
     <section class="pub-tut-bloco pub-tut-youtube"><h3><i data-lucide="youtube" class="i"></i> YouTube Shorts</h3><ol><li>Abra o <a href="https://console.cloud.google.com/" target="_blank" rel="noreferrer">Google Cloud Console</a> e crie ou selecione um projeto.</li><li>Em <b>APIs e serviços → Biblioteca</b>, ative <b>YouTube Data API v3</b>.</li><li>Em <b>Credenciais → Criar credenciais → ID do cliente OAuth</b>, escolha <b>Aplicativo para computador</b>.</li><li>Copie o <b>Client ID</b> e o <b>Client Secret</b> para os dois campos do YouTube.</li><li>Clique em <b>Conectar YouTube</b>, escolha sua conta e aceite a permissão de envio.</li></ol><a class="pub-tut-link" href="https://developers.google.com/youtube/data/guides/authentication" target="_blank" rel="noreferrer">Abrir tutorial oficial do YouTube</a></section>
     <section class="pub-tut-bloco pub-tut-tiktok"><h3><i data-lucide="music-2" class="i"></i> TikTok</h3><ol><li>Abra o <a href="https://developers.tiktok.com/" target="_blank" rel="noreferrer">TikTok for Developers</a> e crie um app.</li><li>Adicione o produto <b>Content Posting API</b> e habilite o <b>Direct Post</b>.</li><li>Na área <b>Credentials</b>, copie <b>Client Key</b> e <b>Client Secret</b>.</li><li>Cole os dados nos campos do TikTok e clique em <b>Conectar TikTok</b>.</li><li>Autorize o app. A publicação pode ficar privada até o TikTok auditar o aplicativo.</li></ol><a class="pub-tut-link" href="https://developers.tiktok.com/docs/en/getting-started-create-an-app" target="_blank" rel="noreferrer">Abrir tutorial oficial do TikTok</a></section>
+    <section class="pub-tut-bloco pub-tut-instagram"><h3><i data-lucide="instagram" class="i"></i> Instagram Reels</h3><ol><li>Abra o <a href="https://developers.facebook.com/apps/" target="_blank" rel="noreferrer">Meta for Developers</a> e crie um aplicativo.</li><li>Adicione o produto <b>Instagram</b> e configure o <b>Instagram Login</b> para uma conta profissional.</li><li>Habilite as permissões <b>instagram_business_basic</b> e <b>instagram_business_content_publish</b>.</li><li>Copie o <b>App ID</b> e o <b>App Secret</b> para os campos do Instagram e clique em <b>Conectar Instagram</b>.</li><li>Ao publicar, informe uma <b>URL pública HTTPS</b> do MP4 do corte. A Meta não consegue acessar arquivos que estão somente no computador.</li></ol><a class="pub-tut-link" href="https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/content-publishing/" target="_blank" rel="noreferrer">Abrir documentação oficial do Instagram</a></section>
     <div style="display:flex;justify-content:flex-end;margin-top:14px"><button class="btn principal" id="btnFecharTutPublicacao2" type="button">Entendi</button></div>
   </div>
 </div>

@@ -1036,7 +1036,7 @@ const servidor = http.createServer(async (req, res) => {
         const arquivo = dentroDaSaida(corpo.arquivo);
         if (!arquivo || !fs.existsSync(arquivo)) return json(res, 400, { erro: 'O vídeo precisa estar na pasta de saída.' });
         return json(res, 200, await publicacao.publicar(String(corpo.plataforma || ''), arquivo, {
-          titulo: String(corpo.titulo || '').trim(), descricao: String(corpo.descricao || '').trim(), privacidade: String(corpo.privacidade || 'private'),
+            titulo: String(corpo.titulo || '').trim(), descricao: String(corpo.descricao || '').trim(), privacidade: String(corpo.privacidade || 'private'), videoUrl: String(corpo.videoUrl || '').trim(),
         }));
       } catch (e) { return json(res, 400, { erro: e.message || 'Não consegui publicar o corte.' }); }
     }
