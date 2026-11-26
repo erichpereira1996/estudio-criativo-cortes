@@ -177,18 +177,14 @@ static class Programa
         if (encerrando) return;
         if (endereco == null) return; // ainda subindo: quem trata e o SubirServidor
         string codigo = SafeExitCode();
-        // Codigo 42 = atualizacao em 1 clique concluida: sobe o servidor novo na mesma porta!
+        // Codigo 42 = o atualizador deixou um instalador agendado.
+        // Fechamos o lançador para liberar os arquivos; o script do atualizador
+        // instala a nova versão e abre este executável novamente.
         if (codigo == "42")
         {
-            Registrar("Atualização aplicada: reiniciando servidor em " + endereco);
-            string porta = null;
-            var m = Regex.Match(endereco, @":(\d+)$");
-            if (m.Success) porta = m.Groups[1].Value;
-            endereco = null;
-            Thread.Sleep(500);
-            string erro = SubirServidor(porta);
-            if (erro == null) return;
-            Registrar("ERRO ao reiniciar apos atualizar: " + erro);
+            Registrar("Atualização baixada: encerrando para instalar a nova versão.");
+            Encerrar(true);
+            return;
         }
         Registrar("O servidor parou sozinho (codigo " + codigo + ").");
         Executar(() =>

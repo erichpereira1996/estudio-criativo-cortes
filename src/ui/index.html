@@ -956,7 +956,7 @@
   .nov-lista li b { color: var(--texto); }
   .nov-lista li div > b:first-child { display: block; margin-bottom: 2px; }
 
-  /* ---------- tela obrigatoria de auto-atualizacao (git novo) */
+  /* ---------- tela obrigatoria de auto-atualizacao (Release do GitHub) */
   .upd-caixa { max-width: 480px; text-align: center; position: relative; overflow: hidden; }
   .upd-orbita {
     width: 72px; height: 72px; margin: 0 auto 16px; border-radius: 22px; display: grid; place-items: center;
@@ -5259,7 +5259,7 @@
     $('barraAtualizar').hidden = true;
     $('autoUpdAcoes').hidden = true;
     $('autoUpdSelo').textContent = estadoRemoto && estadoRemoto.shaRemoto
-      ? ('Git novo detectado · #' + estadoRemoto.shaRemoto + ' · v' + (estadoRemoto.versaoRemota || ''))
+      ? ('Release detectada · #' + estadoRemoto.shaRemoto + ' · v' + (estadoRemoto.versaoRemota || ''))
       : 'Nova atualização encontrada no GitHub';
     $('autoUpdTitulo').textContent = 'Atualizando o Estúdio Criativo Cortes...';
     $('autoUpdResumo').textContent = (estadoRemoto && estadoRemoto.resumoVersao) || 'Sincronizando arquivos novos do GitHub...';
@@ -5341,7 +5341,7 @@
       st.className = 'pasta-status ok';
       abrir(false);
     } else {
-      st.textContent = 'Edição personalizada ' + (r.rotulo || r.versaoAtual) + '. Atualizações do projeto original desativadas.';
+      st.textContent = 'Edição personalizada ' + (r.rotulo || r.versaoAtual) + '. Atualizações automáticas são verificadas pelas Releases do GitHub.';
       st.className = 'pasta-status ok';
     }
   });

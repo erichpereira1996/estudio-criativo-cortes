@@ -72,7 +72,7 @@ A versão usa [Versionamento Semântico](https://semver.org/lang/pt-BR/) no form
 - `MINOR`: nova função compatível, como `v1.1.1` → `v1.2.0`.
 - `MAJOR`: mudança incompatível, como `v1.1.1` → `v2.0.0`.
 
-O número mostrado no app, o instalador e o pacote vêm de `package.json`. As atualizações publicadas ficam na página de [Releases](https://github.com/erichpereira1996/estudio-criativo-cortes/releases). Baixe o instalador da versão desejada e execute-o sobre a instalação existente; seus cortes e presets são preservados.
+O número mostrado no app, o instalador e o pacote vêm de `package.json`. O app verifica automaticamente a Release estável mais recente ao abrir, ao voltar para o foco e periodicamente. Se houver uma versão nova, ele baixa o instalador, fecha o programa, instala a atualização e abre novamente. As atualizações publicadas ficam na página de [Releases](https://github.com/erichpereira1996/estudio-criativo-cortes/releases). Baixe o instalador da versão desejada e execute-o sobre a instalação existente; seus cortes e presets são preservados.
 
 ## Usar o código-fonte
 

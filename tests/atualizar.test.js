@@ -1,0 +1,5 @@
+'use strict';
+const assert=require('node:assert/strict');const {test}=require('node:test');const u=require('../src/atualizar');
+test('SemVer compara versões com prefixo v',()=>{assert.equal(u.compararVersoes('v1.2.0','1.1.9'),1);assert.equal(u.compararVersoes('1.1.1','v1.1.1'),0);assert.equal(u.compararVersoes('1.0.9','1.1.0'),-1);assert.equal(u.compararVersoes('invalida','1.0.0'),null);});
+test('Release escolhe apenas instalador estável correto',()=>{const r=u.releaseInfo({tag_name:'v1.2.0',name:'Estúdio Criativo Cortes v1.2.0',body:'Correções',html_url:'https://github.com/erichpereira1996/estudio-criativo-cortes/releases/tag/v1.2.0',assets:[{name:'outro.exe',browser_download_url:'x'},{name:'Instalar-Estudio-Criativo-Cortes.exe',browser_download_url:'https://x/app.exe',size:123}]});assert.equal(r.versaoRemota,'1.2.0');assert.equal(r.urlInstalador,'https://x/app.exe');assert.equal(r.tamanhoInstalador,123);});
+test('Release sem instalador mantém URL da página',()=>{const r=u.releaseInfo({tag_name:'v1.2.0',assets:[],html_url:'https://x/release'});assert.equal(r.urlInstalador,'');assert.equal(r.urlRelease,'https://x/release');});

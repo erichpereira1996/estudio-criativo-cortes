@@ -1,6 +1,6 @@
 {
-  "versao": "1.1.1",
-  "resumoVersao": "Instalador Windows com visual escuro e verde neon, ferramentas e modelos incluídos.",
+  "versao": "1.2.0",
+  "resumoVersao": "Atualizações automáticas pelas Releases do GitHub, além de correções e melhorias.",
   "precisaInstalador": false,
   "aviso": null
 }
