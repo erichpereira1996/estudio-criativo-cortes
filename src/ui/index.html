@@ -430,6 +430,27 @@
   .grupo.assinatura a { color: var(--marca2); text-decoration: none; }
   .grupo.assinatura a:hover { text-decoration: underline; }
   .grupo + .grupo { margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--linha); }
+  /* Cada bloco de Ajustes é uma seção independente, com cor de orientação própria. */
+  .gaveta-corpo > .grupo { margin-top: 14px; padding: 17px 16px 16px; border: 1px solid var(--linha2); border-top-width: 1px; border-radius: 16px; background: rgba(255,255,255,.018); }
+  .gaveta-corpo > .grupo + .grupo { margin-top: 14px; padding-top: 17px; border-top: 1px solid var(--linha2); }
+  .gaveta-corpo > .grupo h4 { padding-bottom: 10px; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,.07); }
+  #grupoPasta { background: linear-gradient(135deg, rgba(88,211,255,.08), rgba(255,255,255,.015)); border-color: rgba(88,211,255,.26); }
+  #grupoPasta h4 { color: #8cddff; }
+  #grupoLegenda { background: linear-gradient(135deg, rgba(180,125,255,.08), rgba(255,255,255,.015)); border-color: rgba(180,125,255,.25); }
+  #grupoLegenda h4 { color: #d1a9ff; }
+  #grupoDesempenho { background: linear-gradient(135deg, rgba(255,203,93,.08), rgba(255,255,255,.015)); border-color: rgba(255,203,93,.24); }
+  #grupoDesempenho h4 { color: #ffda83; }
+  #grupoVelocidade { background: linear-gradient(135deg, rgba(255,145,105,.07), rgba(255,255,255,.015)); border-color: rgba(255,145,105,.22); }
+  #grupoVelocidade h4 { color: #ffb092; }
+  #grupoOrdem { background: linear-gradient(135deg, rgba(112,157,255,.08), rgba(255,255,255,.015)); border-color: rgba(112,157,255,.24); }
+  #grupoOrdem h4 { color: #a7beff; }
+  #grupoAvancado { background: linear-gradient(135deg, rgba(255,93,151,.06), rgba(255,255,255,.015)); border-color: rgba(255,93,151,.22); }
+  #grupoAvancado h4 { color: #ff9fc2; }
+  #grupoApi { background: linear-gradient(135deg, rgba(163,255,18,.08), rgba(255,255,255,.015)); border-color: rgba(163,255,18,.28); }
+  #grupoApi h4 { color: var(--marca-claro); }
+  #grupoPublicacao { background: linear-gradient(135deg, rgba(70,210,190,.07), rgba(255,255,255,.015)); border-color: rgba(70,210,190,.24); }
+  #grupoPublicacao h4 { color: #8be9dc; }
+  .gaveta-corpo > .grupo:last-child { margin-bottom: 8px; }
   .grupo h4 {
     display: flex; align-items: center; gap: 8px;
     font-size: 11px; font-weight: 600; color: var(--texto3);
@@ -1952,7 +1973,7 @@
       <div class="dica" style="margin-top:6px">Os cortes, os vídeos baixados e a gravação da live vão pra essa pasta. Trocar vale na hora; o que já foi salvo na pasta antiga continua lá.</div>
     </div>
 
-    <div class="grupo">
+    <div class="grupo" id="grupoLegenda">
       <h4><i data-lucide="captions" class="i"></i> Legenda</h4>
       <div>
         <label class="rot">Tamanho da legenda</label>
@@ -1964,7 +1985,7 @@
       </div>
     </div>
 
-    <div class="grupo">
+    <div class="grupo" id="grupoDesempenho">
       <h4><i data-lucide="cpu" class="i"></i> Uso do processador</h4>
       <div class="dsp-mini" id="dspAjustes">
         <button class="dsp-op" type="button" data-dsp="leve"><span class="dsp-tit"><i data-lucide="leaf" class="i"></i> Modo leve</span><p>Metade do processador. Mais lento, o PC esquenta menos. Pra até 8 GB de RAM ou 2 a 4 núcleos.</p></button>
@@ -1977,7 +1998,7 @@
       </label>
     </div>
 
-    <div class="grupo">
+    <div class="grupo" id="grupoVelocidade">
       <h4><i data-lucide="gauge" class="i"></i> Velocidade</h4>
       <div class="trio" id="velocidade">
         <button data-vel="rapido" aria-pressed="false">Rápido</button>
@@ -1989,7 +2010,7 @@
       </div>
     </div>
 
-    <div class="grupo">
+    <div class="grupo" id="grupoOrdem">
       <h4><i data-lucide="list-ordered" class="i"></i> Ordem dos clipes</h4>
       <div class="trio" style="grid-template-columns:1fr 1fr" id="ordem">
         <button data-ordem="nota" aria-pressed="true">Melhores primeiro</button>
@@ -1997,7 +2018,7 @@
       </div>
     </div>
 
-    <div class="grupo">
+    <div class="grupo" id="grupoAvancado">
       <h4><i data-lucide="wrench" class="i"></i> Avançado</h4>
       <label class="marcar">
         <input type="checkbox" id="picos" checked>
