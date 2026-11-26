@@ -29,6 +29,7 @@ using Microsoft.Win32;
 static class Programa
 {
     const string NOME = "Estúdio Criativo Cortes";
+    const string SINAL_ATUALIZACAO = "atualizacao-pendente.json";
 
     static string pastaApp;       // onde o programa foi instalado
     static string pastaLocal;     // %LOCALAPPDATA%\EstudioCriativoCortes: registro, perfil da janela, endereco
@@ -186,8 +187,13 @@ static class Programa
             // A janela antiga não se recupera sozinha quando o servidor cai:
             // sem fechá-la, ela fica mostrando ERR_CONNECTION_REFUSED mesmo
             // depois que a nova instalação sobe em 127.0.0.1.
-            FecharJanelas();
-            Encerrar(true);
+            Executar(() =>
+            {
+                FecharJanelas();
+                Encerrar(false);
+                IniciarAtualizacaoPendente();
+                Application.Exit();
+            });
             return;
         }
         Registrar("O servidor parou sozinho (codigo " + codigo + ").");
@@ -202,6 +208,39 @@ static class Programa
     static string SafeExitCode()
     {
         try { return servidor.ExitCode.ToString(); } catch { return "?"; }
+    }
+
+    // O servidor Node pertence ao Job do lançador. Depois de encerrá-lo, o
+    // lançador inicia o .cmd fora desse Job, para que o Windows não mate o
+    // atualizador junto com os processos antigos.
+    static void IniciarAtualizacaoPendente()
+    {
+        string sinal = Path.Combine(pastaApp, SINAL_ATUALIZACAO);
+        if (!File.Exists(sinal))
+        {
+            Registrar("Sinal de atualização não encontrado: " + sinal);
+            return;
+        }
+        try
+        {
+            string texto = File.ReadAllText(sinal, Encoding.UTF8);
+            Match m = Regex.Match(texto, "\\\"cmd\\\"\\s*:\\s*\\\"((?:[^\\\"\\\\]|\\\\.)*)\\\"", RegexOptions.IgnoreCase);
+            if (!m.Success) throw new InvalidDataException("Sinal de atualização inválido.");
+            string cmd = Regex.Unescape(m.Groups[1].Value);
+            if (!File.Exists(cmd)) throw new FileNotFoundException("Script de atualização não encontrado.", cmd);
+            File.Delete(sinal);
+            var psi = new ProcessStartInfo("cmd.exe", "/d /c call \"" + cmd.Replace("\"", "\"\"") + "\"");
+            psi.WorkingDirectory = Path.GetDirectoryName(cmd);
+            psi.UseShellExecute = false;
+            psi.CreateNoWindow = true;
+            psi.WindowStyle = ProcessWindowStyle.Hidden;
+            Process.Start(psi);
+            Registrar("Atualizador iniciado fora do Job: " + cmd);
+        }
+        catch (Exception ex)
+        {
+            Registrar("Falha ao iniciar atualizador: " + ex.Message);
+        }
     }
 
     // ------------------------------------------------------------ janela

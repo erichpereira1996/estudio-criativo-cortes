@@ -3,13 +3,13 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const https = require('https');
-const { spawn } = require('child_process');
 const { version, rotulo } = require('./versao');
 
 const REPOSITORIO = 'erichpereira1996/estudio-criativo-cortes';
 const API_RELEASE = 'https://api.github.com/repos/' + REPOSITORIO + '/releases/latest';
 const NOME_INSTALADOR = 'Instalar-Estudio-Criativo-Cortes.exe';
 const NOME_PACOTE = 'Estudio-Criativo-Cortes-update.zip';
+const NOME_SINAL = 'atualizacao-pendente.json';
 const INSTALADO = process.env.CORTADOR_AUTO_RESTART === '1';
 const CACHE_MS = 5 * 60 * 1000;
 let cache = null;
@@ -110,6 +110,9 @@ async function baixarComTentativas(url, destino, esperado, minimo) {
 function caminhoLancador() {
   return path.resolve(path.dirname(process.execPath), '..', '..', 'EstudioCriativoCortes.exe');
 }
+function caminhoSinal(launcher) {
+  return path.join(path.dirname(launcher), NOME_SINAL);
+}
 function scriptPowerShellAtualizacao() {
   return "param([string]$Zip, [string]$App)\n$ErrorActionPreference = 'Stop'\nExpand-Archive -LiteralPath $Zip -DestinationPath $App -Force\n";
 }
@@ -139,7 +142,12 @@ async function aplicarAtualizacao() {
     await baixarComTentativas(estado.urlInstalador, exe, estado.tamanhoInstalador, 10 * 1024 * 1024);
     fs.writeFileSync(cmd, '@echo off\r\ntimeout /t 2 /nobreak >nul\r\nstart /wait "" ' + esc(exe) + ' /VERYSILENT /SUPPRESSMSGBOXES /NORESTART\r\nstart "" ' + esc(launcher) + '\r\n', 'utf8');
   }
-  spawn('cmd.exe', ['/d', '/c', 'start', '"Atualização"', '/min', esc(cmd)], { detached: true, stdio: 'ignore', windowsHide: true }).unref();
+  // O Node do programa fica dentro de um Windows Job criado pelo lançador.
+  // Se ele iniciar o .cmd diretamente, o Windows mata o atualizador junto
+  // quando o lançador encerra o Job. O lançador lê este sinal depois que o
+  // Job foi liberado e inicia o script fora dele.
+  const sinal = caminhoSinal(launcher);
+  fs.writeFileSync(sinal, JSON.stringify({ cmd, versaoRemota: estado.versaoRemota, criadoEm: new Date().toISOString() }), 'utf8');
   return { ok: true, atualizado: true, versaoRemota: estado.versaoRemota, rotulo: rotulo(estado.versaoRemota) };
 }
-module.exports = { REPOSITORIO, versaoLocal, semver, compararVersoes, releaseInfo, checarRemoto, aplicarAtualizacao, tamanhoValido, scriptAtualizacaoLeve };
+module.exports = { REPOSITORIO, versaoLocal, semver, compararVersoes, releaseInfo, checarRemoto, aplicarAtualizacao, tamanhoValido, scriptAtualizacaoLeve, caminhoSinal, NOME_SINAL };
