@@ -19,3 +19,9 @@ test('cria palavras aproximadas quando o provedor não devolve timestamps', () =
 test('normaliza endpoint sem barras extras', () => {
   assert.equal(api.normalizarBaseUrl('https://exemplo.test/v1///'), 'https://exemplo.test/v1');
 });
+
+test('normaliza análise JSON do Gateway Claude', () => {
+  const r = api.normalizarAnalise({ content: [{ text: '```json\n{"momentos":[{"inicio":2,"fim":12,"pontuacao":91,"motivo":"virada"}]}\n```' }] }, 30);
+  assert.equal(r.momentos[0].inicio, 2);
+  assert.equal(r.momentos[0].pontuacao, 91);
+});

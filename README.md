@@ -18,7 +18,7 @@ Edição personalizada mantida por **@erichpereira22**. A versão publicada atua
 | Marca d’água | Aceita PNG, JPG e WebP e permite ajustar posição, tamanho, opacidade e margem. |
 | Presets de identidade | Salva vinheta, logo e parâmetros com um nome para reutilizar em outros projetos. |
 | Processamento local | Os vídeos e a transcrição são processados no computador, sem assinatura ou serviço Pro. |
-| Modo híbrido Local/API | Opcionalmente envia somente o áudio para uma API compatível, mantendo seleção, cortes e renderização locais. Se a API falhar, pode voltar automaticamente ao local. |
+| Modo híbrido Local/API | Mantém transcrição, seleção e renderização locais e envia somente o texto ao Gateway para destacar momentos e sugerir ideias. |
 
 ## Instalar pelo `.exe` no Windows
 
@@ -38,9 +38,9 @@ Vídeos locais podem ser processados sem internet depois da instalação. Links 
 
 ### Modo API (opcional)
 
-Em **Ajustes → Transcrição inteligente**, escolha **Local** ou **API**. A primeira versão da integração usa qualquer endpoint compatível com `POST /audio/transcriptions` e `GET /models` (por exemplo, um provedor OpenAI-compatible). Configure o endpoint, o modelo e a chave; ela é guardada apenas no perfil local do Windows e nunca é exibida nas respostas do app.
+Em **Ajustes → Análise inteligente**, escolha **Local** ou **API**. Configure a URL base do Gateway, o modelo (por exemplo, `claude-sonnet-5`) e a chave; ela é guardada apenas no perfil local do Windows e nunca é exibida nas respostas do app.
 
-O modo API pode melhorar a transcrição e reduzir o uso da CPU, mas depende de internet, limites e cobrança do provedor. O vídeo não é enviado: o app extrai o áudio localmente e envia somente esse arquivo. Deixe **Voltar ao local se a API falhar** marcado para continuar gerando cortes quando a conexão ou o serviço estiver indisponível. A transcrição recebida é armazenada em cache separada da transcrição local.
+O modo API pode melhorar a escolha dos momentos e a criação de títulos, mas depende de internet, limites e cobrança do provedor. O vídeo e o áudio não são enviados: o app transcreve localmente e envia somente o texto ao Gateway. Deixe **Voltar à seleção local se o Gateway falhar** marcado para continuar gerando cortes quando a conexão ou o serviço estiver indisponível. A análise recebida é armazenada em cache separada.
 
 ### Primeira abertura
 

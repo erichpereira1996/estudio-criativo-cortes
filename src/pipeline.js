@@ -236,8 +236,10 @@ async function prepararAnalise(video, opcoes, emitir, avisar) {
   // tambem entra: trocar de lingua tem que transcrever de novo, nao reaproveitar
   const idiomaCache = /^[a-z]{2}$/.test(String(opcoes.idioma || '')) ? opcoes.idioma : 'pt';
   const modoProcessamento = opcoes.processamento === 'api' ? 'api' : 'local';
-  const sufixoCache = modoProcessamento === 'api' ? '-api-v1.json' : '-v3.json';
-  const jsonTranscricao = path.join(pastas.trabalho(), assinatura + '-' + (opcoes.modelo || 'small') + '-' + idiomaCache + sufixoCache);
+  // A transcrição é sempre local; o Gateway recebe somente o texto. Assim o
+  // mesmo cache serve aos dois modos e nenhum áudio/vídeo precisa sair do PC.
+  const jsonTranscricao = path.join(pastas.trabalho(), assinatura + '-' + (opcoes.modelo || 'small') + '-' + idiomaCache + '-v3.json');
+  const jsonAnaliseApi = path.join(pastas.trabalho(), assinatura + '-gateway-analise-v1.json');
 
   // ---- 2. audio
   if (!fs.existsSync(wav)) {
@@ -255,33 +257,32 @@ async function prepararAnalise(video, opcoes, emitir, avisar) {
     emitir(60, 'transcricao', 'Transcricao ja existia - reaproveitando.');
     transcricao = JSON.parse(fs.readFileSync(jsonTranscricao, 'utf8'));
   } else {
-    emitir(8, 'transcricao', modoProcessamento === 'api' ? 'Preparando a transcrição pela API...' : 'Começando a ouvir o vídeo inteiro...');
-    if (modoProcessamento === 'api') {
+    emitir(8, 'transcricao', 'Começando a ouvir o vídeo inteiro localmente...');
+    transcricao = await transcrever(
+      wav, jsonTranscricao, info.duracao, opcoes.modelo, opcoes.idioma,
+      (pct, msg) => {
+        // o python vai de 2 a 94; aqui isso vira 8 a 60
+        const p = 8 + (Math.max(0, Math.min(94, pct)) / 94) * 52;
+        emitir(p, 'transcricao', msg);
+      },
+      (msg) => avisar({ tipo: 'aviso', msg })
+    );
+  }
+
+  let analiseApi = null;
+  if (modoProcessamento === 'api') {
+    if (fs.existsSync(jsonAnaliseApi)) {
+      try { analiseApi = JSON.parse(fs.readFileSync(jsonAnaliseApi, 'utf8')); emitir(63, 'analise', 'Análise do Gateway já existia - reaproveitando.'); } catch (_) { analiseApi = null; }
+    }
+    if (!analiseApi) {
       try {
-        transcricao = await api.transcrever(wav, info.duracao, opcoes.idioma, null, (pct, msg) => {
-          emitir(8 + (Math.max(0, Math.min(94, pct)) / 94) * 52, 'transcricao', msg);
-        });
-        fs.writeFileSync(jsonTranscricao, JSON.stringify(transcricao), 'utf8');
+        analiseApi = await api.analisar(transcricao, info.duracao, null, (pct, msg) => emitir(pct, 'analise', msg));
+        fs.writeFileSync(jsonAnaliseApi, JSON.stringify(analiseApi), 'utf8');
       } catch (e) {
         const cfgApi = api.lerConfig();
         if (!cfgApi.fallbackLocal) throw e;
-        avisar({ tipo: 'aviso', msg: 'API indisponível; usando a transcrição local. (' + e.message + ')' });
-        transcricao = await transcrever(
-          wav, jsonTranscricao, info.duracao, opcoes.modelo, opcoes.idioma,
-          (pct, msg) => emitir(8 + (Math.max(0, Math.min(94, pct)) / 94) * 52, 'transcricao', msg),
-          (msg) => avisar({ tipo: 'aviso', msg })
-        );
+        avisar({ tipo: 'aviso', msg: 'Gateway indisponível; usando a seleção local. (' + e.message + ')' });
       }
-    } else {
-      transcricao = await transcrever(
-        wav, jsonTranscricao, info.duracao, opcoes.modelo, opcoes.idioma,
-        (pct, msg) => {
-          // o python vai de 2 a 94; aqui isso vira 8 a 60
-          const p = 8 + (Math.max(0, Math.min(94, pct)) / 94) * 52;
-          emitir(p, 'transcricao', msg);
-        },
-        (msg) => avisar({ tipo: 'aviso', msg })
-      );
     }
   }
 
@@ -330,7 +331,7 @@ async function prepararAnalise(video, opcoes, emitir, avisar) {
     }
   }
 
-  return { info, assinatura, wav, jsonTranscricao, transcricao, energia, picos };
+  return { info, assinatura, wav, jsonTranscricao, jsonAnaliseApi, transcricao, analiseApi, energia, picos };
 }
 
 /**
@@ -355,7 +356,7 @@ async function processar(opcoes, avisar) {
   fs.mkdirSync(raiz, { recursive: true });
 
   const emitir = (pct, etapa, msg) => avisar({ tipo: 'progresso', pct: Math.round(pct * 10) / 10, etapa, msg });
-  const { info, assinatura, jsonTranscricao, transcricao, energia, picos } =
+  const { info, assinatura, jsonTranscricao, transcricao, analiseApi, energia, picos } =
     await prepararAnalise(video, opcoes, emitir, avisar);
 
   // A descricao escrita manda no perfil, a nao ser que a pessoa tenha
@@ -405,6 +406,8 @@ async function processar(opcoes, avisar) {
       'Aumente o trecho, escolha cortes curtos ou peça um corte só com o trecho inteiro.'
       : 'Nao consegui montar nenhum corte. O video pode ter pouca fala.');
   }
+
+  aplicarAnaliseApi(cortes, analiseApi, avisar);
 
 
   // Pediu 12 e sairam 3? A pessoa merece saber por que, na hora, em vez de
@@ -496,6 +499,26 @@ function ordenarCortes(cortes, ordem) {
 
   lista.forEach((c, i) => { c.numero = i + 1; });
   return lista;
+}
+
+/** Dá um pequeno bônus aos cortes que o Gateway marcou como fortes. */
+function aplicarAnaliseApi(cortes, analise, avisar) {
+  if (!analise || !Array.isArray(analise.momentos) || !analise.momentos.length) return;
+  let aplicados = 0;
+  for (const corte of cortes) {
+    const melhor = analise.momentos.reduce((a, m) => {
+      const sobreposicao = Math.max(0, Math.min(corte.fim, m.fim) - Math.max(corte.inicio, m.inicio));
+      const proporcao = sobreposicao / Math.max(1, Math.min(corte.fim - corte.inicio, m.fim - m.inicio));
+      return !a || proporcao > a.proporcao ? { m, proporcao } : a;
+    }, null);
+    if (!melhor || melhor.proporcao < 0.25) continue;
+    const pontos = Math.max(1, Math.min(8, Math.round((melhor.m.pontuacao || 0) / 14)));
+    corte.nota = Math.min(99, (corte.nota || 0) + pontos);
+    corte.motivos = Array.isArray(corte.motivos) ? corte.motivos : [];
+    corte.motivos.push({ fator: 'Análise do Gateway', pontos, detalhe: melhor.m.motivo || 'Momento destacado pelo modelo.' });
+    aplicados++;
+  }
+  if (aplicados && avisar) avisar({ tipo: 'aviso', msg: 'O Gateway analisou a transcrição e destacou ' + aplicados + ' corte' + (aplicados === 1 ? '' : 's') + '.' });
 }
 
 function semPalavras(c) {

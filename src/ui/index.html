@@ -1980,20 +1980,20 @@
     </div>
 
     <div class="grupo" id="grupoApi">
-      <h4><i data-lucide="cloud-cog" class="i"></i> Transcrição inteligente</h4>
+      <h4><i data-lucide="cloud-cog" class="i"></i> Análise inteligente</h4>
       <div class="trio" id="modoProcessamento" style="grid-template-columns:1fr 1fr">
         <button type="button" data-processamento="local" aria-pressed="true">Local</button>
         <button type="button" data-processamento="api" aria-pressed="false">API</button>
       </div>
-      <div class="dica" style="margin-top:8px">Local é gratuito e mantém tudo no PC. API envia somente o áudio e pode melhorar a transcrição, conforme o provedor.</div>
+      <div class="dica" style="margin-top:8px">Local é gratuito e mantém tudo no PC. O Gateway recebe somente o texto transcrito para destacar momentos e sugerir ideias.</div>
       <div id="configApi" hidden style="margin-top:10px">
-        <label class="rot" for="apiBaseUrl">Endpoint compatível</label>
-        <input class="campo" id="apiBaseUrl" type="url" placeholder="https://api.openai.com/v1">
-        <label class="rot" for="apiModelo" style="margin-top:8px">Modelo de transcrição</label>
-        <input class="campo" id="apiModelo" type="text" placeholder="whisper-1">
+        <label class="rot" for="apiBaseUrl">URL base do Gateway</label>
+        <input class="campo" id="apiBaseUrl" type="url" placeholder="https://anthropicapi.online/api/public">
+        <label class="rot" for="apiModelo" style="margin-top:8px">Modelo de análise</label>
+        <input class="campo" id="apiModelo" type="text" placeholder="claude-sonnet-5">
         <label class="rot" for="apiChave" style="margin-top:8px">Chave da API</label>
         <input class="campo" id="apiChave" type="password" placeholder="Cole a chave; ela fica salva só neste PC">
-        <label class="marcar" style="margin-top:8px"><input type="checkbox" id="apiFallback" checked><div><b>Voltar ao local se a API falhar</b><span>O corte não para por falta de internet.</span></div></label>
+        <label class="marcar" style="margin-top:8px"><input type="checkbox" id="apiFallback" checked><div><b>Voltar à seleção local se o Gateway falhar</b><span>A transcrição local continua disponível sem internet.</span></div></label>
         <div style="display:flex; gap:8px; align-items:center; margin-top:9px; flex-wrap:wrap"><button class="btn p" id="btnTestarApi" type="button">Testar conexão</button><span class="pasta-status" id="apiStatus"></span></div>
       </div>
     </div>
