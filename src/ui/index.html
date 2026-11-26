@@ -1732,12 +1732,12 @@
 <div class="dsp-fundo" id="modalAutoUpdate" hidden role="dialog" aria-modal="true" aria-labelledby="autoUpdTitulo" style="z-index:260">
   <div class="dsp-caixa upd-caixa">
     <div class="upd-orbita" id="autoUpdOrbita"><i data-lucide="refresh-cw" class="i"></i></div>
-    <span class="selo-info" id="autoUpdSelo">Nova atualização encontrada no GitHub</span>
+    <span class="selo-info" id="autoUpdSelo">Nova atualização encontrada</span>
     <h2 id="autoUpdTitulo" style="margin-top:10px">Atualizando o Estúdio Criativo Cortes</h2>
     <p id="autoUpdResumo" style="margin:6px auto 14px; color:var(--texto2); font-size:var(--t5)">Baixando a versão mais recente para manter tudo sincronizado...</p>
     <div class="barra-fora"><div class="barra-dentro" id="autoUpdBarra" style="width:18%; transition:width .45s ease"></div></div>
     <div class="upd-etapas" id="autoUpdEtapas">
-      <div class="upd-etapa ativa" data-upd-passo="1"><i data-lucide="git-branch" class="i"></i> <span>Verificando commit novo no GitHub</span></div>
+      <div class="upd-etapa ativa" data-upd-passo="1"><i data-lucide="git-branch" class="i"></i> <span>Verificando atualização</span></div>
       <div class="upd-etapa" data-upd-passo="2"><i data-lucide="download" class="i"></i> <span>Baixando pacote de atualização</span></div>
       <div class="upd-etapa" data-upd-passo="3"><i data-lucide="cpu" class="i"></i> <span>Aplicando arquivos e reiniciando motor</span></div>
     </div>
@@ -5259,7 +5259,7 @@
     irPara(projetoAtual && projetoAtual.recem && arquivo ? 3 : 1);
   });
 
-  // ------------------------------------------------------------ avisos e auto-update obrigatorio por git
+  // ------------------------------------------------------------ avisos e auto-update interno
   const AVISOS_LIDOS = 'cortador.avisos.dispensados.v1';
   let estadoRemoto = null;
   let atualizandoAgora = false;
@@ -5295,22 +5295,10 @@
 
   async function executarAtualizacao() {
     if (atualizandoAgora) return;
-    if (estadoRemoto && estadoRemoto.precisaInstalador && estadoRemoto.urlInstalador) {
-      $('modalAutoUpdate').hidden = false;
-      $('autoUpdTitulo').textContent = 'Novo instalador obrigatório disponível';
-      $('autoUpdResumo').textContent = estadoRemoto.resumoVersao || 'Esta atualização inclui novos componentes de vídeo e precisa do instalador.';
-      $('autoUpdBarra').style.width = '100%';
-      $('autoUpdAcoes').hidden = false;
-      $('btnForcarUpdTentativa').innerHTML = '<i data-lucide="download" class="i"></i> Baixar novo instalador agora';
-      $('btnForcarUpdTentativa').onclick = () => window.open(estadoRemoto.urlInstalador, '_blank', 'noopener');
-      icones($('modalAutoUpdate'));
-      return;
-    }
-
     // Se estiver no meio de um corte ou gravacao de live, agenda pra rodar assim que terminar
     if (processandoAgora || avAtivo) {
       updPendenteAposJob = true;
-      $('updTitulo').textContent = 'Nova atualização pronta no GitHub';
+      $('updTitulo').textContent = 'Nova atualização pronta';
       $('updResumo').textContent = 'Assim que o corte atual terminar, o programa vai atualizar sozinho.';
       $('btnFecharUpd').hidden = true;
       $('barraAtualizar').hidden = false;
@@ -5323,9 +5311,9 @@
     $('autoUpdAcoes').hidden = true;
     $('autoUpdSelo').textContent = estadoRemoto && estadoRemoto.shaRemoto
       ? ('Release detectada · ' + (estadoRemoto.versaoRemota || ''))
-      : 'Nova atualização encontrada no GitHub';
+      : 'Nova atualização encontrada';
     $('autoUpdTitulo').textContent = 'Atualizando o Estúdio Criativo Cortes...';
-    $('autoUpdResumo').textContent = (estadoRemoto && estadoRemoto.resumoVersao) || 'Sincronizando arquivos novos do GitHub...';
+    $('autoUpdResumo').textContent = (estadoRemoto && estadoRemoto.resumoVersao) || 'Baixando os arquivos da atualização dentro do app...';
     marcarPassoAutoUpd(1, 24);
     $('modalAutoUpdate').hidden = false;
     icones($('modalAutoUpdate'));
@@ -5373,7 +5361,7 @@
 
       if (r.temAtualizacao) {
         $('updTitulo').textContent = 'Nova versão ' + (r.rotuloRemoto || ('v' + r.versaoRemota)) + ' disponível';
-        $('updResumo').textContent = r.resumoVersao ? r.resumoVersao.split('\n')[0] : 'Uma atualização está disponível no GitHub.';
+        $('updResumo').textContent = r.resumoVersao ? r.resumoVersao.split('\n')[0] : 'Uma atualização está disponível.';
         $('barraAtualizar').hidden = false;
         icones($('barraAtualizar'));
       } else {
