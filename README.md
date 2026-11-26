@@ -19,6 +19,7 @@ Edição personalizada mantida por **@erichpereira22**. A versão publicada atua
 | Presets de identidade | Salva vinheta, logo e parâmetros com um nome para reutilizar em outros projetos. |
 | Processamento local | Os vídeos e a transcrição são processados no computador, sem assinatura ou serviço Pro. |
 | Modo híbrido Local/API | Mantém transcrição, seleção e renderização locais e envia somente o texto ao Gateway para destacar momentos e sugerir ideias. |
+| Cortes por assunto | Com a API conectada, a IA decide o começo e o fim de cada corte conforme o tema, sem ficar presa a uma duração fixa. |
 
 ## Instalar pelo `.exe` no Windows
 
@@ -41,6 +42,8 @@ Vídeos locais podem ser processados sem internet depois da instalação. Links 
 Em **Ajustes → Análise inteligente**, escolha **Local** ou **API**. Configure a URL base do Gateway, o modelo (por exemplo, `claude-sonnet-5`) e a chave; ela é guardada apenas no perfil local do Windows e nunca é exibida nas respostas do app.
 
 O modo API pode melhorar a escolha dos momentos e a criação de títulos, mas depende de internet, limites e cobrança do provedor. O vídeo e o áudio não são enviados: o app transcreve localmente e envia somente o texto ao Gateway. Deixe **Voltar à seleção local se o Gateway falhar** marcado para continuar gerando cortes quando a conexão ou o serviço estiver indisponível. A análise recebida é armazenada em cache separada.
+
+Para usar a duração semântica, selecione **Por assunto · IA** na etapa de geração. O Gateway sugere limites com base no assunto de cada trecho; o app valida sobreposição e duração mínima antes de renderizar. Sem API conectada, essa opção solicita a conexão em vez de substituir silenciosamente a decisão da IA por uma duração fixa.
 
 ### Primeira abertura
 
@@ -78,6 +81,8 @@ A versão usa [Versionamento Semântico](https://semver.org/lang/pt-BR/) no form
 - `MAJOR`: mudança incompatível, como `v1.2.1` → `v2.0.0`.
 
 O número mostrado no app, o instalador e o pacote vêm de `package.json`. O app verifica automaticamente a Release estável mais recente ao abrir, ao voltar para o foco e periodicamente. Se houver uma versão nova, ele baixa o instalador, fecha o programa, instala a atualização e abre novamente. As atualizações publicadas ficam na página de [Releases](https://github.com/erichpereira1996/estudio-criativo-cortes/releases). Baixe o instalador da versão desejada e execute-o sobre a instalação existente; seus cortes e presets são preservados.
+
+Quando a Release possui o pacote leve, o app baixa somente o código atualizado (normalmente menos de 1 MB) e preserva runtime, FFmpeg, Python, modelos, presets e vídeos. O instalador completo continua disponível como alternativa.
 
 ## Usar o código-fonte
 
