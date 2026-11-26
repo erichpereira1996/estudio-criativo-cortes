@@ -227,7 +227,7 @@ function corParaFfmpeg(cor) {
   return /^[0-9a-fA-F]{6}$/.test(limpa) ? '0x' + limpa : '0xffffff';
 }
 
-/** Monta o pedaco de filtro que recorta uma regiao (em fracao do frame) e a encaixa num tamanho fixo. */
+/** Monta o pedaco de filtro que recorta uma regiao e a encaixa sem perder as laterais. */
 function recorteEncaixado(entrada, area, largura, altura, saida) {
   const a = area || { x: 0, y: 0, w: 1, h: 1 };
   const cx = Math.max(0, Math.min(0.999, a.x));
@@ -238,8 +238,8 @@ function recorteEncaixado(entrada, area, largura, altura, saida) {
   return '[' + entrada + ']crop=' +
     'iw*' + cw.toFixed(5) + ':ih*' + ch.toFixed(5) + ':' +
     'iw*' + cx.toFixed(5) + ':ih*' + cy.toFixed(5) + ',' +
-    'scale=' + largura + ':' + altura + ':force_original_aspect_ratio=increase:flags=lanczos,' +
-    'crop=' + largura + ':' + altura + ',setsar=1[' + saida + ']';
+    'scale=' + largura + ':' + altura + ':force_original_aspect_ratio=decrease:flags=lanczos,' +
+    'pad=' + largura + ':' + altura + ':(ow-iw)/2:(oh-ih)/2:color=0x05070b,setsar=1[' + saida + ']';
 }
 
 /**
