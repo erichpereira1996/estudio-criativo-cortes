@@ -89,6 +89,24 @@ function baixarArquivo(url, destino) {
     out.on('error', e => { request.destroy(); reject(e); });
   });
 }
+function tamanhoValido(arquivo, esperado, minimo) {
+  try {
+    const n = fs.statSync(arquivo).size;
+    return n >= (minimo || 1) && (!esperado || n === Number(esperado));
+  } catch (_) { return false; }
+}
+async function baixarComTentativas(url, destino, esperado, minimo) {
+  let ultimo;
+  for (let tentativa = 1; tentativa <= 3; tentativa++) {
+    try {
+      await baixarArquivo(url, destino);
+      if (tamanhoValido(destino, esperado, minimo)) return;
+      ultimo = new Error('download incompleto (' + (fs.existsSync(destino) ? fs.statSync(destino).size : 0) + '/' + esperado + ' bytes)');
+    } catch (e) { ultimo = e; }
+    try { fs.unlinkSync(destino); } catch (_) {}
+  }
+  throw new Error('Não consegui baixar a atualização após 3 tentativas: ' + (ultimo ? ultimo.message : 'arquivo inválido'));
+}
 function caminhoLancador() {
   return path.resolve(path.dirname(process.execPath), '..', '..', 'EstudioCriativoCortes.exe');
 }
@@ -104,20 +122,16 @@ async function aplicarAtualizacao() {
   const esc = p => '"' + p.replaceAll('"', '""') + '"';
   if (estado.urlPacote) {
     const zip = path.join(pasta, NOME_PACOTE);
-    await baixarArquivo(estado.urlPacote, zip);
-    const stat = fs.statSync(zip);
-    if (stat.size < 10 * 1024 || (estado.tamanhoPacote && stat.size !== estado.tamanhoPacote)) throw new Error('O pacote leve baixado não passou na verificação de tamanho.');
+    await baixarComTentativas(estado.urlPacote, zip, estado.tamanhoPacote, 10 * 1024);
     const app = path.resolve(path.dirname(process.execPath), '..', '..', 'app');
     const comando = "$ErrorActionPreference='Stop'; Expand-Archive -LiteralPath '" + zip.replaceAll("'", "''") + "' -DestinationPath '" + app.replaceAll("'", "''") + "' -Force";
     fs.writeFileSync(cmd, '@echo off\r\ntimeout /t 2 /nobreak >nul\r\npowershell.exe -NoProfile -ExecutionPolicy Bypass -Command "' + comando.replaceAll('"', '\\"') + '"\r\nif errorlevel 1 exit /b 1\r\nstart "" ' + esc(launcher) + '\r\n', 'utf8');
   } else {
     const exe = path.join(pasta, NOME_INSTALADOR);
-    await baixarArquivo(estado.urlInstalador, exe);
-    const stat = fs.statSync(exe);
-    if (stat.size < 10 * 1024 * 1024 || (estado.tamanhoInstalador && stat.size !== estado.tamanhoInstalador)) throw new Error('O instalador baixado não passou na verificação de tamanho.');
+    await baixarComTentativas(estado.urlInstalador, exe, estado.tamanhoInstalador, 10 * 1024 * 1024);
     fs.writeFileSync(cmd, '@echo off\r\ntimeout /t 2 /nobreak >nul\r\nstart /wait "" ' + esc(exe) + ' /VERYSILENT /SUPPRESSMSGBOXES /NORESTART\r\nstart "" ' + esc(launcher) + '\r\n', 'utf8');
   }
   spawn('cmd.exe', ['/d', '/c', 'start', '"Atualização"', '/min', esc(cmd)], { detached: true, stdio: 'ignore', windowsHide: true }).unref();
   return { ok: true, atualizado: true, versaoRemota: estado.versaoRemota, rotulo: rotulo(estado.versaoRemota) };
 }
-module.exports = { REPOSITORIO, versaoLocal, semver, compararVersoes, releaseInfo, checarRemoto, aplicarAtualizacao };
+module.exports = { REPOSITORIO, versaoLocal, semver, compararVersoes, releaseInfo, checarRemoto, aplicarAtualizacao, tamanhoValido };
