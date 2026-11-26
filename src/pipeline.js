@@ -851,6 +851,7 @@ async function renderizarClipe(ctx, c) {
       // o instante da revelacao muda de clipe pra clipe)
       teaser: c.teaser || null,
       atrasoAudio: c.atrasoAudio || 0,
+      audio: opcoes.audio || {},
       fontsdir: arquivoAss ? fontsdirRelativo() : null,
       pastaTrabalho: pastas.trabalho(),
       aoProgredir: (frac) => aoProgredir((marcaDoClipe.vinheta.ativa || marcaDoClipe.marca.ativa) ? frac * 0.8 : frac,

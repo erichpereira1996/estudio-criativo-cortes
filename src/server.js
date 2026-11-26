@@ -328,6 +328,16 @@ function escolherArquivoNativo() {
   ], 'FileName');
 }
 
+/** Janela do Windows pra escolher uma musica de fundo. */
+function escolherAudioNativo() {
+  return janelaDoWindows([
+    '$d = New-Object System.Windows.Forms.OpenFileDialog',
+    '$d.Title = "Escolha uma musica de fundo"',
+    '$d.Filter = "Audio|*.mp3;*.wav;*.m4a;*.aac;*.ogg;*.flac|Todos os arquivos|*.*"',
+    '$d.Multiselect = $false',
+  ], 'FileName');
+}
+
 /** Quando o usuario arrasta o arquivo, o navegador so entrega o nome. Procuramos ele. */
 function localizarPorNome(nome, tamanho) {
   const casa = os.homedir();
@@ -485,6 +495,10 @@ const servidor = http.createServer(async (req, res) => {
       // { caminho } | { cancelou } | { falhou: motivo }
       return json(res, 200, await escolherArquivoNativo());
     }
+    if (rota === '/api/escolher-audio' && req.method === 'POST') {
+      if (process.platform !== 'win32') return json(res, 200, { caminho: null });
+      return json(res, 200, await escolherAudioNativo());
+    }
 
     if (rota === '/api/localizar' && req.method === 'POST') {
       if (process.platform !== 'win32') return json(res, 200, { caminho: null });
@@ -525,6 +539,20 @@ const servidor = http.createServer(async (req, res) => {
       gravador.on('finish', () => emitir(id, { tipo: 'baixado', caminho: destino }));
       req.pipe(gravador);
       return;
+    }
+
+    if (rota === '/api/audio/upload' && req.method === 'POST') {
+      const nome = nomeDeArquivoSeguro(url.searchParams.get('nome'));
+      const ext = path.extname(nome).toLowerCase();
+      if (!['.mp3', '.wav', '.m4a', '.aac', '.ogg', '.flac'].includes(ext)) return json(res, 400, { erro: 'Use MP3, WAV, M4A, AAC, OGG ou FLAC.' });
+      const tamanho = Number(req.headers['content-length'] || 0);
+      if (tamanho > 200 * 1024 * 1024) return json(res, 413, { erro: 'A música deve ter no máximo 200 MB.' });
+      const destino = path.join(pastas.baixados(), 'musica-' + Date.now() + '-' + nome);
+      fs.mkdirSync(path.dirname(destino), { recursive: true });
+      const gravador = fs.createWriteStream(destino);
+      req.pipe(gravador);
+      await new Promise((resolve, reject) => { gravador.on('finish', resolve); gravador.on('error', reject); req.on('error', reject); });
+      return json(res, 200, { caminho: destino });
     }
 
     if (rota === '/api/verificar' && req.method === 'POST') {

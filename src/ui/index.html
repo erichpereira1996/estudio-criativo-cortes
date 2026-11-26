@@ -1996,6 +1996,15 @@
       </div>
     </div>
 
+    <div class="grupo" id="grupoAudio">
+      <h4><i data-lucide="audio-lines" class="i"></i> Áudio e efeitos</h4>
+      <label class="marcar"><input type="checkbox" id="audioRuido"><div><b>Remover ruído de fundo</b><span>Reduz chiados e ruídos constantes da gravação.</span></div></label>
+      <label class="marcar" style="margin-top:9px"><input type="checkbox" id="audioNormalizar"><div><b>Normalizar voz</b><span>Equilibra o volume para a fala ficar mais clara.</span></div></label>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px"><button class="btn p" id="btnEscolherMusica" type="button"><i data-lucide="music-2" class="i"></i> Escolher música</button><button class="btn p" id="btnRemoverMusica" type="button" hidden>Remover música</button><input type="file" id="audioMusicaReal" accept="audio/*" hidden><span class="pasta-status" id="audioMusicaStatus">Nenhuma música selecionada</span></div>
+      <div id="audioMusicaOpcoes" hidden style="margin-top:10px"><label class="rot" for="audioVolumeMusica">Volume da música <span id="audioVolumeTxt">18%</span></label><input type="range" id="audioVolumeMusica" min="0" max="60" value="18"><label class="rot" for="audioFade" style="margin-top:8px">Fade de entrada e saída</label><select class="campo" id="audioFade"><option value="0">Sem fade</option><option value="1">1 segundo</option><option value="2" selected>2 segundos</option><option value="3">3 segundos</option><option value="4">4 segundos</option></select></div>
+      <div class="dica" style="margin-top:10px">A música fica em volume baixo e é misturada com a voz. Use arquivos próprios ou licenciados.</div>
+    </div>
+
     <div class="grupo" id="grupoDesempenho">
       <h4><i data-lucide="cpu" class="i"></i> Uso do processador</h4>
       <div class="dsp-mini" id="dspAjustes">
@@ -2314,6 +2323,7 @@
     velocidade: 'equilibrado', tamLegenda: 78, processamento: 'local',
     gancho: true, legenda: false, focarRosto: true, picos: true,
     resolucao: 1080, pedidos: [], idioma: 'pt', motor: 'local',
+    audio: { ruido: false, normalizar: true, musica: '', volumeMusica: 0.18, fade: 2 },
     // ao vivo: formato, webcam e o jeito de clipar
     av: { formato: 'split', canto: 'se', tamanho: 'media', duracao: 30, auto: true, sens: 'media', clipDur: 30 },
   };
@@ -2326,6 +2336,7 @@
       Object.assign(cfg, salvo);
       cfg.recorte = rec;
       cfg.av = Object.assign({ formato: 'split', canto: 'se', tamanho: 'media', duracao: 30, auto: true, sens: 'media', clipDur: 30 }, salvo.av || {});
+      cfg.audio = Object.assign({ ruido: false, normalizar: true, musica: '', volumeMusica: 0.18, fade: 2 }, salvo.audio || {});
     }
   } catch (_) {}
   cfg.motor = 'local'; // Compatibilidade com preferências antigas.
@@ -3120,6 +3131,42 @@
   $('textoGancho').addEventListener('change', () => { cfg.gancho = $('textoGancho').checked; guardar(); resumo(); });
   $('legendar').addEventListener('change', () => { cfg.legenda = $('legendar').checked; guardar(); resumo(); });
   $('picos').addEventListener('change', () => { cfg.picos = $('picos').checked; guardar(); });
+
+  // ------------------------------------------------------------ audio e efeitos
+  cfg.audio = Object.assign({ ruido: false, normalizar: true, musica: '', volumeMusica: 0.18, fade: 2 }, cfg.audio || {});
+  const pintarAudio = () => {
+    $('audioRuido').checked = !!cfg.audio.ruido;
+    $('audioNormalizar').checked = cfg.audio.normalizar !== false;
+    const temMusica = !!cfg.audio.musica;
+    $('audioMusicaOpcoes').hidden = !temMusica;
+    $('btnRemoverMusica').hidden = !temMusica;
+    $('audioMusicaStatus').textContent = temMusica ? String(cfg.audio.musica).split(/[\\/]/).pop() : 'Nenhuma música selecionada';
+    $('audioVolumeMusica').value = Math.round(Number(cfg.audio.volumeMusica || 0.18) * 100);
+    $('audioVolumeTxt').textContent = $('audioVolumeMusica').value + '%';
+    $('audioFade').value = String(cfg.audio.fade || 0);
+  };
+  $('audioRuido').addEventListener('change', () => { cfg.audio.ruido = $('audioRuido').checked; guardar(); });
+  $('audioNormalizar').addEventListener('change', () => { cfg.audio.normalizar = $('audioNormalizar').checked; guardar(); });
+  $('audioVolumeMusica').addEventListener('input', () => { cfg.audio.volumeMusica = Number($('audioVolumeMusica').value) / 100; $('audioVolumeTxt').textContent = $('audioVolumeMusica').value + '%'; guardar(); });
+  $('audioFade').addEventListener('change', () => { cfg.audio.fade = Number($('audioFade').value); guardar(); });
+  $('btnRemoverMusica').addEventListener('click', () => { cfg.audio.musica = ''; guardar(); pintarAudio(); });
+  $('btnEscolherMusica').addEventListener('click', async () => {
+    try {
+      const r = await fetch('/api/escolher-audio', { method: 'POST' }).then((x) => x.json());
+      if (r.caminho) { cfg.audio.musica = r.caminho; guardar(); pintarAudio(); return; }
+    } catch (_) {}
+    $('audioMusicaReal').click();
+  });
+  $('audioMusicaReal').addEventListener('change', async () => {
+    const f = $('audioMusicaReal').files[0]; if (!f) return;
+    $('audioMusicaStatus').textContent = 'Enviando música...';
+    try {
+      const r = await fetch('/api/audio/upload?nome=' + encodeURIComponent(f.name), { method: 'POST', body: f }).then((x) => x.json());
+      if (r.erro) throw new Error(r.erro);
+      cfg.audio.musica = r.caminho; guardar(); pintarAudio();
+    } catch (e) { $('audioMusicaStatus').textContent = e.message || 'Não consegui carregar a música.'; }
+  });
+  pintarAudio();
 
   function pintarModoProcessamento() {
     const apiAtiva = cfg.processamento === 'api';
@@ -4061,6 +4108,7 @@
         legendar: cfg.legenda && formato !== 'original',
         textoGancho: cfg.gancho, tamanhoLegenda: cfg.tamLegenda,
         detectarWebcam: cfg.focarRosto, detectarMomentos: cfg.picos,
+        audio: cfg.audio,
         trecho: trechoFluxo ? { inicio: trechoFluxo.inicio, fim: trechoFluxo.fim } : null,
         modoTrecho: trechoFluxo ? trechoFluxo.modo : null,
         idioma: 'pt',

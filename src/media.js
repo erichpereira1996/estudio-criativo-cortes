@@ -327,6 +327,13 @@ async function cortarClipe(o) {
     '-t', String(o.duracao + (teaser ? teaser.duracao : 0)),
   ]);
 
+  const audio = o.audio || {};
+  const musica = audio.musica && fs.existsSync(audio.musica) ? audio.musica : null;
+  const tratarAudio = !!(audio.ruido || audio.normalizar || musica);
+  const duracaoSaida = o.duracao + (teaser ? teaser.duracao : 0);
+  const indiceMusica = atraso ? 2 : 1;
+  if (musica) args.push('-stream_loop', '-1', '-i', musica);
+
   const filtroBase = filtroDeFormato(o.formato, o.recorte);
   // A legenda entra depois do enquadramento, ja no tamanho final.
   // Rodamos o ffmpeg com cwd na pasta do .ass e passamos so o nome:
@@ -373,8 +380,28 @@ async function cortarClipe(o) {
   if (legenda) { partes.push(rotulo + legenda + '[vleg]'); rotulo = '[vleg]'; }
 
   if (atraso) rotuloAudio = '1:a?';
+  let audioMap = rotuloAudio;
+  if (tratarAudio && (o.temAudio !== false || musica)) {
+    const audioEntrada = o.temAudio === false ? null : rotuloAudio.replace('?', '');
+    const filtrosAudio = [];
+    if (audioEntrada) {
+      if (audio.ruido) filtrosAudio.push('afftdn=nr=12:nf=-25');
+      if (audio.normalizar) filtrosAudio.push('loudnorm=I=-16:TP=-1.5:LRA=11');
+      partes.push(audioEntrada + (filtrosAudio.length ? ',' + filtrosAudio.join(',') : '') + ',aresample=48000:async=1:first_pts=0[aBase]');
+    }
+    if (musica) {
+      const volume = Math.max(0, Math.min(1, Number(audio.volumeMusica == null ? 0.18 : audio.volumeMusica)));
+      const fade = Math.max(0, Math.min(4, Number(audio.fade || 0)));
+      const fadeIn = fade ? ',afade=t=in:st=0:d=' + fade : '';
+      const fadeOut = fade ? ',afade=t=out:st=' + Math.max(0, duracaoSaida - fade).toFixed(3) + ':d=' + fade : '';
+      partes.push('[' + indiceMusica + ':a]atrim=duration=' + duracaoSaida.toFixed(3) + ',asetpts=PTS-STARTPTS,volume=' + volume + fadeIn + fadeOut + '[musica]');
+      if (audioEntrada) partes.push('[aBase][musica]amix=inputs=2:duration=first:dropout_transition=2[aFinal]');
+      else partes.push('[musica]anull[aFinal]');
+      audioMap = '[aFinal]';
+    } else if (audioEntrada) audioMap = '[aBase]';
+  }
   if (partes.length) {
-    args.push('-filter_complex', partes.join(';'), '-map', rotulo, '-map', rotuloAudio);
+    args.push('-filter_complex', partes.join(';'), '-map', rotulo, '-map', audioMap);
   } else if (atraso) {
     args.push('-map', '0:v:0', '-map', rotuloAudio);
   }
@@ -385,7 +412,7 @@ async function cortarClipe(o) {
   // no comeco do audio (live gravada da Twitch/Kick as vezes tem), vira silencio.
   // Sem isso o arquivo dependia de "edit list", que o TikTok e o CapCut ignoram -
   // e a voz saia fora de tempo la (medido: 0,19s num clipe de VOD da Twitch).
-  if (!teaser && o.temAudio !== false) args.push('-af', (silencioAntes ? 'adelay=' + Math.round(silencioAntes * 1000) + ':all=1,' : '') + 'aresample=async=1000:min_hard_comp=0.100000:first_pts=0');
+  if (!teaser && o.temAudio !== false && !tratarAudio) args.push('-af', (silencioAntes ? 'adelay=' + Math.round(silencioAntes * 1000) + ':all=1,' : '') + 'aresample=async=1000:min_hard_comp=0.100000:first_pts=0');
 
   args.push(
     '-fps_mode', 'cfr',
