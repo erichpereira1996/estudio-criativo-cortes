@@ -183,6 +183,10 @@ static class Programa
         if (codigo == "42")
         {
             Registrar("Atualização baixada: encerrando para instalar a nova versão.");
+            // A janela antiga não se recupera sozinha quando o servidor cai:
+            // sem fechá-la, ela fica mostrando ERR_CONNECTION_REFUSED mesmo
+            // depois que a nova instalação sobe em 127.0.0.1.
+            FecharJanelas();
             Encerrar(true);
             return;
         }
