@@ -117,6 +117,14 @@ instalador/dist/Instalar-Estudio-Criativo-Cortes.exe
 
 O workflow do GitHub Actions também pode gerar o instalador quando uma tag `v*` é publicada.
 
+Para atualizar a cópia local com o instalador já publicado na Release, use:
+
+```powershell
+npm run sincronizar:instalador -- v1.7.2
+```
+
+O comando valida o tamanho e a assinatura do executável antes de substituir `instalador/dist/Instalar-Estudio-Criativo-Cortes.exe`.
+
 ## Licença e origem
 
 Esta é uma edição independente mantida por **@erichpereira22**. A origem do código e os avisos do projeto anterior estão em [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). O código permanece acompanhado da [licença MIT](LICENSE), e as licenças dos componentes de terceiros são mantidas nos avisos.

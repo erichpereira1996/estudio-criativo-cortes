@@ -8,6 +8,7 @@
   "scripts": {
     "start": "node src/server.js",
     "version:next": "node scripts/proxima-versao.js",
+    "sincronizar:instalador": "node scripts/sincronizar-instalador.js",
     "test": "node --test tests/*.test.js"
   },
   "dependencies": {},
