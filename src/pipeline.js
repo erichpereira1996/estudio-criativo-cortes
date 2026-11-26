@@ -279,6 +279,7 @@ async function prepararAnalise(video, opcoes, emitir, avisar) {
         analiseApi = await api.analisar(transcricao, info.duracao, null, (pct, msg) => emitir(pct, 'analise', msg));
         fs.writeFileSync(jsonAnaliseApi, JSON.stringify(analiseApi), 'utf8');
       } catch (e) {
+        api.marcarStatus('indisponivel', e.message);
         const cfgApi = api.lerConfig();
         if (!cfgApi.fallbackLocal) throw e;
         avisar({ tipo: 'aviso', msg: 'Gateway indisponível; usando a seleção local. (' + e.message + ')' });

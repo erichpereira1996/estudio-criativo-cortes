@@ -94,6 +94,20 @@
     flex: 1; font-size: 13px; font-weight: 500; text-transform: uppercase;
     letter-spacing: .2em; color: var(--texto);
   }
+  .status-api {
+    display: inline-flex; align-items: center; gap: 7px; flex: none;
+    border: 1px solid var(--linha2); border-radius: 99px; padding: 7px 10px;
+    background: rgba(255,255,255,.03); color: var(--texto2); font: inherit;
+    font-size: 11px; cursor: pointer; transition: .2s ease;
+  }
+  .status-api:hover { border-color: var(--marca); color: var(--texto); }
+  .status-api-ponto { width: 7px; height: 7px; border-radius: 50%; background: var(--texto3); box-shadow: 0 0 0 3px rgba(255,255,255,.05); }
+  .status-api.api-conectada { border-color: rgba(153,255,0,.38); color: var(--verde); }
+  .status-api.api-conectada .status-api-ponto { background: var(--verde); box-shadow: 0 0 10px var(--verde); }
+  .status-api.api-configurada { border-color: rgba(255,200,80,.35); color: #ffd780; }
+  .status-api.api-configurada .status-api-ponto { background: #ffd04d; }
+  .status-api.api-indisponivel { border-color: rgba(255,105,115,.4); color: #ff9aa2; }
+  .status-api.api-indisponivel .status-api-ponto { background: #ff5964; }
   @media (max-width: 700px) { .topo { flex-wrap: wrap; } .topo h1 { display: none; } }
 
   /* ---------------------------------------------------------- link no topo */
@@ -1034,6 +1048,9 @@
 <div class="topo">
   <img class="marca-logo" src="/ui/estudio.svg" alt="">
   <h1>Estúdio Criativo Cortes</h1>
+  <button class="status-api api-nao-configurada" id="statusApi" type="button" title="Configurar API" aria-label="Status da API">
+    <span class="status-api-ponto" aria-hidden="true"></span><span data-status-api-text>API não configurada</span>
+  </button>
   <span class="versao-app" data-versao-app aria-label="Versão do programa">…</span>
   <button class="btn p" type="button" data-abrir-identidade><i data-lucide="stamp" class="i"></i> Identidade</button>
   <form class="link-topo" id="formLinkTopo" autocomplete="off">
@@ -1042,7 +1059,6 @@
     <button class="btn principal p" id="btnLinkTopo" type="submit">Ir</button>
   </form>
 
-  <button class="btn p" id="btnTopoTutorial" type="button" title="Abrir tutorial passo a passo"><i data-lucide="circle-help" class="i"></i> Como usar</button>
   <button class="btn p" id="btnProjetos"><i data-lucide="folder-kanban" class="i"></i> Projetos</button>
   <button class="btn p" id="btnAjustes"><i data-lucide="settings-2" class="i"></i> Ajustes</button>
 </div>
@@ -3115,13 +3131,24 @@
       $('apiModelo').value = r.modeloTranscricao || '';
       $('apiFallback').checked = r.fallbackLocal !== false;
       $('apiChave').value = r.temChave ? '********' : '';
+      pintarStatusApi(r);
       pintarModoProcessamento();
     } catch (_) {}
+  }
+  function pintarStatusApi(r) {
+    const el = $('statusApi');
+    if (!el) return;
+    const status = r && r.status ? r.status : (r && r.temChave ? 'configurada' : 'nao-configurada');
+    const rotulos = { 'nao-configurada': 'API não configurada', configurada: 'API configurada', conectada: 'API conectada', indisponivel: 'API indisponível' };
+    el.className = 'status-api api-' + status;
+    el.querySelector('[data-status-api-text]').textContent = rotulos[status] || 'API';
+    el.title = r && r.ultimoErro ? r.ultimoErro : (status === 'conectada' ? 'Gateway conectado e pronto para análise.' : 'Clique para abrir as configurações da API.');
   }
   async function salvarApi(mostrar) {
     const corpo = { baseUrl: $('apiBaseUrl').value, modeloTranscricao: $('apiModelo').value, apiKey: $('apiChave').value, fallbackLocal: $('apiFallback').checked, ativada: cfg.processamento === 'api' };
     const r = await postJson('/api/api-config', corpo);
     if (r.erro) throw new Error(r.erro);
+    pintarStatusApi(r);
     if (mostrar) $('apiStatus').textContent = 'Configuração salva.';
     return r;
   }
@@ -3132,9 +3159,18 @@
       await salvarApi(false);
       const r = await postJson('/api/api-test', {});
       $('apiStatus').textContent = r.ok ? 'Conexão funcionando.' : (r.erro || 'Falha na conexão.');
-    } catch (e) { $('apiStatus').textContent = e.message || 'Falha na conexão.'; }
+      pintarStatusApi(await fetch('/api/api-config').then((x) => x.json()));
+    } catch (e) {
+      $('apiStatus').textContent = e.message || 'Falha na conexão.';
+      try { pintarStatusApi(await fetch('/api/api-config').then((x) => x.json())); } catch (_) {}
+    }
   });
   carregarApi();
+  $('statusApi').addEventListener('click', () => {
+    abrir(true);
+    carregarApi();
+    setTimeout(() => $('grupoApi')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+  });
 
   // ------------------------------------------------------------ onde salvar
   let armazenamento = null;

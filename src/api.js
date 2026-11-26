@@ -12,6 +12,8 @@ const PADRAO = {
   baseUrl: 'https://anthropicapi.online/api/public',
   modeloTranscricao: 'claude-sonnet-5',
   fallbackLocal: true,
+  ultimoTeste: null,
+  ultimoErro: '',
 };
 
 function normalizarBaseUrl(url) {
@@ -26,6 +28,8 @@ function lerConfig() {
     apiKey: typeof cfg.apiKey === 'string' ? cfg.apiKey : '',
     ativada: cfg.ativada === true,
     fallbackLocal: cfg.fallbackLocal !== false,
+    ultimoTeste: cfg.ultimoTeste || null,
+    ultimoErro: String(cfg.ultimoErro || ''),
   });
 }
 
@@ -40,6 +44,11 @@ function salvarConfig(novo) {
     ativada: recebido.ativada === true,
     fallbackLocal: recebido.fallbackLocal !== false,
   });
+  // Uma alteração de credenciais/configuração invalida o resultado do teste anterior.
+  if (recebido.baseUrl !== undefined || recebido.modeloTranscricao !== undefined || recebido.apiKey !== undefined) {
+    cfg.ultimoTeste = null;
+    cfg.ultimoErro = '';
+  }
   const raiz = pastas.lerConfig();
   raiz.api = cfg;
   pastas.gravarConfig(raiz);
@@ -48,13 +57,29 @@ function salvarConfig(novo) {
 
 function resumo() {
   const cfg = lerConfig();
+  const status = !cfg.apiKey ? 'nao-configurada' : (cfg.ultimoErro ? 'indisponivel' : (cfg.ultimoTeste ? 'conectada' : 'configurada'));
   return {
     ativada: cfg.ativada,
     baseUrl: cfg.baseUrl,
     modeloTranscricao: cfg.modeloTranscricao,
     fallbackLocal: cfg.fallbackLocal,
     temChave: Boolean(cfg.apiKey),
+    ultimoTeste: cfg.ultimoTeste,
+    ultimoErro: cfg.ultimoErro,
+    status,
   };
+}
+
+function marcarStatus(status, erro) {
+  const atual = lerConfig();
+  const raiz = pastas.lerConfig();
+  const novo = Object.assign({}, atual, {
+    ultimoTeste: status === 'conectada' ? new Date().toISOString() : atual.ultimoTeste,
+    ultimoErro: status === 'indisponivel' ? String(erro || 'Falha na conexão com o Gateway.') : '',
+  });
+  raiz.api = novo;
+  pastas.gravarConfig(raiz);
+  return resumo();
 }
 
 function erroHttp(res, corpo) {
@@ -124,10 +149,13 @@ async function testar(config) {
   for (const alvo of [base + '/v1/models', base + '/models', base]) {
     try {
       const corpo = await requisicao(alvo, { method: 'GET', headers: { Authorization: 'Bearer ' + cfg.apiKey, 'x-api-key': cfg.apiKey, Accept: 'application/json' } }, 15000);
+      marcarStatus('conectada');
       return { ok: true, modelos: Array.isArray(corpo.data) ? corpo.data.length : null };
     } catch (e) { ultimo = e; }
   }
-  throw ultimo || new Error('Não consegui conectar ao Gateway.');
+  const erro = ultimo || new Error('Não consegui conectar ao Gateway.');
+  marcarStatus('indisponivel', erro.message);
+  throw erro;
 }
 
 function textoDaTranscricao(transcricao, limite = 70000) {
@@ -194,6 +222,7 @@ async function analisar(transcricao, duracao, config, aoProgredir) {
     resposta = await requisicao(normalizarBaseUrl(cfg.baseUrl) + '/chat/completions', { method: 'POST', headers: { Authorization: 'Bearer ' + cfg.apiKey, 'content-type': 'application/json' }, body: JSON.stringify({ model: cfg.modeloTranscricao, max_tokens: 1800, messages: [{ role: 'user', content: prompt }] }) }, 120000);
   }
   if (aoProgredir) aoProgredir(94, 'Análise recebida; escolhendo os cortes localmente...');
+  marcarStatus('conectada');
   return normalizarAnalise(resposta, duracao);
 }
 
@@ -216,4 +245,4 @@ async function transcrever(audio, duracao, idioma, config, aoProgredir) {
   return normalizarTranscricao(resposta, duracao, idioma);
 }
 
-module.exports = { PADRAO, lerConfig, salvarConfig, resumo, testar, transcrever, analisar, textoDaTranscricao, normalizarAnalise, normalizarTranscricao, normalizarBaseUrl };
+module.exports = { PADRAO, lerConfig, salvarConfig, resumo, marcarStatus, testar, transcrever, analisar, textoDaTranscricao, normalizarAnalise, normalizarTranscricao, normalizarBaseUrl };
