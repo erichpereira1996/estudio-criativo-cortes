@@ -2,7 +2,7 @@
 
 **Cortes de vídeos e lives com processamento local, identidade visual e instalador completo para Windows.**
 
-Edição personalizada mantida por **@erichpereira22**. A versão publicada atualmente é **v1.2.1**.
+Edição personalizada mantida por **@erichpereira22**. A próxima versão publicada será **v1.3.0**.
 
 ## O que o app faz
 
@@ -18,6 +18,7 @@ Edição personalizada mantida por **@erichpereira22**. A versão publicada atua
 | Marca d’água | Aceita PNG, JPG e WebP e permite ajustar posição, tamanho, opacidade e margem. |
 | Presets de identidade | Salva vinheta, logo e parâmetros com um nome para reutilizar em outros projetos. |
 | Processamento local | Os vídeos e a transcrição são processados no computador, sem assinatura ou serviço Pro. |
+| Modo híbrido Local/API | Opcionalmente envia somente o áudio para uma API compatível, mantendo seleção, cortes e renderização locais. Se a API falhar, pode voltar automaticamente ao local. |
 
 ## Instalar pelo `.exe` no Windows
 
@@ -34,6 +35,12 @@ Baixe o instalador na [release mais recente](https://github.com/erichpereira1996
 O instalador inclui Node.js, Python, FFmpeg, yt-dlp e os modelos base e small. Não é preciso instalar essas ferramentas separadamente. A instalação é feita apenas para o usuário atual e os arquivos de trabalho ficam na pasta de vídeos do usuário.
 
 Vídeos locais podem ser processados sem internet depois da instalação. Links de vídeos, lives, downloads de ferramentas e modelos adicionais precisam de conexão.
+
+### Modo API (opcional)
+
+Em **Ajustes → Transcrição inteligente**, escolha **Local** ou **API**. A primeira versão da integração usa qualquer endpoint compatível com `POST /audio/transcriptions` e `GET /models` (por exemplo, um provedor OpenAI-compatible). Configure o endpoint, o modelo e a chave; ela é guardada apenas no perfil local do Windows e nunca é exibida nas respostas do app.
+
+O modo API pode melhorar a transcrição e reduzir o uso da CPU, mas depende de internet, limites e cobrança do provedor. O vídeo não é enviado: o app extrai o áudio localmente e envia somente esse arquivo. Deixe **Voltar ao local se a API falhar** marcado para continuar gerando cortes quando a conexão ou o serviço estiver indisponível. A transcrição recebida é armazenada em cache separada da transcrição local.
 
 ### Primeira abertura
 
@@ -66,8 +73,8 @@ A identidade começa limpa quando o app é aberto ou recarregado. Projetos já e
 
 A versão usa [Versionamento Semântico](https://semver.org/lang/pt-BR/) no formato `vMAJOR.MINOR.PATCH`.
 
-- `PATCH`: correção compatível, como `v1.2.1` → `v1.1.2`.
-- `MINOR`: nova função compatível, como `v1.2.1` → `v1.2.0`.
+- `PATCH`: correção compatível, como `v1.2.1` → `v1.2.2`.
+- `MINOR`: nova função compatível, como `v1.2.1` → `v1.3.0`.
 - `MAJOR`: mudança incompatível, como `v1.2.1` → `v2.0.0`.
 
 O número mostrado no app, o instalador e o pacote vêm de `package.json`. O app verifica automaticamente a Release estável mais recente ao abrir, ao voltar para o foco e periodicamente. Se houver uma versão nova, ele baixa o instalador, fecha o programa, instala a atualização e abre novamente. As atualizações publicadas ficam na página de [Releases](https://github.com/erichpereira1996/estudio-criativo-cortes/releases). Baixe o instalador da versão desejada e execute-o sobre a instalação existente; seus cortes e presets são preservados.

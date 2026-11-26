@@ -24,6 +24,7 @@ const sessoes = require('./sessoes');
 const aovivo = require('./aovivo');
 const identidade = require('./identidade');
 const versao = require('./versao');
+const api = require('./api');
 
 // Um erro solto em algum canto (um ffmpeg que sumiu, uma conexao que caiu)
 // nao pode derrubar o programa inteiro: a janela ficaria dando "Failed to fetch"
@@ -997,6 +998,28 @@ const servidor = http.createServer(async (req, res) => {
         return json(res, 200, desempenho.resumo());
       } catch (e) {
         return json(res, 400, { erro: e.message });
+      }
+    }
+
+    // ---------------------------------------------------------- processamento API/local
+    if (rota === '/api/api-config' && req.method === 'GET') {
+      return json(res, 200, api.resumo());
+    }
+    if (rota === '/api/api-config' && req.method === 'POST') {
+      try {
+        const corpo = await lerCorpo(req);
+        const cfg = api.salvarConfig(corpo);
+        return json(res, 200, Object.assign(api.resumo(), { salvo: true, temChave: Boolean(cfg.apiKey) }));
+      } catch (e) {
+        return json(res, 400, { erro: e.message || 'Não consegui salvar a configuração da API.' });
+      }
+    }
+    if (rota === '/api/api-test' && req.method === 'POST') {
+      try {
+        const corpo = await lerCorpo(req);
+        return json(res, 200, await api.testar(corpo));
+      } catch (e) {
+        return json(res, 400, { ok: false, erro: e.message || 'Não consegui conectar à API.' });
       }
     }
 

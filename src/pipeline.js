@@ -23,6 +23,7 @@ const RAIZ = path.join(__dirname, '..');
 // as pastas de dados mudam quando a pessoa escolhe outro disco: sempre pergunte ao pastas.js
 const pastas = require('./pastas');
 const desempenho = require('./desempenho');
+const api = require('./api');
 const MODELOS = process.env.MODELOS_DIR || path.join(RAIZ, 'modelos');
 // Fontes que vem com o programa (usadas no gancho e na legenda queimada)
 const FONTES = path.join(RAIZ, 'fontes');
@@ -234,7 +235,9 @@ async function prepararAnalise(video, opcoes, emitir, avisar) {
   // o v3 no nome invalida o cache quando a gente muda como transcreve; o idioma
   // tambem entra: trocar de lingua tem que transcrever de novo, nao reaproveitar
   const idiomaCache = /^[a-z]{2}$/.test(String(opcoes.idioma || '')) ? opcoes.idioma : 'pt';
-  const jsonTranscricao = path.join(pastas.trabalho(), assinatura + '-' + (opcoes.modelo || 'small') + '-' + idiomaCache + '-v3.json');
+  const modoProcessamento = opcoes.processamento === 'api' ? 'api' : 'local';
+  const sufixoCache = modoProcessamento === 'api' ? '-api-v1.json' : '-v3.json';
+  const jsonTranscricao = path.join(pastas.trabalho(), assinatura + '-' + (opcoes.modelo || 'small') + '-' + idiomaCache + sufixoCache);
 
   // ---- 2. audio
   if (!fs.existsSync(wav)) {
@@ -252,16 +255,34 @@ async function prepararAnalise(video, opcoes, emitir, avisar) {
     emitir(60, 'transcricao', 'Transcricao ja existia - reaproveitando.');
     transcricao = JSON.parse(fs.readFileSync(jsonTranscricao, 'utf8'));
   } else {
-    emitir(8, 'transcricao', 'Comecando a ouvir o video inteiro...');
-    transcricao = await transcrever(
-      wav, jsonTranscricao, info.duracao, opcoes.modelo, opcoes.idioma,
-      (pct, msg) => {
-        // o python vai de 2 a 94; aqui isso vira 8 a 60
-        const p = 8 + (Math.max(0, Math.min(94, pct)) / 94) * 52;
-        emitir(p, 'transcricao', msg);
-      },
-      (msg) => avisar({ tipo: 'aviso', msg })
-    );
+    emitir(8, 'transcricao', modoProcessamento === 'api' ? 'Preparando a transcrição pela API...' : 'Começando a ouvir o vídeo inteiro...');
+    if (modoProcessamento === 'api') {
+      try {
+        transcricao = await api.transcrever(wav, info.duracao, opcoes.idioma, null, (pct, msg) => {
+          emitir(8 + (Math.max(0, Math.min(94, pct)) / 94) * 52, 'transcricao', msg);
+        });
+        fs.writeFileSync(jsonTranscricao, JSON.stringify(transcricao), 'utf8');
+      } catch (e) {
+        const cfgApi = api.lerConfig();
+        if (!cfgApi.fallbackLocal) throw e;
+        avisar({ tipo: 'aviso', msg: 'API indisponível; usando a transcrição local. (' + e.message + ')' });
+        transcricao = await transcrever(
+          wav, jsonTranscricao, info.duracao, opcoes.modelo, opcoes.idioma,
+          (pct, msg) => emitir(8 + (Math.max(0, Math.min(94, pct)) / 94) * 52, 'transcricao', msg),
+          (msg) => avisar({ tipo: 'aviso', msg })
+        );
+      }
+    } else {
+      transcricao = await transcrever(
+        wav, jsonTranscricao, info.duracao, opcoes.modelo, opcoes.idioma,
+        (pct, msg) => {
+          // o python vai de 2 a 94; aqui isso vira 8 a 60
+          const p = 8 + (Math.max(0, Math.min(94, pct)) / 94) * 52;
+          emitir(p, 'transcricao', msg);
+        },
+        (msg) => avisar({ tipo: 'aviso', msg })
+      );
+    }
   }
 
   // ---- 4. energia do audio

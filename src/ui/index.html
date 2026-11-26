@@ -1979,6 +1979,25 @@
       </label>
     </div>
 
+    <div class="grupo" id="grupoApi">
+      <h4><i data-lucide="cloud-cog" class="i"></i> Transcrição inteligente</h4>
+      <div class="trio" id="modoProcessamento" style="grid-template-columns:1fr 1fr">
+        <button type="button" data-processamento="local" aria-pressed="true">Local</button>
+        <button type="button" data-processamento="api" aria-pressed="false">API</button>
+      </div>
+      <div class="dica" style="margin-top:8px">Local é gratuito e mantém tudo no PC. API envia somente o áudio e pode melhorar a transcrição, conforme o provedor.</div>
+      <div id="configApi" hidden style="margin-top:10px">
+        <label class="rot" for="apiBaseUrl">Endpoint compatível</label>
+        <input class="campo" id="apiBaseUrl" type="url" placeholder="https://api.openai.com/v1">
+        <label class="rot" for="apiModelo" style="margin-top:8px">Modelo de transcrição</label>
+        <input class="campo" id="apiModelo" type="text" placeholder="whisper-1">
+        <label class="rot" for="apiChave" style="margin-top:8px">Chave da API</label>
+        <input class="campo" id="apiChave" type="password" placeholder="Cole a chave; ela fica salva só neste PC">
+        <label class="marcar" style="margin-top:8px"><input type="checkbox" id="apiFallback" checked><div><b>Voltar ao local se a API falhar</b><span>O corte não para por falta de internet.</span></div></label>
+        <div style="display:flex; gap:8px; align-items:center; margin-top:9px; flex-wrap:wrap"><button class="btn p" id="btnTestarApi" type="button">Testar conexão</button><span class="pasta-status" id="apiStatus"></span></div>
+      </div>
+    </div>
+
     <div class="grupo">
       <h4><i data-lucide="refresh-cw" class="i"></i> Versão e atualizações</h4>
       <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap">
@@ -2218,7 +2237,7 @@
       linha: { cor: '#ffffff', espessura: 8 },
     },
     formato: 'split', quantidade: 8, duracao: '28-62', ordem: 'nota',
-    velocidade: 'equilibrado', tamLegenda: 78,
+    velocidade: 'equilibrado', tamLegenda: 78, processamento: 'local',
     gancho: true, legenda: false, focarRosto: true, picos: true,
     resolucao: 1080, pedidos: [], idioma: 'pt', motor: 'local',
     // ao vivo: formato, webcam e o jeito de clipar
@@ -2235,7 +2254,7 @@
       cfg.av = Object.assign({ formato: 'split', canto: 'se', tamanho: 'media', duracao: 30, auto: true, sens: 'media', clipDur: 30 }, salvo.av || {});
     }
   } catch (_) {}
-  cfg.motor = 'local'; // Migra preferências antigas para o processamento local.
+  cfg.motor = 'local'; // Compatibilidade com preferências antigas.
   const guardar = () => { try { localStorage.setItem(LEMBRAR, JSON.stringify(cfg)); } catch (_) {} };
 
   const mmss = (s) => { s = Math.max(0, Math.round(s || 0)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
@@ -3028,6 +3047,17 @@
   $('legendar').addEventListener('change', () => { cfg.legenda = $('legendar').checked; guardar(); resumo(); });
   $('picos').addEventListener('change', () => { cfg.picos = $('picos').checked; guardar(); });
 
+  function pintarModoProcessamento() {
+    const apiAtiva = cfg.processamento === 'api';
+    document.querySelectorAll('#modoProcessamento [data-processamento]').forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.processamento === 'api') === apiAtiva)));
+    $('configApi').hidden = !apiAtiva;
+  }
+  document.querySelectorAll('#modoProcessamento [data-processamento]').forEach((b) => b.addEventListener('click', () => {
+    cfg.processamento = b.dataset.processamento === 'api' ? 'api' : 'local';
+    guardar(); pintarModoProcessamento();
+  }));
+  pintarModoProcessamento();
+
   // ------------------------------------------------------------ trecho (etapa 3)
   // O trecho marcado antes de gerar. Nao fica salvo: e de um video so.
   function pintarTrechoFluxo() {
@@ -3076,6 +3106,34 @@
   // ------------------------------------------------------------ gaveta
   const abrir = (v) => { $('gaveta').classList.toggle('on', v); $('fundoGaveta').classList.toggle('on', v); };
   $('btnAjustes').addEventListener('click', () => { abrir(true); carregarArmazenamento(); });
+
+  async function carregarApi() {
+    try {
+      const r = await fetch('/api/api-config').then((x) => x.json());
+      $('apiBaseUrl').value = r.baseUrl || '';
+      $('apiModelo').value = r.modeloTranscricao || '';
+      $('apiFallback').checked = r.fallbackLocal !== false;
+      $('apiChave').value = r.temChave ? '********' : '';
+      pintarModoProcessamento();
+    } catch (_) {}
+  }
+  async function salvarApi(mostrar) {
+    const corpo = { baseUrl: $('apiBaseUrl').value, modeloTranscricao: $('apiModelo').value, apiKey: $('apiChave').value, fallbackLocal: $('apiFallback').checked, ativada: cfg.processamento === 'api' };
+    const r = await postJson('/api/api-config', corpo);
+    if (r.erro) throw new Error(r.erro);
+    if (mostrar) $('apiStatus').textContent = 'Configuração salva.';
+    return r;
+  }
+  ['apiBaseUrl', 'apiModelo', 'apiChave', 'apiFallback'].forEach((id) => $(id).addEventListener('change', () => salvarApi(false).catch(() => {})));
+  $('btnTestarApi').addEventListener('click', async () => {
+    $('apiStatus').textContent = 'Testando...';
+    try {
+      await salvarApi(false);
+      const r = await postJson('/api/api-test', {});
+      $('apiStatus').textContent = r.ok ? 'Conexão funcionando.' : (r.erro || 'Falha na conexão.');
+    } catch (e) { $('apiStatus').textContent = e.message || 'Falha na conexão.'; }
+  });
+  carregarApi();
 
   // ------------------------------------------------------------ onde salvar
   let armazenamento = null;
@@ -3830,6 +3888,7 @@
         trecho: trechoFluxo ? { inicio: trechoFluxo.inicio, fim: trechoFluxo.fim } : null,
         modoTrecho: trechoFluxo ? trechoFluxo.modo : null,
         idioma: 'pt',
+        processamento: cfg.processamento === 'api' ? 'api' : 'local',
         textoFixo: textoAtual(),
         sessao: SESSAO,
       }),
