@@ -4,8 +4,6 @@
 
 Edição personalizada mantida por **@erichpereira22**. A versão publicada atualmente é **v1.2.1**.
 
-![Painel de identidade do vídeo](docs/telas/identidade.png)
-
 ## O que o app faz
 
 | Função | Como ajuda |
