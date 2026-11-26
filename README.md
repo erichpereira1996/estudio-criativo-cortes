@@ -1,69 +1,117 @@
 # Estúdio Criativo Cortes
 
-Edição personalizada mantida por **@erichpereira22**, para criar cortes de vídeos e lives, com interface escura em verde neon e processamento local.
+**Cortes de vídeos e lives com processamento local, identidade visual e instalador completo para Windows.**
 
-## Instalação no Windows
+Edição personalizada mantida por **@erichpereira22**. A versão publicada atualmente é **v1.1.1**.
 
-Baixe **Instalar-Estudio-Criativo-Cortes.exe** na [última release](https://github.com/erichpereira1996/estudio-criativo-cortes/releases/latest), execute e clique em **Instalar agora**. O pacote inclui as ferramentas e os modelos de transcrição base e small. Não é necessário instalar Node.js ou Python separadamente. Requer Windows 10/11 x64 e Edge ou Chrome para a janela do app.
+![Painel de identidade do vídeo](docs/telas/identidade.png)
 
-Vídeos locais podem ser processados sem internet; links e lives precisam de conexão. Modelos adicionais podem exigir download. O instalador é por usuário e cria atalhos no menu Iniciar e, opcionalmente, na área de trabalho. A desinstalação preserva dados e presets.
+## O que o app faz
 
-## Uso pelo código-fonte no Windows
+| Função | Como ajuda |
+| --- | --- |
+| Cortes de vídeo gravado | Importa um arquivo local ou baixa um vídeo por link para selecionar os melhores trechos. |
+| Cortes ao vivo | Conecta a lives da Twitch, Kick e YouTube e permite recortar enquanto a transmissão acontece. |
+| Transcrição local | Usa modelos do Whisper no computador para encontrar momentos e gerar legendas. |
+| Editor de cortes | Ajusta início, fim, enquadramento, texto, legenda palavra por palavra e título antes da exportação. |
+| Formatos de exportação | Gera versões verticais, originais, divididas ou com fundo, conforme o projeto. |
+| Projetos e reedição | Guarda os cortes, metadados, legendas e a identidade usada para reabrir e editar depois. |
+| Vinheta de 2 segundos | Coloca uma abertura ou encerramento em cada corte, com o áudio da vinheta quando existir. |
+| Marca d’água | Aceita PNG, JPG e WebP e permite ajustar posição, tamanho, opacidade e margem. |
+| Presets de identidade | Salva vinheta, logo e parâmetros com um nome para reutilizar em outros projetos. |
+| Processamento local | Os vídeos e a transcrição são processados no computador, sem assinatura ou serviço Pro. |
 
-1. Execute `instalar.bat` para preparar as dependências.
-2. Execute `iniciar.bat` para abrir o programa.
-3. Escolha um vídeo ou link, ajuste o enquadramento e gere os cortes.
+## Instalar pelo `.exe` no Windows
 
-Para iniciar com Node.js instalado: `npm start`.
+Baixe o instalador na [release mais recente](https://github.com/erichpereira1996/estudio-criativo-cortes/releases/latest). O arquivo é **Instalar-Estudio-Criativo-Cortes.exe**.
 
-A transcrição, a seleção dos momentos e a geração dos cortes usam os recursos locais do computador. Downloads de vídeos, lives, modelos e ferramentas podem exigir internet.
+![Prévia visual do instalador](instalador/previa/instalador-preview.png)
 
-## Esta edição
+1. Abra o arquivo baixado.
+2. Na tela de boas-vindas, clique em **Instalar agora**.
+3. Mantenha a opção de criar atalho na área de trabalho, se quiser.
+4. Aguarde a cópia dos componentes e dos modelos de transcrição. A instalação pode levar alguns minutos e ocupa aproximadamente 1 GB.
+5. Na tela final, clique em **Começar a criar** ou abra o app pelo menu Iniciar.
 
-- Nome e ícone próprios, com destaques em verde neon.
-- Sem assinaturas, testes pagos, checkout, ativação ou serviços de IA Pro.
-- As atualizações automáticas do projeto original estão desativadas para preservar esta edição.
-- Instalador próprio para Windows, com interface escura e verde neon.
+O instalador inclui Node.js, Python, FFmpeg, yt-dlp e os modelos base e small. Não é preciso instalar essas ferramentas separadamente. A instalação é feita apenas para o usuário atual e os arquivos de trabalho ficam na pasta de vídeos do usuário.
+
+Vídeos locais podem ser processados sem internet depois da instalação. Links de vídeos, lives, downloads de ferramentas e modelos adicionais precisam de conexão.
+
+### Primeira abertura
+
+1. Abra **Estúdio Criativo Cortes** pelo atalho.
+2. Escolha **Vídeo gravado** para usar um arquivo ou um link já disponível, ou **Ao vivo agora** para acompanhar uma transmissão.
+3. Selecione o formato, o idioma e a qualidade desejada.
+4. Aguarde a transcrição e revise os momentos encontrados.
+5. Edite cada corte, confira a legenda e exporte.
+
+## Identidade visual, vinheta e marca d’água
+
+Abra **Identidade** no topo do app ou **Configurar identidade** na tela de geração.
+
+- **Vinheta:** envie MP4, MOV ou WebM com pelo menos 2 segundos e escolha **No início do corte** ou **No fim do corte**.
+- **Marca d’água:** envie PNG, JPG ou WebP e ajuste a posição pela grade, arrastando na prévia ou usando os controles.
+- **Também na vinheta:** ativa a marca sobre a abertura ou encerramento.
+- **Resetar identidade:** limpa as opções e anexos da configuração atual.
+- **Presets:** informe um nome e clique em **Salvar como preset**. Para usar depois, selecione o preset, clique em **Carregar** e confirme com **Salvar identidade**.
+
+A identidade começa limpa quando o app é aberto ou recarregado. Projetos já exportados conservam a identidade usada neles; excluir um preset não apaga os arquivos necessários para reeditá-los.
+
+## Projetos, arquivos e dados
+
+- Os cortes exportados ficam na pasta de dados escolhida no app, normalmente dentro de **Vídeos/Estúdio Criativo Cortes**.
+- A configuração, os presets e os anexos da identidade ficam no perfil local do usuário.
+- A desinstalação remove os arquivos do programa, mas preserva cortes, configurações, presets e anexos.
+- Para liberar espaço, remova modelos ou arquivos baixados somente depois de confirmar que não serão usados em novos projetos.
+
+## Atualizações e versões
+
+A versão usa [Versionamento Semântico](https://semver.org/lang/pt-BR/) no formato `vMAJOR.MINOR.PATCH`.
+
+- `PATCH`: correção compatível, como `v1.1.1` → `v1.1.2`.
+- `MINOR`: nova função compatível, como `v1.1.1` → `v1.2.0`.
+- `MAJOR`: mudança incompatível, como `v1.1.1` → `v2.0.0`.
+
+O número mostrado no app, o instalador e o pacote vêm de `package.json`. As atualizações publicadas ficam na página de [Releases](https://github.com/erichpereira1996/estudio-criativo-cortes/releases). Baixe o instalador da versão desejada e execute-o sobre a instalação existente; seus cortes e presets são preservados.
+
+## Usar o código-fonte
+
+Para desenvolver sem o instalador:
+
+1. Instale Node.js 20 ou superior, Python 3.12, FFmpeg, FFprobe e yt-dlp.
+2. Clone o repositório:
+
+   ```powershell
+   git clone https://github.com/erichpereira1996/estudio-criativo-cortes.git
+   cd estudio-criativo-cortes
+   ```
+
+3. Execute `instalar.bat` para preparar o ambiente de transcrição.
+4. Execute `iniciar.bat` ou `npm start`.
+
+Para validar as mudanças, configure `FFMPEG_PATH` e `FFPROBE_PATH` quando necessário e execute:
+
+```powershell
+npm test
+```
+
+## Compilar um novo instalador
+
+Em um Windows x64 com Python 3.12 e Pillow instalado:
+
+```powershell
+python -m pip install Pillow==13.0.0
+node instalador/montar.js
+```
+
+O script baixa ou reutiliza as ferramentas da pasta `instalador/cache`, monta uma instalação portátil, valida o Python embarcado, gera a arte do instalador e grava o resultado em:
+
+```text
+instalador/dist/Instalar-Estudio-Criativo-Cortes.exe
+```
+
+O workflow do GitHub Actions também pode gerar o instalador quando uma tag `v*` é publicada.
 
 ## Licença e origem
 
-Edição independente. A origem do código está documentada em [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-
-O código original permanece sob a [licença MIT](LICENSE), com seu aviso de copyright preservado em [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). As licenças dos componentes de terceiros também são mantidas.
-
-## Vinheta e marca d’água
-
-Abra **Identidade** no topo ou **Configurar identidade** na geração de cortes.
-
-- Vinheta: MP4, MOV ou WebM com pelo menos 2 segundos, até 100 MB. São usados os primeiros 2 segundos, com áudio quando presente. Escolha início ou fim; esses 2 segundos são acrescentados ao conteúdo.
-- Marca d’água: PNG, JPG ou WebP até 10 MB. Ajuste pela prévia, pelos atalhos ou pelos controles de posição, tamanho, opacidade e margem. A opção “também na vinheta” estende a marca à abertura/encerramento.
-- Clique em **Salvar identidade**. As escolhas valem para novos projetos e novos cortes da live. Ao reeditar um corte, preservamos a identidade original daquele corte e usamos o vídeo-fonte, sem duplicar a vinheta.
-- Arquivos de identidade ficam junto da configuração do usuário, fora das pastas temporárias. A identidade é opcional; quando ativada, adiciona uma etapa de exportação.
-
-## Versões
-
-A numeração usa **SemVer**, no formato **v1.0.0** (major.minor.patch), começando em **v1.0.0** nesta migração. O prefixo `v` é usado na interface; o pacote guarda `1.0.0`. Interface e instalador leem a mesma versão de `package.json`.
-
-Prepare cada lançamento conforme o tipo de mudança:
-
-- `npm run version:next -- patch`: correções compatíveis, por exemplo v1.0.0 → v1.0.1. É o padrão quando nenhum tipo é informado.
-- `npm run version:next -- minor`: funcionalidades compatíveis, por exemplo v1.0.1 → v1.1.0.
-- `npm run version:next -- major`: mudanças incompatíveis, por exemplo v1.1.0 → v2.0.0.
-
-Pacote e lock são atualizados juntos. Reinicie o app para carregar a versão nova. Abrir o programa ou rodar testes não incrementa a versão.
-
-O instalador deve ser gerado por `node instalador/montar.js`; ele recebe a versão do pacote e gera os metadados do executável automaticamente. A distribuição de atualizações continua manual nesta edição.
-
-## Verificação
-
-`npm test` executa testes de configuração, versionamento e exportação com FFmpeg. É necessário ter FFmpeg e FFprobe instalados; caminhos personalizados podem ser informados em `FFMPEG_PATH` e `FFPROBE_PATH`.
-
-Na janela Identidade, **Resetar identidade** desativa as duas opções, remove os anexos da configuração e restaura posição, tamanho, opacidade e margem. Clique em **Salvar identidade** para confirmar ou em **Cancelar** para restaurar a configuração anterior. Arquivos usados por projetos existentes são preservados para permitir sua reedição.
-
-### Presets de identidade
-
-Ao abrir ou recarregar o app, a identidade começa limpa. No painel Identidade, use **Salvar como preset** para guardar os anexos e parâmetros com um nome. Selecione um preset, clique em **Carregar** e depois em **Salvar identidade** para aplicá-lo aos próximos cortes nesta abertura. Excluir um preset não apaga arquivos utilizados em projetos anteriores.
-
-## Compilar o instalador
-
-No Windows x64, instale Python 3.12 e Pillow (`python -m pip install Pillow==13.0.0`), e mantenha os modelos base e small em `modelos/`. Execute `node instalador/montar.js`. A montagem valida o Python embarcado, gera a identidade visual e compila o pacote com Inno Setup. O resultado fica em `instalador/dist/Instalar-Estudio-Criativo-Cortes.exe`. O workflow do GitHub também gera o instalador ao publicar uma tag `v*`.
+Esta é uma edição independente mantida por **@erichpereira22**. A origem do código e os avisos do projeto anterior estão em [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). O código permanece acompanhado da [licença MIT](LICENSE), e as licenças dos componentes de terceiros são mantidas nos avisos.
