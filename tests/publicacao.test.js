@@ -23,4 +23,5 @@ test('painel de publicação não interrompe os eventos do painel de ajustes', (
   assert.match(html, /DOMContentLoaded/);
   assert.doesNotMatch(html, /setTimeout\(\(\) => \{\s*\$\('btnSalvarPublicacao'\)/);
   assert.match(html, /btnAjudaPublicacao/);
+  assert.match(html, /\.clipe-acoes\s*\{[^}]*grid-template-columns:\s*repeat\(2/);
 });

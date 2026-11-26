@@ -527,8 +527,8 @@
   .selo.fraco { background: rgba(148,163,184,.12); color: #94a3b8; }
   .clipe-gancho { font-size: var(--t4); font-weight: 600; line-height: 1.35; letter-spacing: -.01em; }
   .clipe-meta { font-size: var(--t6); color: var(--texto2); font-variant-numeric: tabular-nums; display: flex; align-items: flex-start; gap: 6px; line-height: 1.45; }
-  .clipe-acoes { display: flex; gap: 7px; margin-top: auto; }
-  .clipe-acoes .btn { flex: 1; }
+  .clipe-acoes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; margin-top: auto; min-width: 0; }
+  .clipe-acoes .btn { width: 100%; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-left: 8px; padding-right: 8px; }
   .clipe-det { font-size: var(--t6); color: var(--texto2); line-height: 1.55; margin-top: 9px; }
   .clipe-det .bloco + .bloco { margin-top: 9px; }
   .alt {
