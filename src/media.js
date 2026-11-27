@@ -930,7 +930,9 @@ async function legendarVideo(video, arquivoAss, destino, cwd) {
     '-y', '-i', video,
     '-vf', 'subtitles=' + nomeAss,
     '-map', '0:v:0', '-map', '0:a?',
-    '-c:v', 'libx264', '-preset', 'medium', '-crf', '20',
+    // A legenda completa é reencodada a cada ajuste do editor. O preset
+    // veryfast reduz bastante a espera do preview sem alterar a resolução.
+    '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '20',
     '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '192k',
     '-movflags', '+faststart', '-loglevel', 'error', destino,
   ];
