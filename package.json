@@ -1,6 +1,6 @@
 {
   "name": "estudio-criativo-cortes",
-  "version": "1.8.8",
+  "version": "1.8.9",
   "private": true,
   "description": "Estúdio Criativo Cortes: corta video e live (gravada ou ao vivo) da Kick, Twitch e YouTube em clipes verticais, tudo no proprio PC",
   "main": "src/server.js",
