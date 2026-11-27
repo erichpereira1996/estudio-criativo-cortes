@@ -3670,7 +3670,7 @@
       if (r.erro) throw new Error(r.erro);
       ouvir(r.id, {
         progresso: (d) => { $('barraLegendar').style.width = Math.max(0, Math.min(100, Number(d.pct) || 0)) + '%'; $('statusLegendar').textContent = d.msg || 'Processando...'; },
-        fim: (d) => { $('barraLegendar').style.width = '100%'; $('statusLegendar').textContent = 'Concluído'; $('legendarResultadoTexto').textContent = d.modo === 'srt' ? 'O arquivo de legenda foi salvo na pasta de saída.' : 'O vídeo completo foi exportado com a legenda embutida.'; $('btnBaixarLegenda').href = d.url; $('btnBaixarLegenda').download = ''; $('legendarResultado').hidden = false; icones($('legendarResultado')); $('btnGerarLegenda').disabled = false; },
+        fim: (d) => { $('barraLegendar').style.width = '100%'; $('statusLegendar').textContent = 'Concluído'; $('legendarResultadoTexto').textContent = d.modo === 'srt' ? 'O arquivo SRT foi salvo na pasta de saída. No modo vídeo, a prévia mostra a legenda antes do download.' : 'O vídeo completo foi exportado com a legenda embutida. Confira a prévia abaixo antes de baixar.'; $('btnBaixarLegenda').href = d.url; $('btnBaixarLegenda').download = ''; if (d.modo === 'embutida' && d.url) { const previa = $('legendarPreview'); previa.src = d.url + '&t=' + Date.now(); previa.hidden = false; previa.load(); } $('legendarResultado').hidden = false; icones($('legendarResultado')); $('btnGerarLegenda').disabled = false; },
         erro: (m) => { $('btnGerarLegenda').disabled = false; erro(m); },
         caiu: () => { $('btnGerarLegenda').disabled = false; erro('A conexão com o processamento caiu. Confira a pasta de saída antes de tentar novamente.'); },
       });

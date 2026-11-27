@@ -347,12 +347,16 @@ async function legendarVideoCompleto(video, opcoes, emitir, avisar) {
   const base = path.basename(video, path.extname(video));
   const ass = path.join(pastas.trabalho(), 'legenda-' + analise.assinatura + '.ass');
   const srt = path.join(legendas, base + '-legendado.srt');
-  legenda.gerarAss(analise.transcricao.palavras || [], 0, ass, {
+  // A transcrição local guarda as palavras dentro de segmentos; o fluxo de
+  // cortes usa o mesmo achatamento para não gerar um vídeo sem legendas.
+  const palavras = achatarPalavras(analise.transcricao);
+  if (!palavras.length) throw new Error('Não encontrei palavras suficientes para gerar a legenda.');
+  legenda.gerarAss(palavras, 0, ass, {
     incluirPalavras: true,
     tamanho: Number(opcoes.tamanho) || 78,
     margemBaixo: Number(opcoes.margemBaixo) || 180,
   });
-  legenda.gerarSrt(analise.transcricao.palavras || [], 0, srt);
+  legenda.gerarSrt(palavras, 0, srt);
   emitir(88, 'legenda', 'Legenda pronta. Preparando o arquivo final...');
   if (opcoes.modo === 'srt') {
     emitir(100, 'pronto', 'Arquivo SRT salvo na pasta de saída.');
