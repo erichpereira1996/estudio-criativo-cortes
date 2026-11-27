@@ -14,3 +14,10 @@ test('encaixe do preview preserva a área selecionada sem cortar as laterais', (
   assert.match(filtro, /pad=1080:1344/);
   assert.doesNotMatch(filtro, /scale=1080:576[^;]*crop=1080:576/);
 });
+
+test('presets visuais são filtros locais e opcionais', () => {
+  assert.equal(media.filtroVisual('nenhum'), null);
+  assert.match(media.filtroVisual('cinematico'), /eq=contrast/);
+  assert.match(media.filtroVisual('vibrante'), /saturation=1\.35/);
+  assert.match(media.filtroVisual('pb'), /hue=s=0/);
+});

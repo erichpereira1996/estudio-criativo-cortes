@@ -294,6 +294,13 @@ function filtroDeFormato(formato, recorte) {
   return '[0:v]scale=1080:1920:force_original_aspect_ratio=increase:flags=lanczos,crop=1080:1920,setsar=1[v]';
 }
 
+function filtroVisual(nome) {
+  if (nome === 'cinematico') return 'eq=contrast=1.08:saturation=1.12:brightness=0.01';
+  if (nome === 'vibrante') return 'eq=contrast=1.05:saturation=1.35';
+  if (nome === 'pb') return 'hue=s=0,eq=contrast=1.10';
+  return null;
+}
+
 /**
  * Corta um clipe.
  * @param {object} o { video, inicio, duracao, destino, formato, arquivoAss,
@@ -335,6 +342,7 @@ async function cortarClipe(o) {
   if (musica) args.push('-stream_loop', '-1', '-i', musica);
 
   const filtroBase = filtroDeFormato(o.formato, o.recorte);
+  const efeitoVisual = filtroVisual(o.visual && o.visual.preset);
   // A legenda entra depois do enquadramento, ja no tamanho final.
   // Rodamos o ffmpeg com cwd na pasta do .ass e passamos so o nome:
   // isso evita todo o inferno de escapar caminho do Windows no filtro.
@@ -348,6 +356,7 @@ async function cortarClipe(o) {
   const partes = [];
   let rotulo = '[0:v]';
   if (filtroBase) { partes.push(filtroBase); rotulo = '[v]'; }
+  if (efeitoVisual) { partes.push(rotulo + efeitoVisual + '[vfx]'); rotulo = '[vfx]'; }
 
   // O chamariz entra DEPOIS do enquadramento (pra sair ja no tamanho final) e
   // ANTES da legenda (pro gancho ficar por cima dos dois pedacos).
@@ -875,11 +884,16 @@ async function gerarFrame(video, segundo, destino, largura) {
 async function gerarPrevia(video, segundo, formato, recorte, destino, extra) {
   const { ffmpeg } = await garantirFfmpeg();
   const filtro = filtroDeFormato(formato, recorte);
+  const visual = filtroVisual(extra && extra.visual && extra.visual.preset);
   const texto = extra && extra.ass
     ? ',subtitles=' + extra.ass + (extra.fontsdir ? ':fontsdir=' + extra.fontsdir : '') : '';
 
   const args = ['-y', '-ss', String(Math.max(0, segundo)), '-i', video, '-frames:v', '1'];
-  if (filtro) args.push('-filter_complex', filtro.replace(/\[v\]$/, texto + ',' + JPG_CHEIO + '[v]'), '-map', '[v]');
+  if (filtro) {
+    let montado = filtro;
+    if (visual) montado = montado.replace(/\[v\]$/, ',' + visual + '[v]');
+    args.push('-filter_complex', montado.replace(/\[v\]$/, texto + ',' + JPG_CHEIO + '[v]'), '-map', '[v]');
+  }
   else args.push('-vf', JPG_CHEIO);
   args.push('-q:v', '3', '-loglevel', 'error', destino);
 
@@ -900,5 +914,6 @@ module.exports = {
   acharWebcamAoVivo,
   gerarPrevia,
   filtroDeFormato,
+  filtroVisual,
   rodar,
 };

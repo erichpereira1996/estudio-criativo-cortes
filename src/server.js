@@ -810,7 +810,7 @@ const servidor = http.createServer(async (req, res) => {
       fs.mkdirSync(pastas.trabalho(), { recursive: true });
       const alvo = path.join(pastas.trabalho(), 'previa-' + idDeSessao(corpo.sid) + '.jpg');
       await media.gerarPrevia(corpo.video, Number(corpo.segundo) || 0,
-        corpo.formato || 'vertical', corpo.recorte, alvo, textoDaPrevia(corpo.textoFixo, corpo.sid, corpo.formato || 'vertical', corpo.recorte));
+        corpo.formato || 'vertical', corpo.recorte, alvo, Object.assign(textoDaPrevia(corpo.textoFixo, corpo.sid, corpo.formato || 'vertical', corpo.recorte) || {}, { visual: corpo.visual }));
       return enviarImagem(res, alvo);
     }
 

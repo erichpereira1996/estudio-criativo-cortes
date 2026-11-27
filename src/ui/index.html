@@ -1492,6 +1492,11 @@
       <div id="audioMusicaOpcoes" hidden style="margin-top:10px"><label class="rot" for="audioVolumeMusica">Volume da música <span id="audioVolumeTxt">18%</span></label><input type="range" id="audioVolumeMusica" min="0" max="60" value="18"><label class="rot" for="audioFade" style="margin-top:8px">Fade de entrada e saída</label><select class="campo" id="audioFade"><option value="0">Sem fade</option><option value="1">1 segundo</option><option value="2" selected>2 segundos</option><option value="3">3 segundos</option><option value="4">4 segundos</option></select></div>
       <div class="dica" style="margin-top:10px">Essas escolhas valem somente para este vídeo. Use arquivos próprios ou licenciados.</div>
     </div>
+    <div class="cartao" id="grupoVisual">
+      <label class="rot"><i data-lucide="wand-sparkles" class="i"></i> Estilo visual deste vídeo</label>
+      <select class="campo" id="visualPreset"><option value="nenhum">Sem filtro</option><option value="cinematico">Cinemático</option><option value="vibrante">Vibrante</option><option value="pb">Preto e branco</option></select>
+      <div class="dica" style="margin-top:8px">O preset é aplicado somente nesta geração. A prévia visual será ampliada nas próximas etapas.</div>
+    </div>
   </section>
 
   <!-- ============ AO VIVO ============ -->
@@ -2312,6 +2317,7 @@
   let temDialogoNativo = false, jaProcurou = null, amostrasFeitas = false;
   const idSessao = 'sid' + Math.random().toString(36).slice(2, 10);
   const AUDIO_PADRAO = { ruido: false, normalizar: true, musica: '', volumeMusica: 0.18, fade: 2 };
+  const VISUAL_PADRAO = { preset: 'nenhum' };
 
   const cfg = {
     recorte: {
@@ -2325,6 +2331,7 @@
     gancho: true, legenda: false, focarRosto: true, picos: true,
     resolucao: 1080, pedidos: [], idioma: 'pt', motor: 'local',
     audio: Object.assign({}, AUDIO_PADRAO),
+    visual: Object.assign({}, VISUAL_PADRAO),
     // ao vivo: formato, webcam e o jeito de clipar
     av: { formato: 'split', canto: 'se', tamanho: 'media', duracao: 30, auto: true, sens: 'media', clipDur: 30 },
   };
@@ -2339,10 +2346,11 @@
       cfg.av = Object.assign({ formato: 'split', canto: 'se', tamanho: 'media', duracao: 30, auto: true, sens: 'media', clipDur: 30 }, salvo.av || {});
       // Áudio, música e efeitos são escolhas do vídeo atual, não preferências globais.
       cfg.audio = Object.assign({}, AUDIO_PADRAO);
+      cfg.visual = Object.assign({}, VISUAL_PADRAO);
     }
   } catch (_) {}
   cfg.motor = 'local'; // Compatibilidade com preferências antigas.
-  const guardar = () => { try { const salvo = Object.assign({}, cfg); delete salvo.audio; localStorage.setItem(LEMBRAR, JSON.stringify(salvo)); } catch (_) {} };
+  const guardar = () => { try { const salvo = Object.assign({}, cfg); delete salvo.audio; delete salvo.visual; localStorage.setItem(LEMBRAR, JSON.stringify(salvo)); } catch (_) {} };
 
   const mmss = (s) => { s = Math.max(0, Math.round(s || 0)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
   const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -2996,7 +3004,7 @@
     try {
       const r = await fetch('/api/previa', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ video: videoDoEditor(), segundo: segundoDoSlider(), formato: formatoDoEditor(), recorte: cfg.recorte, textoFixo: textoAtual(), sid: idSessao }),
+        body: JSON.stringify({ video: videoDoEditor(), segundo: segundoDoSlider(), formato: formatoDoEditor(), recorte: cfg.recorte, textoFixo: textoAtual(), visual: cfg.visual, sid: idSessao }),
       });
       if (!r.ok) throw new Error('falhou');
       const url = URL.createObjectURL(await r.blob());
@@ -3055,7 +3063,7 @@
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             video: arquivo, segundo: duracaoVideo * 0.3, formato: el.dataset.amostra,
-            recorte: cfg.recorte, sid: idSessao + el.dataset.amostra,
+            recorte: cfg.recorte, visual: cfg.visual, sid: idSessao + el.dataset.amostra,
           }),
         });
         if (r.ok) el.src = URL.createObjectURL(await r.blob());
@@ -3169,6 +3177,9 @@
     } catch (e) { $('audioMusicaStatus').textContent = e.message || 'Não consegui carregar a música.'; }
   });
   pintarAudio();
+  cfg.visual = Object.assign({}, VISUAL_PADRAO, cfg.visual || {});
+  $('visualPreset').value = cfg.visual.preset;
+  $('visualPreset').addEventListener('change', () => { cfg.visual.preset = $('visualPreset').value; resumo(); });
 
   function pintarModoProcessamento() {
     const apiAtiva = cfg.processamento === 'api';
