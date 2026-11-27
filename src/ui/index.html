@@ -572,8 +572,8 @@
   .av-preparo .info b { color: var(--texto); }
   #aovivo { display: none; }
   #aovivo.on { display: block; }
-  #legendar { display:none; }
-  #legendar.on { display:block; }
+  #legendarVideo { display:none; }
+  #legendarVideo.on { display:block; }
   .legendar-hero { display:flex; align-items:flex-start; gap:14px; margin-bottom:20px; }
   .legendar-hero .i { color:var(--marca); font-size:26px; margin-top:3px; }
   .legendar-acoes { display:flex; gap:9px; flex-wrap:wrap; align-items:center; }
@@ -1519,7 +1519,7 @@
   </section>
 
   <!-- ============ LEGENDAR ============ -->
-  <section id="legendar">
+  <section id="legendarVideo">
     <div class="legendar-hero">
       <i data-lucide="captions" class="i"></i>
       <div><h2 style="font-size:var(--t1); font-weight:500; letter-spacing:-.03em; margin-bottom:8px">Legendar vídeo completo</h2><p class="sub" style="color:var(--texto2); font-size:var(--t4)">Transcreva e coloque legendas no vídeo inteiro, sem cortar o conteúdo.</p></div>
@@ -2470,20 +2470,20 @@
   const semErro = () => $('erro').classList.add('oculto');
 
   // Uma secao na tela por vez. O modo diz se a trilha e a barra de baixo aparecem.
-  const SECOES = ['tela1', 'tela2', 'tela3', 'processando', 'resultado', 'projetos', 'aovivo', 'legendar'];
+  const SECOES = ['tela1', 'tela2', 'tela3', 'processando', 'resultado', 'projetos', 'aovivo', 'legendarVideo'];
   let avAtivo = false;     // tem live sendo gravada agora
   let modoCorte = 'video'; // aba escolhida: video gravado ou ao vivo
   function mostrarSecao(id, modo) {
     SECOES.forEach((s) => $(s).classList.toggle('on', s === id));
     document.body.dataset.modo = modo;
     // as abas so aparecem no comeco de cada caminho
-    $('modos').hidden = !(id === 'tela1' || id === 'legendar' || (id === 'aovivo' && !avAtivo));
-    if (id === 'tela1' || id === 'aovivo' || id === 'legendar') {
+    $('modos').hidden = !(id === 'tela1' || id === 'legendarVideo' || (id === 'aovivo' && !avAtivo));
+    if (id === 'tela1' || id === 'aovivo' || id === 'legendarVideo') {
       modoCorte = id === 'aovivo' ? 'aovivo' : 'video';
       document.querySelectorAll('#modos [data-modo-corte]').forEach((b) =>
         b.setAttribute('aria-pressed', String(b.dataset.modoCorte === modoCorte)));
       document.querySelectorAll('#modos [data-modo-corte]').forEach((b) =>
-        b.setAttribute('aria-pressed', String(b.dataset.modoCorte === id)));
+      b.setAttribute('aria-pressed', String(b.dataset.modoCorte === (id === 'legendarVideo' ? 'legendar' : id))));
     }
   }
 
@@ -3621,7 +3621,7 @@
     semErro();
     if (m === 'legendar') {
       colocarEditor('video');
-      mostrarSecao('legendar', 'legendar');
+      mostrarSecao('legendarVideo', 'legendar');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
