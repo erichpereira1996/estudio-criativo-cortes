@@ -21,3 +21,9 @@ test('presets visuais são filtros locais e opcionais', () => {
   assert.match(media.filtroVisual('vibrante'), /saturation=1\.35/);
   assert.match(media.filtroVisual('pb'), /hue=s=0/);
 });
+
+test('entrada de áudio fica rotulada corretamente no filter_complex', () => {
+  assert.equal(media.rotuloAudioParaFiltro('0:a?'), '[0:a]');
+  assert.equal(media.rotuloAudioParaFiltro('1:a?'), '[1:a]');
+  assert.equal(media.rotuloAudioParaFiltro('[atz]'), '[atz]');
+});

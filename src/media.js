@@ -301,6 +301,17 @@ function filtroVisual(nome) {
   return null;
 }
 
+/** Normaliza uma entrada de áudio para uso dentro do filter_complex.
+ *
+ * O mapeamento aceita `0:a?`/`1:a?`, mas dentro do filtro o FFmpeg exige
+ * o rótulo entre colchetes (`[0:a]`). Sem essa conversão, qualquer clipe
+ * com tratamento de áudio falha com "No such filter: '0:a'".
+ */
+function rotuloAudioParaFiltro(rotulo) {
+  if (!rotulo) return null;
+  return '[' + String(rotulo).replace(/^\[|\]$/g, '').replace(/\?$/, '') + ']';
+}
+
 /**
  * Corta um clipe.
  * @param {object} o { video, inicio, duracao, destino, formato, arquivoAss,
@@ -391,7 +402,7 @@ async function cortarClipe(o) {
   if (atraso) rotuloAudio = '1:a?';
   let audioMap = rotuloAudio;
   if (tratarAudio && (o.temAudio !== false || musica)) {
-    const audioEntrada = o.temAudio === false ? null : rotuloAudio.replace('?', '');
+    const audioEntrada = o.temAudio === false ? null : rotuloAudioParaFiltro(rotuloAudio);
     const filtrosAudio = [];
     if (audioEntrada) {
       if (audio.ruido) filtrosAudio.push('afftdn=nr=12:nf=-25');
@@ -915,5 +926,6 @@ module.exports = {
   gerarPrevia,
   filtroDeFormato,
   filtroVisual,
+  rotuloAudioParaFiltro,
   rodar,
 };
