@@ -1483,6 +1483,15 @@
         <div class="dica" style="margin-top:10px">Vai em todos os clipes, por cima do vídeo, e aparece na prévia do enquadramento. Não sai no formato "Sem mexer".</div>
       </div>
     </div>
+
+    <div class="cartao" id="grupoAudio">
+      <label class="rot"><i data-lucide="audio-lines" class="i"></i> Áudio e efeitos deste vídeo</label>
+      <label class="marcar"><input type="checkbox" id="audioRuido"><div><b>Remover ruído de fundo</b><span>Reduz chiados e ruídos constantes somente nesta geração.</span></div></label>
+      <label class="marcar" style="margin-top:9px"><input type="checkbox" id="audioNormalizar"><div><b>Normalizar voz</b><span>Equilibra o volume para a fala ficar mais clara.</span></div></label>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px"><button class="btn p" id="btnEscolherMusica" type="button"><i data-lucide="music-2" class="i"></i> Escolher música</button><button class="btn p" id="btnRemoverMusica" type="button" hidden>Remover música</button><input type="file" id="audioMusicaReal" accept="audio/*" hidden><span class="pasta-status" id="audioMusicaStatus">Nenhuma música selecionada</span></div>
+      <div id="audioMusicaOpcoes" hidden style="margin-top:10px"><label class="rot" for="audioVolumeMusica">Volume da música <span id="audioVolumeTxt">18%</span></label><input type="range" id="audioVolumeMusica" min="0" max="60" value="18"><label class="rot" for="audioFade" style="margin-top:8px">Fade de entrada e saída</label><select class="campo" id="audioFade"><option value="0">Sem fade</option><option value="1">1 segundo</option><option value="2" selected>2 segundos</option><option value="3">3 segundos</option><option value="4">4 segundos</option></select></div>
+      <div class="dica" style="margin-top:10px">Essas escolhas valem somente para este vídeo. Use arquivos próprios ou licenciados.</div>
+    </div>
   </section>
 
   <!-- ============ AO VIVO ============ -->
@@ -1996,15 +2005,6 @@
       </div>
     </div>
 
-    <div class="grupo" id="grupoAudio">
-      <h4><i data-lucide="audio-lines" class="i"></i> Áudio e efeitos</h4>
-      <label class="marcar"><input type="checkbox" id="audioRuido"><div><b>Remover ruído de fundo</b><span>Reduz chiados e ruídos constantes da gravação.</span></div></label>
-      <label class="marcar" style="margin-top:9px"><input type="checkbox" id="audioNormalizar"><div><b>Normalizar voz</b><span>Equilibra o volume para a fala ficar mais clara.</span></div></label>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px"><button class="btn p" id="btnEscolherMusica" type="button"><i data-lucide="music-2" class="i"></i> Escolher música</button><button class="btn p" id="btnRemoverMusica" type="button" hidden>Remover música</button><input type="file" id="audioMusicaReal" accept="audio/*" hidden><span class="pasta-status" id="audioMusicaStatus">Nenhuma música selecionada</span></div>
-      <div id="audioMusicaOpcoes" hidden style="margin-top:10px"><label class="rot" for="audioVolumeMusica">Volume da música <span id="audioVolumeTxt">18%</span></label><input type="range" id="audioVolumeMusica" min="0" max="60" value="18"><label class="rot" for="audioFade" style="margin-top:8px">Fade de entrada e saída</label><select class="campo" id="audioFade"><option value="0">Sem fade</option><option value="1">1 segundo</option><option value="2" selected>2 segundos</option><option value="3">3 segundos</option><option value="4">4 segundos</option></select></div>
-      <div class="dica" style="margin-top:10px">A música fica em volume baixo e é misturada com a voz. Use arquivos próprios ou licenciados.</div>
-    </div>
-
     <div class="grupo" id="grupoDesempenho">
       <h4><i data-lucide="cpu" class="i"></i> Uso do processador</h4>
       <div class="dsp-mini" id="dspAjustes">
@@ -2311,6 +2311,7 @@
   let telaAtual = 1, formato = 'split', alvoAtual = 'topo';
   let temDialogoNativo = false, jaProcurou = null, amostrasFeitas = false;
   const idSessao = 'sid' + Math.random().toString(36).slice(2, 10);
+  const AUDIO_PADRAO = { ruido: false, normalizar: true, musica: '', volumeMusica: 0.18, fade: 2 };
 
   const cfg = {
     recorte: {
@@ -2323,7 +2324,7 @@
     velocidade: 'equilibrado', tamLegenda: 78, processamento: 'local',
     gancho: true, legenda: false, focarRosto: true, picos: true,
     resolucao: 1080, pedidos: [], idioma: 'pt', motor: 'local',
-    audio: { ruido: false, normalizar: true, musica: '', volumeMusica: 0.18, fade: 2 },
+    audio: Object.assign({}, AUDIO_PADRAO),
     // ao vivo: formato, webcam e o jeito de clipar
     av: { formato: 'split', canto: 'se', tamanho: 'media', duracao: 30, auto: true, sens: 'media', clipDur: 30 },
   };
@@ -2336,11 +2337,12 @@
       Object.assign(cfg, salvo);
       cfg.recorte = rec;
       cfg.av = Object.assign({ formato: 'split', canto: 'se', tamanho: 'media', duracao: 30, auto: true, sens: 'media', clipDur: 30 }, salvo.av || {});
-      cfg.audio = Object.assign({ ruido: false, normalizar: true, musica: '', volumeMusica: 0.18, fade: 2 }, salvo.audio || {});
+      // Áudio, música e efeitos são escolhas do vídeo atual, não preferências globais.
+      cfg.audio = Object.assign({}, AUDIO_PADRAO);
     }
   } catch (_) {}
   cfg.motor = 'local'; // Compatibilidade com preferências antigas.
-  const guardar = () => { try { localStorage.setItem(LEMBRAR, JSON.stringify(cfg)); } catch (_) {} };
+  const guardar = () => { try { const salvo = Object.assign({}, cfg); delete salvo.audio; localStorage.setItem(LEMBRAR, JSON.stringify(salvo)); } catch (_) {} };
 
   const mmss = (s) => { s = Math.max(0, Math.round(s || 0)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
   const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
