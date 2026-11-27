@@ -312,6 +312,16 @@ function rotuloAudioParaFiltro(rotulo) {
   return '[' + String(rotulo).replace(/^\[|\]$/g, '').replace(/\?$/, '') + ']';
 }
 
+/** Monta a cadeia de áudio sem inserir uma vírgula entre o rótulo e o filtro.
+ * Em filter_complex, `[0:a]afftdn` é válido; `[0:a],afftdn` cria um filtro
+ * vazio e faz o FFmpeg retornar "No such filter: ''".
+ */
+function montarAudioBase(rotulo, filtros) {
+  const etapas = (Array.isArray(filtros) ? filtros : []).filter(Boolean);
+  etapas.push('aresample=48000:async=1:first_pts=0');
+  return rotulo + etapas.join(',') + '[aBase]';
+}
+
 /**
  * Corta um clipe.
  * @param {object} o { video, inicio, duracao, destino, formato, arquivoAss,
@@ -407,7 +417,7 @@ async function cortarClipe(o) {
     if (audioEntrada) {
       if (audio.ruido) filtrosAudio.push('afftdn=nr=12:nf=-25');
       if (audio.normalizar) filtrosAudio.push('loudnorm=I=-16:TP=-1.5:LRA=11');
-      partes.push(audioEntrada + (filtrosAudio.length ? ',' + filtrosAudio.join(',') : '') + ',aresample=48000:async=1:first_pts=0[aBase]');
+      partes.push(montarAudioBase(audioEntrada, filtrosAudio));
     }
     if (musica) {
       const volume = Math.max(0, Math.min(1, Number(audio.volumeMusica == null ? 0.18 : audio.volumeMusica)));
@@ -927,5 +937,6 @@ module.exports = {
   filtroDeFormato,
   filtroVisual,
   rotuloAudioParaFiltro,
+  montarAudioBase,
   rodar,
 };

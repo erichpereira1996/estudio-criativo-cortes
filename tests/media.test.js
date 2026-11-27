@@ -26,4 +26,8 @@ test('entrada de áudio fica rotulada corretamente no filter_complex', () => {
   assert.equal(media.rotuloAudioParaFiltro('0:a?'), '[0:a]');
   assert.equal(media.rotuloAudioParaFiltro('1:a?'), '[1:a]');
   assert.equal(media.rotuloAudioParaFiltro('[atz]'), '[atz]');
+  assert.equal(
+    media.montarAudioBase('[0:a]', ['afftdn=nr=12:nf=-25']),
+    '[0:a]afftdn=nr=12:nf=-25,aresample=48000:async=1:first_pts=0[aBase]'
+  );
 });
