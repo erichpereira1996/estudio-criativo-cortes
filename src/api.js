@@ -195,6 +195,12 @@ function normalizarAnalise(resposta, duracao) {
       fechamento: m.fechamento !== false && m.closure !== false,
     })).filter((m) => m.fim > m.inicio),
     titulos: Array.isArray(obj.titulos) ? obj.titulos.map((t) => String(t).slice(0, 120)).filter(Boolean).slice(0, 10) : [],
+    sugestoes: {
+      trilha: String((obj.sugestoes && (obj.sugestoes.trilha || obj.sugestoes.musica)) || '').slice(0, 80),
+      efeitos: Array.isArray(obj.sugestoes && obj.sugestoes.efeitos) ? obj.sugestoes.efeitos.map((e) => String(e).slice(0, 60)).filter(Boolean).slice(0, 5) : [],
+      visual: ['nenhum', 'cinematico', 'vibrante', 'pb'].includes(obj.sugestoes && obj.sugestoes.visual) ? obj.sugestoes.visual : 'nenhum',
+      motivo: String((obj.sugestoes && (obj.sugestoes.motivo || obj.sugestoes.justificativa)) || '').slice(0, 240),
+    },
   };
 }
 
@@ -206,9 +212,10 @@ async function analisar(transcricao, duracao, config, aoProgredir) {
   const prompt = [
     'Analise a transcrição abaixo para criar cortes completos por assunto.',
     'Responda SOMENTE JSON válido, sem markdown, neste formato:',
-    '{"resumo":"...","momentos":[{"assunto":"...","inicio":0,"fim":40,"pontuacao":0,"motivo":"...","fechamento":true}],"titulos":["..."]}',
+    '{"resumo":"...","momentos":[{"assunto":"...","inicio":0,"fim":40,"pontuacao":0,"motivo":"...","fechamento":true}],"titulos":["..."],"sugestoes":{"trilha":"suspense|energia|humor|motivacional|neutra","efeitos":["impacto","whoosh"],"visual":"nenhum|cinematico|vibrante|pb","motivo":"..."}}',
     'Escolha até 12 assuntos completos, com no mínimo 20 segundos e no máximo 120 segundos. Comece antes da explicação e termine somente depois da conclusão. Não corte no meio de uma ideia, não trate troca de diálogo como novo assunto e não invente tempos fora da transcrição.',
     'Duração total: ' + Number(duracao || 0).toFixed(2) + ' segundos.',
+    'Sugira trilha e efeitos apenas como recomendação editorial; não invente nomes de arquivos. Escolha o estilo visual que combine com o ritmo.',
     'TRANSCRIÇÃO:\n' + entrada,
   ].join('\n');
   if (aoProgredir) aoProgredir(72, 'Enviando a transcrição para o Gateway...');

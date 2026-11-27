@@ -1770,6 +1770,9 @@
         <div id="recadoSugestao" style="margin-top:8px; font-weight:600"></div>
       </div>
     </div>
+    <div class="cartao" id="sugestoesIA" hidden style="margin-bottom:16px;border-color:rgba(163,255,18,.28);background:rgba(163,255,18,.045)">
+      <div style="display:flex;align-items:flex-start;gap:10px"><i data-lucide="sparkles" class="i" style="color:var(--marca);margin-top:2px"></i><div style="flex:1"><b>Sugestões da IA para este conteúdo</b><div id="sugestoesIATexto" class="dica" style="margin-top:5px"></div><button class="btn p" id="btnUsarVisualIA" type="button" style="margin-top:10px" hidden>Usar no próximo corte</button></div></div>
+    </div>
 
 
 
@@ -4171,7 +4174,7 @@
 
         processandoAgora = false;
 
-        await abrirProjeto(d.pasta, { recem: true, recado: d.recado, clipes: d.clipes });
+        await abrirProjeto(d.pasta, { recem: true, recado: d.recado, clipes: d.clipes, sugestoes: d.sugestoes });
 
         {}
       },
@@ -4476,10 +4479,10 @@
       p = { pasta: pasta, nome: '', clipes: extra.clipes, editavel: true, videoExiste: true, opcoes: {} };
     }
     p.recem = !!extra.recem;
-    mostrarProjeto(p, extra.recado);
+    mostrarProjeto(p, extra.recado, extra.sugestoes);
   }
 
-  function mostrarProjeto(p, recado) {
+  function mostrarProjeto(p, recado, sugestoes) {
     projetoAtual = p;
     pastaSaida = p.pasta;
     semErro();
@@ -4488,6 +4491,7 @@
       : (p.nome || 'Projeto');
     legendaDoProjeto();
     mostrarRecado(recado);
+    mostrarSugestoesIA(sugestoes);
     $('painelMais').hidden = true;
     // uma tarefa que ainda esta rodando (ou acabou de terminar) continua aparecendo no projeto dela
     $('tarefa').hidden = !(tarefa.pasta === p.pasta && (tarefa.rodando || tarefa.aberta));
@@ -4498,6 +4502,22 @@
     travarBotoesDoProjeto();
     mostrarSecao('resultado', 'resultado');
     window.scrollTo({ top: 0 });
+  }
+
+  function mostrarSugestoesIA(s) {
+    const bloco = $('sugestoesIA');
+    if (!s || (!s.trilha && !s.motivo && !(s.efeitos || []).length)) { bloco.hidden = true; return; }
+    const partes = [];
+    if (s.trilha) partes.push('Trilha: ' + s.trilha);
+    if (s.efeitos && s.efeitos.length) partes.push('Efeitos: ' + s.efeitos.join(', '));
+    if (s.motivo) partes.push(s.motivo);
+    $('sugestoesIATexto').textContent = partes.join(' · ');
+    const btn = $('btnUsarVisualIA');
+    btn.hidden = !s.visual || s.visual === 'nenhum';
+    btn.textContent = 'Usar estilo visual: ' + ({ cinematico: 'Cinemático', vibrante: 'Vibrante', pb: 'Preto e branco' }[s.visual] || s.visual);
+    btn.onclick = () => { cfg.visual.preset = s.visual; $('visualPreset').value = s.visual; btn.textContent = 'Estilo escolhido para o próximo corte'; btn.disabled = true; };
+    bloco.hidden = false;
+    icones(bloco);
   }
 
   function legendaDoProjeto() {

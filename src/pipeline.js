@@ -480,7 +480,7 @@ async function processar(opcoes, avisar) {
   fs.writeFileSync(path.join(pastaSaida, 'RELATORIO.txt'), textoDoRelatorio(relatorio), 'utf8');
 
   emitir(100, 'pronto', 'Tudo pronto! ' + prontos.length + (prontos.length === 1 ? ' clipe' : ' clipes') + ' na pasta de saida.');
-  avisar({ tipo: 'fim', pasta: pastaSaida, clipes: prontos, recado });
+  avisar({ tipo: 'fim', pasta: pastaSaida, clipes: prontos, recado, sugestoes: analiseApi && analiseApi.sugestoes });
 
   return { pasta: pastaSaida, clipes: prontos, recado };
 }
