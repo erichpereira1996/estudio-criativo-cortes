@@ -335,6 +335,35 @@ async function prepararAnalise(video, opcoes, emitir, avisar) {
   return { info, assinatura, wav, jsonTranscricao, jsonAnaliseApi, transcricao, analiseApi, energia, picos };
 }
 
+/** Transcreve o vídeo inteiro e entrega legenda SRT ou vídeo com ASS embutida. */
+async function legendarVideoCompleto(video, opcoes, emitir, avisar) {
+  const analise = await prepararAnalise(video, Object.assign({}, opcoes, {
+    detectarMomentos: false,
+    olharImagem: false,
+  }), emitir, avisar);
+  const pasta = pastas.saida();
+  const legendas = path.join(pasta, 'legendas');
+  fs.mkdirSync(legendas, { recursive: true });
+  const base = path.basename(video, path.extname(video));
+  const ass = path.join(pastas.trabalho(), 'legenda-' + analise.assinatura + '.ass');
+  const srt = path.join(legendas, base + '-legendado.srt');
+  legenda.gerarAss(analise.transcricao.palavras || [], 0, ass, {
+    incluirPalavras: true,
+    tamanho: Number(opcoes.tamanho) || 78,
+    margemBaixo: Number(opcoes.margemBaixo) || 180,
+  });
+  legenda.gerarSrt(analise.transcricao.palavras || [], 0, srt);
+  emitir(88, 'legenda', 'Legenda pronta. Preparando o arquivo final...');
+  if (opcoes.modo === 'srt') {
+    emitir(100, 'pronto', 'Arquivo SRT salvo na pasta de saída.');
+    return { arquivo: srt, legenda: srt, modo: 'srt' };
+  }
+  const destino = path.join(legendas, base + '-legendado.mp4');
+  await media.legendarVideo(video, ass, destino, pastas.trabalho());
+  emitir(100, 'pronto', 'Vídeo completo legendado salvo na pasta de saída.');
+  return { arquivo: destino, legenda: srt, modo: 'embutida' };
+}
+
 /**
  * @param {object} opcoes  { video, formato, legendar, quantidade, minDur, maxDur, modelo, idioma }
  * @param {function} avisar  (evento) => void
@@ -1230,4 +1259,4 @@ function explicarPoucosNovos(sairam, pedidos, jaTinha, d, minAtual, trecho) {
   return { titulo, detalhe, sugestao };
 }
 
-module.exports = { chavesDasPalavras, processar, refazerClipe, extrairMais, assinaturaDoArquivo, transcrever, fontsdirRelativo, acharPython, fonteDoClipe, cortesPorAssunto };
+module.exports = { chavesDasPalavras, processar, refazerClipe, extrairMais, assinaturaDoArquivo, transcrever, prepararAnalise, legendarVideoCompleto, fontsdirRelativo, acharPython, fonteDoClipe, cortesPorAssunto };

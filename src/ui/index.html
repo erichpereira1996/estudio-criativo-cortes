@@ -128,7 +128,7 @@
   .pub-tut-tiktok { border-color:rgba(70,220,200,.3); background:rgba(70,220,200,.05); }
   .pub-tut-tiktok h3 { color:#8be9dc; }
   .pub-tut-link { display:inline-block; margin-top:10px; font-size:var(--t6); font-weight:700; }
-  @media (max-width: 700px) { .topo { flex-wrap: wrap; } .topo h1 { display: none; } }
+  @media (max-width: 700px) { .topo { flex-wrap: wrap; } .topo h1 { display: none; } .modos { grid-template-columns: 1fr; } }
 
   /* ---------------------------------------------------------- link no topo */
   .topo h1 { flex: none; }
@@ -148,7 +148,7 @@
   @media (max-width: 700px) { .link-topo { order: 9; flex-basis: 100%; margin: 4px 0 0; } }
 
   /* ---------------------------------------------------------- video x ao vivo */
-  .modos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 22px; }
+  .modos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 22px; }
   .modos button {
     display: flex; align-items: center; gap: 12px; padding: 14px 16px; text-align: left;
     background: var(--vidro); border: 1px solid var(--linha); border-radius: 14px;
@@ -572,6 +572,12 @@
   .av-preparo .info b { color: var(--texto); }
   #aovivo { display: none; }
   #aovivo.on { display: block; }
+  #legendar { display:none; }
+  #legendar.on { display:block; }
+  .legendar-hero { display:flex; align-items:flex-start; gap:14px; margin-bottom:20px; }
+  .legendar-hero .i { color:var(--marca); font-size:26px; margin-top:3px; }
+  .legendar-acoes { display:flex; gap:9px; flex-wrap:wrap; align-items:center; }
+  .legendar-preview { width:100%; max-height:430px; border-radius:14px; background:#000; object-fit:contain; margin-top:14px; }
 
   /* ---------------------------------------------------------- ao vivo */
   .av-linha { display: flex; gap: 8px; }
@@ -1150,6 +1156,10 @@
       <span class="ponto-vivo"></span>
       <span><b>Ao vivo agora</b><small>Clipa enquanto a live acontece · pra postar primeiro</small></span>
     </button>
+    <button data-modo-corte="legendar" aria-pressed="false">
+      <i data-lucide="captions" class="i"></i>
+      <span><b>Legendar vídeo</b><small>Legenda o vídeo inteiro · sem gerar cortes</small></span>
+    </button>
   </div>
 
   <nav class="trilha" id="trilha">
@@ -1506,6 +1516,41 @@
       <select class="campo" id="visualPreset"><option value="nenhum">Sem filtro</option><option value="cinematico">Cinemático</option><option value="vibrante">Vibrante</option><option value="pb">Preto e branco</option></select>
       <div class="dica" style="margin-top:8px">O preset é aplicado somente nesta geração. A prévia visual será ampliada nas próximas etapas.</div>
     </div>
+  </section>
+
+  <!-- ============ LEGENDAR ============ -->
+  <section id="legendar">
+    <div class="legendar-hero">
+      <i data-lucide="captions" class="i"></i>
+      <div><h2 style="font-size:var(--t1); font-weight:500; letter-spacing:-.03em; margin-bottom:8px">Legendar vídeo completo</h2><p class="sub" style="color:var(--texto2); font-size:var(--t4)">Transcreva e coloque legendas no vídeo inteiro, sem cortar o conteúdo.</p></div>
+    </div>
+    <div class="cartao">
+      <label class="rot"><i data-lucide="file-video" class="i"></i> Vídeo para legendar</label>
+      <div class="legendar-acoes">
+        <input id="arquivoLegendar" type="file" accept="video/*" hidden>
+        <button class="btn principal" id="btnEscolherLegendar" type="button"><i data-lucide="folder-open" class="i"></i> Escolher vídeo</button>
+        <span class="pasta-status" id="legendarNome">Nenhum vídeo escolhido</span>
+      </div>
+      <video id="legendarPreview" class="legendar-preview" controls hidden></video>
+    </div>
+    <div class="cartao">
+      <label class="rot"><i data-lucide="settings-2" class="i"></i> Como gerar</label>
+      <div class="trio" id="modoLegendar" style="grid-template-columns:1fr 1fr">
+        <button type="button" data-legendar-modo="embutida" aria-pressed="true">Vídeo com legenda</button>
+        <button type="button" data-legendar-modo="srt" aria-pressed="false">Somente arquivo SRT</button>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px">
+        <div><label class="rot" for="legendarTamanho">Tamanho da legenda</label><select class="campo" id="legendarTamanho"><option value="62">Pequena</option><option value="78" selected>Média</option><option value="96">Grande</option></select></div>
+        <div><label class="rot" for="legendarIdioma">Idioma</label><select class="campo" id="legendarIdioma"><option value="pt" selected>Português</option><option value="en">Inglês</option><option value="es">Espanhol</option></select></div>
+      </div>
+      <div class="dica" style="margin-top:10px">A transcrição é feita localmente. O vídeo original não é enviado para a API.</div>
+    </div>
+    <div class="cartao" id="legendarProgresso" hidden>
+      <div class="barra"><div class="barra-dentro" id="barraLegendar"></div></div>
+      <div class="pasta-status" id="statusLegendar" style="margin-top:8px">Preparando...</div>
+    </div>
+    <div class="legendar-acoes" style="justify-content:flex-end"><button class="btn principal" id="btnGerarLegenda" type="button" disabled><i data-lucide="wand-sparkles" class="i"></i> Gerar legenda</button></div>
+    <div class="cartao" id="legendarResultado" hidden style="margin-top:14px"><b><i data-lucide="check-circle-2" class="i" style="color:var(--marca)"></i> Legenda concluída</b><div class="dica" id="legendarResultadoTexto" style="margin-top:7px"></div><a class="btn p" id="btnBaixarLegenda" href="#" download style="display:inline-flex; margin-top:10px"><i data-lucide="download" class="i"></i> Baixar arquivo</a></div>
   </section>
 
   <!-- ============ AO VIVO ============ -->
@@ -2371,7 +2416,7 @@
 
   // Chave nova: nada dos ajustes da versao antiga vem junto
   const LEMBRAR = 'estudio.criativo.cortes.v1';
-  let arquivo = null, duracaoVideo = 0, pastaSaida = null;
+  let arquivo = null, duracaoVideo = 0, pastaSaida = null, videoLegendar = null;
   let projetoAtual = null, processandoAgora = false;
   let trechoFluxo = null; // { inicio, fim, modo } marcado antes de gerar, so vale pro video escolhido
   let telaAtual = 1, formato = 'split', alvoAtual = 'topo';
@@ -2425,18 +2470,20 @@
   const semErro = () => $('erro').classList.add('oculto');
 
   // Uma secao na tela por vez. O modo diz se a trilha e a barra de baixo aparecem.
-  const SECOES = ['tela1', 'tela2', 'tela3', 'processando', 'resultado', 'projetos', 'aovivo'];
+  const SECOES = ['tela1', 'tela2', 'tela3', 'processando', 'resultado', 'projetos', 'aovivo', 'legendar'];
   let avAtivo = false;     // tem live sendo gravada agora
   let modoCorte = 'video'; // aba escolhida: video gravado ou ao vivo
   function mostrarSecao(id, modo) {
     SECOES.forEach((s) => $(s).classList.toggle('on', s === id));
     document.body.dataset.modo = modo;
     // as abas so aparecem no comeco de cada caminho
-    $('modos').hidden = !(id === 'tela1' || (id === 'aovivo' && !avAtivo));
-    if (id === 'tela1' || id === 'aovivo') {
+    $('modos').hidden = !(id === 'tela1' || id === 'legendar' || (id === 'aovivo' && !avAtivo));
+    if (id === 'tela1' || id === 'aovivo' || id === 'legendar') {
       modoCorte = id === 'aovivo' ? 'aovivo' : 'video';
       document.querySelectorAll('#modos [data-modo-corte]').forEach((b) =>
         b.setAttribute('aria-pressed', String(b.dataset.modoCorte === modoCorte)));
+      document.querySelectorAll('#modos [data-modo-corte]').forEach((b) =>
+        b.setAttribute('aria-pressed', String(b.dataset.modoCorte === id)));
     }
   }
 
@@ -3572,6 +3619,12 @@
 
   function escolherModo(m) {
     semErro();
+    if (m === 'legendar') {
+      colocarEditor('video');
+      mostrarSecao('legendar', 'legendar');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
     if (m === 'aovivo') {
       colocarEditor('aovivo');
       mostrarEditor();
@@ -3583,6 +3636,46 @@
   }
   document.querySelectorAll('#modos [data-modo-corte]').forEach((b) =>
     b.addEventListener('click', () => escolherModo(b.dataset.modoCorte)));
+
+  // ------------------------------------------------------------ legendar vídeo inteiro
+  $('btnEscolherLegendar').addEventListener('click', () => $('arquivoLegendar').click());
+  $('arquivoLegendar').addEventListener('change', () => {
+    const f = $('arquivoLegendar').files[0];
+    if (!f) return;
+    videoLegendar = null;
+    $('legendarNome').textContent = 'Enviando ' + f.name + '...';
+    const previa = $('legendarPreview');
+    if (previa.dataset.url) URL.revokeObjectURL(previa.dataset.url);
+    previa.dataset.url = URL.createObjectURL(f);
+    previa.src = previa.dataset.url; previa.hidden = false; previa.load();
+    $('btnGerarLegenda').disabled = true;
+    fetch('/api/upload?nome=' + encodeURIComponent(f.name), { method: 'POST', body: f }).then((x) => x.json()).then((r) => {
+      if (r.erro) throw new Error(r.erro);
+      ouvir(r.id, {
+        progresso: (d) => { $('legendarNome').textContent = d.msg || 'Enviando...'; },
+        baixado: (d) => { videoLegendar = d.caminho; $('legendarNome').textContent = f.name; $('btnGerarLegenda').disabled = false; },
+        erro: (m) => { $('legendarNome').textContent = 'Falha no envio'; erro(m); },
+      });
+    }).catch((e) => { $('legendarNome').textContent = 'Falha no envio'; erro(e.message); });
+  });
+  document.querySelectorAll('#modoLegendar [data-legendar-modo]').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('#modoLegendar [data-legendar-modo]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  }));
+  $('btnGerarLegenda').addEventListener('click', async () => {
+    if (!videoLegendar) return;
+    semErro(); $('btnGerarLegenda').disabled = true; $('legendarProgresso').hidden = false; $('barraLegendar').style.width = '0%'; $('legendarResultado').hidden = true;
+    const modo = document.querySelector('#modoLegendar [aria-pressed="true"]').dataset.legendarModo;
+    try {
+      const r = await postJson('/api/legendar', { video: videoLegendar, modo, modelo: 'small', idioma: $('legendarIdioma').value, tamanho: $('legendarTamanho').value });
+      if (r.erro) throw new Error(r.erro);
+      ouvir(r.id, {
+        progresso: (d) => { $('barraLegendar').style.width = Math.max(0, Math.min(100, Number(d.pct) || 0)) + '%'; $('statusLegendar').textContent = d.msg || 'Processando...'; },
+        fim: (d) => { $('barraLegendar').style.width = '100%'; $('statusLegendar').textContent = 'Concluído'; $('legendarResultadoTexto').textContent = d.modo === 'srt' ? 'O arquivo de legenda foi salvo na pasta de saída.' : 'O vídeo completo foi exportado com a legenda embutida.'; $('btnBaixarLegenda').href = d.url; $('btnBaixarLegenda').download = ''; $('legendarResultado').hidden = false; icones($('legendarResultado')); $('btnGerarLegenda').disabled = false; },
+        erro: (m) => { $('btnGerarLegenda').disabled = false; erro(m); },
+        caiu: () => { $('btnGerarLegenda').disabled = false; erro('A conexão com o processamento caiu. Confira a pasta de saída antes de tentar novamente.'); },
+      });
+    } catch (e) { $('btnGerarLegenda').disabled = false; erro(e.message); }
+  });
 
   // O link do topo: descobre sozinho se e live acontecendo, canal offline
   // ou video gravado, e leva pro caminho certo.

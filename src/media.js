@@ -922,6 +922,22 @@ async function gerarPrevia(video, segundo, formato, recorte, destino, extra) {
   return destino;
 }
 
+/** Queima uma legenda ASS no vídeo inteiro, sem recortar nem mudar o enquadramento. */
+async function legendarVideo(video, arquivoAss, destino, cwd) {
+  const { ffmpeg } = await garantirFfmpeg();
+  const nomeAss = path.basename(arquivoAss);
+  const args = [
+    '-y', '-i', video,
+    '-vf', 'subtitles=' + nomeAss,
+    '-map', '0:v:0', '-map', '0:a?',
+    '-c:v', 'libx264', '-preset', 'medium', '-crf', '20',
+    '-pix_fmt', 'yuv420p', '-c:a', 'aac', '-b:a', '192k',
+    '-movflags', '+faststart', '-loglevel', 'error', destino,
+  ];
+  await rodar(ffmpeg, args, { cwd: cwd || path.dirname(arquivoAss) });
+  return destino;
+}
+
 module.exports = {
   garantirFfmpeg,
   inspecionar,
@@ -934,6 +950,7 @@ module.exports = {
   acharWebcam,
   acharWebcamAoVivo,
   gerarPrevia,
+  legendarVideo,
   filtroDeFormato,
   filtroVisual,
   rotuloAudioParaFiltro,

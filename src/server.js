@@ -15,7 +15,7 @@ const { URL } = require('url');
 const pastas = require('./pastas');
 const desempenho = require('./desempenho');
 
-const { processar, refazerClipe, extrairMais, fontsdirRelativo } = require('./pipeline');
+const { processar, refazerClipe, extrairMais, legendarVideoCompleto, fontsdirRelativo } = require('./pipeline');
 const legenda = require('./legenda');
 const media = require('./media');
 const baixador = require('./baixar');
@@ -825,6 +825,26 @@ const servidor = http.createServer(async (req, res) => {
 
       jobAtivo = true;
       processar(opcoes, (ev) => emitir(id, ev))
+        .catch((e) => emitir(id, { tipo: 'erro', msg: e.message || String(e) }))
+        .finally(() => { jobAtivo = false; });
+      return;
+    }
+
+    if (rota === '/api/legendar' && req.method === 'POST') {
+      if (jobAtivo) return json(res, 429, { erro: 'Já tem um vídeo sendo processado. Espere terminar antes de mandar outro.' });
+      const corpo = await lerCorpo(req);
+      const video = String(corpo.video || '');
+      if (!video || !path.isAbsolute(video) || !fs.existsSync(video)) return json(res, 400, { erro: 'Vídeo não encontrado.' });
+      const modo = corpo.modo === 'srt' ? 'srt' : 'embutida';
+      const id = novoTrabalho();
+      json(res, 200, { id });
+      jobAtivo = true;
+      legendarVideoCompleto(video, {
+        modelo: corpo.modelo || 'small', idioma: corpo.idioma || 'pt', modo,
+        tamanho: Number(corpo.tamanho) || 78, margemBaixo: Number(corpo.margemBaixo) || 180,
+      }, (pct, etapa, msg) => emitir(id, { tipo: 'progresso', pct, etapa, msg }),
+      (ev) => emitir(id, ev))
+        .then((pronto) => emitir(id, { tipo: 'fim', arquivo: pronto.arquivo, legenda: pronto.legenda, modo: pronto.modo, url: '/arquivo?p=' + encodeURIComponent(pronto.arquivo) }))
         .catch((e) => emitir(id, { tipo: 'erro', msg: e.message || String(e) }))
         .finally(() => { jobAtivo = false; });
       return;
