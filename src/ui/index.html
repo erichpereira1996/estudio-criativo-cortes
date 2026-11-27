@@ -578,6 +578,10 @@
   .legendar-hero .i { color:var(--marca); font-size:26px; margin-top:3px; }
   .legendar-acoes { display:flex; gap:9px; flex-wrap:wrap; align-items:center; }
   .legendar-preview { width:100%; max-height:430px; border-radius:14px; background:#000; object-fit:contain; margin-top:14px; }
+  .legendar-editor-list { display:grid; gap:8px; max-height:320px; overflow:auto; margin-top:12px; }
+  .legendar-bloco { display:grid; grid-template-columns:72px 1fr; gap:8px; align-items:start; }
+  .legendar-bloco small { color:var(--texto3); padding-top:10px; }
+  .legendar-bloco textarea { min-height:46px; resize:vertical; }
 
   /* ---------------------------------------------------------- ao vivo */
   .av-linha { display: flex; gap: 8px; }
@@ -1533,6 +1537,18 @@
       </div>
       <video id="legendarPreview" class="legendar-preview" controls hidden></video>
     </div>
+    <div class="cartao" id="legendarEditor" hidden>
+      <label class="rot"><i data-lucide="pencil-line" class="i"></i> Revisar e personalizar legenda</label>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+        <div><label class="rot" for="legendarFonte">Fonte</label><select class="campo" id="legendarFonte"><option>Arial Black</option><option>Arial</option><option>Manrope</option><option>Verdana</option></select></div>
+        <div><label class="rot" for="legendarPosicao">Posição vertical</label><input id="legendarPosicao" type="range" min="80" max="600" value="180" style="width:100%; accent-color:var(--marca)"></div>
+        <div><label class="rot" for="legendarCor">Cor do texto</label><input class="campo" id="legendarCor" type="color" value="#ffffff" style="height:42px; padding:4px"></div>
+        <div><label class="rot" for="legendarDestaque">Cor da palavra ativa</label><input class="campo" id="legendarDestaque" type="color" value="#ffe500" style="height:42px; padding:4px"></div>
+      </div>
+      <div class="dica" style="margin-top:10px">Edite o texto de cada bloco. Os tempos originais são preservados; se você adicionar ou remover palavras, o tempo do bloco é redistribuído.</div>
+      <div class="legendar-editor-list" id="legendarBlocos"></div>
+      <button class="btn principal" id="btnAplicarEdicaoLegenda" type="button" style="margin-top:12px"><i data-lucide="refresh-cw" class="i"></i> Aplicar alterações e atualizar prévia</button>
+    </div>
     <div class="cartao">
       <label class="rot"><i data-lucide="settings-2" class="i"></i> Como gerar</label>
       <div class="trio" id="modoLegendar" style="grid-template-columns:1fr 1fr">
@@ -2416,7 +2432,7 @@
 
   // Chave nova: nada dos ajustes da versao antiga vem junto
   const LEMBRAR = 'estudio.criativo.cortes.v1';
-  let arquivo = null, duracaoVideo = 0, pastaSaida = null, videoLegendar = null;
+  let arquivo = null, duracaoVideo = 0, pastaSaida = null, videoLegendar = null, legendarPalavras = [];
   let projetoAtual = null, processandoAgora = false;
   let trechoFluxo = null; // { inicio, fim, modo } marcado antes de gerar, so vale pro video escolhido
   let telaAtual = 1, formato = 'split', alvoAtual = 'topo';
@@ -3643,6 +3659,7 @@
     const f = $('arquivoLegendar').files[0];
     if (!f) return;
     videoLegendar = null;
+    legendarPalavras = []; $('legendarEditor').hidden = true; $('legendarResultado').hidden = true;
     $('legendarNome').textContent = 'Enviando ' + f.name + '...';
     const previa = $('legendarPreview');
     if (previa.dataset.url) URL.revokeObjectURL(previa.dataset.url);
@@ -3661,21 +3678,46 @@
   document.querySelectorAll('#modoLegendar [data-legendar-modo]').forEach((b) => b.addEventListener('click', () => {
     document.querySelectorAll('#modoLegendar [data-legendar-modo]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
   }));
-  $('btnGerarLegenda').addEventListener('click', async () => {
+  function gruposDaLegenda() { const grupos = []; for (let i = 0; i < legendarPalavras.length; i += 3) grupos.push(legendarPalavras.slice(i, i + 3)); return grupos; }
+  function pintarEditorLegenda() {
+    const lista = $('legendarBlocos');
+    lista.innerHTML = gruposDaLegenda().map((g, i) => '<div class="legendar-bloco"><small>' + mmss(g[0].inicio) + '</small><textarea class="campo" data-leg-bloco="' + i + '" rows="2">' + esc(g.map((p) => p.texto).join(' ')) + '</textarea></div>').join('');
+    $('legendarEditor').hidden = !legendarPalavras.length;
+    icones($('legendarEditor'));
+  }
+  function palavrasEditadas() {
+    const saida = [];
+    gruposDaLegenda().forEach((grupo, i) => {
+      const campo = document.querySelector('[data-leg-bloco="' + i + '"]');
+      const textos = String(campo ? campo.value : '').trim().split(/\s+/).filter(Boolean);
+      if (!textos.length) return;
+      const inicio = Number(grupo[0].inicio) || 0, fim = Number(grupo[grupo.length - 1].fim) || inicio + 1;
+      textos.forEach((texto, j) => {
+        const a = textos.length === grupo.length ? grupo[j].inicio : inicio + (fim - inicio) * (j / textos.length);
+        const b = textos.length === grupo.length ? grupo[j].fim : inicio + (fim - inicio) * ((j + 1) / textos.length);
+        saida.push({ inicio: a, fim: Math.max(a + .12, b), texto });
+      });
+    });
+    return saida;
+  }
+  async function rodarLegenda(pedido) {
     if (!videoLegendar) return;
-    semErro(); $('btnGerarLegenda').disabled = true; $('legendarProgresso').hidden = false; $('barraLegendar').style.width = '0%'; $('legendarResultado').hidden = true;
+    semErro(); $('btnGerarLegenda').disabled = true; $('btnAplicarEdicaoLegenda').disabled = true; $('legendarProgresso').hidden = false; $('barraLegendar').style.width = '0%'; $('legendarResultado').hidden = true;
     const modo = document.querySelector('#modoLegendar [aria-pressed="true"]').dataset.legendarModo;
+    const corpo = Object.assign({ video: videoLegendar, modo, modelo: 'small', idioma: $('legendarIdioma').value, tamanho: $('legendarTamanho').value, fonte: $('legendarFonte').value, margemBaixo: $('legendarPosicao').value, corTexto: $('legendarCor').value, corDestaque: $('legendarDestaque').value, palavrasPorBloco: 3 }, pedido || {});
     try {
-      const r = await postJson('/api/legendar', { video: videoLegendar, modo, modelo: 'small', idioma: $('legendarIdioma').value, tamanho: $('legendarTamanho').value });
+      const r = await postJson('/api/legendar', corpo);
       if (r.erro) throw new Error(r.erro);
       ouvir(r.id, {
         progresso: (d) => { $('barraLegendar').style.width = Math.max(0, Math.min(100, Number(d.pct) || 0)) + '%'; $('statusLegendar').textContent = d.msg || 'Processando...'; },
-        fim: (d) => { $('barraLegendar').style.width = '100%'; $('statusLegendar').textContent = 'Concluído'; $('legendarResultadoTexto').textContent = d.modo === 'srt' ? 'O arquivo SRT foi salvo na pasta de saída. No modo vídeo, a prévia mostra a legenda antes do download.' : 'O vídeo completo foi exportado com a legenda embutida. Confira a prévia abaixo antes de baixar.'; $('btnBaixarLegenda').href = d.url; $('btnBaixarLegenda').download = ''; if (d.modo === 'embutida' && d.url) { const previa = $('legendarPreview'); previa.src = d.url + '&t=' + Date.now(); previa.hidden = false; previa.load(); } $('legendarResultado').hidden = false; icones($('legendarResultado')); $('btnGerarLegenda').disabled = false; },
-        erro: (m) => { $('btnGerarLegenda').disabled = false; erro(m); },
-        caiu: () => { $('btnGerarLegenda').disabled = false; erro('A conexão com o processamento caiu. Confira a pasta de saída antes de tentar novamente.'); },
+        fim: (d) => { legendarPalavras = d.palavras || legendarPalavras; pintarEditorLegenda(); $('barraLegendar').style.width = '100%'; $('statusLegendar').textContent = 'Concluído'; $('legendarResultadoTexto').textContent = d.modo === 'srt' ? 'O arquivo SRT foi salvo na pasta de saída.' : 'Prévia atualizada com a legenda. Confira antes de baixar.'; $('btnBaixarLegenda').href = d.url; $('btnBaixarLegenda').download = ''; if (d.modo === 'embutida' && d.url) { const previa = $('legendarPreview'); previa.src = d.url + '&t=' + Date.now(); previa.hidden = false; previa.load(); } $('legendarResultado').hidden = false; icones($('legendarResultado')); $('btnGerarLegenda').disabled = false; $('btnAplicarEdicaoLegenda').disabled = false; },
+        erro: (m) => { $('btnGerarLegenda').disabled = false; $('btnAplicarEdicaoLegenda').disabled = false; erro(m); },
+        caiu: () => { $('btnGerarLegenda').disabled = false; $('btnAplicarEdicaoLegenda').disabled = false; erro('A conexão com o processamento caiu. Confira a pasta de saída antes de tentar novamente.'); },
       });
-    } catch (e) { $('btnGerarLegenda').disabled = false; erro(e.message); }
-  });
+    } catch (e) { $('btnGerarLegenda').disabled = false; $('btnAplicarEdicaoLegenda').disabled = false; erro(e.message); }
+  }
+  $('btnGerarLegenda').addEventListener('click', () => rodarLegenda());
+  $('btnAplicarEdicaoLegenda').addEventListener('click', () => { const palavras = palavrasEditadas(); if (palavras.length) rodarLegenda({ palavras }); });
 
   // O link do topo: descobre sozinho se e live acontecendo, canal offline
   // ou video gravado, e leva pro caminho certo.

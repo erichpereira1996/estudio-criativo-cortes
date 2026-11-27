@@ -337,10 +337,9 @@ async function prepararAnalise(video, opcoes, emitir, avisar) {
 
 /** Transcreve o vídeo inteiro e entrega legenda SRT ou vídeo com ASS embutida. */
 async function legendarVideoCompleto(video, opcoes, emitir, avisar) {
-  const analise = await prepararAnalise(video, Object.assign({}, opcoes, {
-    detectarMomentos: false,
-    olharImagem: false,
-  }), emitir, avisar);
+  const analise = opcoes.palavras && Array.isArray(opcoes.palavras) && opcoes.palavras.length
+    ? { info: await media.inspecionar(video), assinatura: assinaturaDoArquivo(video), transcricao: { segmentos: [] } }
+    : await prepararAnalise(video, Object.assign({}, opcoes, { detectarMomentos: false, olharImagem: false }), emitir, avisar);
   const pasta = pastas.saida();
   const legendas = path.join(pasta, 'legendas');
   fs.mkdirSync(legendas, { recursive: true });
@@ -349,23 +348,29 @@ async function legendarVideoCompleto(video, opcoes, emitir, avisar) {
   const srt = path.join(legendas, base + '-legendado.srt');
   // A transcrição local guarda as palavras dentro de segmentos; o fluxo de
   // cortes usa o mesmo achatamento para não gerar um vídeo sem legendas.
-  const palavras = achatarPalavras(analise.transcricao);
+  const palavras = opcoes.palavras && Array.isArray(opcoes.palavras) && opcoes.palavras.length
+    ? opcoes.palavras.map((p) => ({ inicio: Number(p.inicio), fim: Number(p.fim), texto: String(p.texto || '').trim() })).filter((p) => p.texto && isFinite(p.inicio) && isFinite(p.fim))
+    : achatarPalavras(analise.transcricao);
   if (!palavras.length) throw new Error('Não encontrei palavras suficientes para gerar a legenda.');
   legenda.gerarAss(palavras, 0, ass, {
     incluirPalavras: true,
     tamanho: Number(opcoes.tamanho) || 78,
     margemBaixo: Number(opcoes.margemBaixo) || 180,
+    fonte: opcoes.fonte,
+    corTexto: opcoes.corTexto,
+    corDestaque: opcoes.corDestaque,
+    palavrasPorBloco: opcoes.palavrasPorBloco,
   });
   legenda.gerarSrt(palavras, 0, srt);
   emitir(88, 'legenda', 'Legenda pronta. Preparando o arquivo final...');
   if (opcoes.modo === 'srt') {
     emitir(100, 'pronto', 'Arquivo SRT salvo na pasta de saída.');
-    return { arquivo: srt, legenda: srt, modo: 'srt' };
+    return { arquivo: srt, legenda: srt, modo: 'srt', palavras };
   }
   const destino = path.join(legendas, base + '-legendado.mp4');
   await media.legendarVideo(video, ass, destino, pastas.trabalho());
   emitir(100, 'pronto', 'Vídeo completo legendado salvo na pasta de saída.');
-  return { arquivo: destino, legenda: srt, modo: 'embutida' };
+  return { arquivo: destino, legenda: srt, modo: 'embutida', palavras };
 }
 
 /**

@@ -842,9 +842,11 @@ const servidor = http.createServer(async (req, res) => {
       legendarVideoCompleto(video, {
         modelo: corpo.modelo || 'small', idioma: corpo.idioma || 'pt', modo,
         tamanho: Number(corpo.tamanho) || 78, margemBaixo: Number(corpo.margemBaixo) || 180,
+        fonte: corpo.fonte, corTexto: corpo.corTexto, corDestaque: corpo.corDestaque,
+        palavrasPorBloco: Number(corpo.palavrasPorBloco) || 3, palavras: Array.isArray(corpo.palavras) ? corpo.palavras : null,
       }, (pct, etapa, msg) => emitir(id, { tipo: 'progresso', pct, etapa, msg }),
       (ev) => emitir(id, ev))
-        .then((pronto) => emitir(id, { tipo: 'fim', arquivo: pronto.arquivo, legenda: pronto.legenda, modo: pronto.modo, url: '/arquivo?p=' + encodeURIComponent(pronto.arquivo) }))
+        .then((pronto) => emitir(id, { tipo: 'fim', arquivo: pronto.arquivo, legenda: pronto.legenda, modo: pronto.modo, palavras: pronto.palavras, url: '/arquivo?p=' + encodeURIComponent(pronto.arquivo) }))
         .catch((e) => emitir(id, { tipo: 'erro', msg: e.message || String(e) }))
         .finally(() => { jobAtivo = false; });
       return;

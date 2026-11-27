@@ -14,6 +14,13 @@ const BRANCO = '&H00FFFFFF';
 const AMARELO = '&H0000E5FF';
 const PRETO = '&H00000000';
 
+function corAss(hex, padrao) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(String(hex || ''));
+  if (!m) return padrao;
+  const h = m[1];
+  return '&H00' + h.slice(4, 6) + h.slice(2, 4) + h.slice(0, 2);
+}
+
 function tempoAss(s) {
   // arredonda pro centesimo ANTES de separar: 59.996 virava "0:00:60.00"
   const cs = Math.round(Math.max(0, Number(s) || 0) * 100);
@@ -58,6 +65,8 @@ function cabecalho(opcoes) {
   const tamanho = opcoes.tamanho || 78;
   const margemBaixo = opcoes.margemBaixo || 300;
   const margemGancho = opcoes.margemGancho || 150;
+  const corTexto = corAss(opcoes.corTexto, BRANCO);
+  const corDestaque = corAss(opcoes.corDestaque, AMARELO);
   // No meio da tela o gancho e o centro das atencoes: letra maior
   const tamanhoGancho = opcoes.tamanhoGancho || (opcoes.posicaoGancho === 'meio' ? 74 : 62);
   return [
@@ -71,7 +80,7 @@ function cabecalho(opcoes) {
     '',
     '[V4+ Styles]',
     'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding',
-    'Style: Corte,' + fonte + ',' + tamanho + ',' + BRANCO + ',' + AMARELO + ',' + PRETO + ',&H64000000,' +
+    'Style: Corte,' + fonte + ',' + tamanho + ',' + corTexto + ',' + corDestaque + ',' + PRETO + ',&H64000000,' +
       '-1,0,0,0,100,100,1,0,1,7,4,2,70,70,' + margemBaixo + ',1',
     // Alignment 8 = em cima, centralizado; 5 = bem no meio da tela. BorderStyle 3
     // desenha uma tarja atras do texto: legivel por cima de qualquer imagem.
@@ -161,6 +170,8 @@ function quebrarGancho(texto, porLinha) {
 function gerarAss(palavras, offset, destino, opcoes) {
   opcoes = opcoes || {};
   const linhas = [cabecalho(opcoes)];
+  const corTexto = corAss(opcoes.corTexto, BRANCO);
+  const corDestaque = corAss(opcoes.corDestaque, AMARELO);
 
   // O gancho fica na tela nos primeiros segundos. E o que segura quem parou de
   // rolar antes mesmo de entender o audio - e muita gente assiste sem som.
@@ -187,7 +198,7 @@ function gerarAss(palavras, offset, destino, opcoes) {
   // Agrupa em blocos curtos - texto comprido na tela ninguem le
   // (palavra que ja tinha terminado antes do clipe comecar nao entra)
   const doClipe = (palavras || []).filter((p) => p && Number(p.fim) - offset > 0.05);
-  const blocos = opcoes.incluirPalavras !== false ? montarBlocos(doClipe, PALAVRAS_POR_BLOCO) : [];
+  const blocos = opcoes.incluirPalavras !== false ? montarBlocos(doClipe, Math.max(1, Math.min(8, Number(opcoes.palavrasPorBloco) || PALAVRAS_POR_BLOCO))) : [];
 
   for (let b = 0; b < blocos.length; b++) {
     const bloco = blocos[b];
@@ -208,7 +219,7 @@ function gerarAss(palavras, offset, destino, opcoes) {
         const limpo = escapar(p.texto);
         if (j === i) {
           // palavra sendo dita: amarela e um tico maior
-          return '{\\c' + AMARELO + '\\fscx108\\fscy108}' + limpo + '{\\c' + BRANCO + '\\fscx100\\fscy100}';
+          return '{\\c' + corDestaque + '\\fscx108\\fscy108}' + limpo + '{\\c' + corTexto + '\\fscx100\\fscy100}';
         }
         return limpo;
       }).join(' ');
