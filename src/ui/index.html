@@ -892,6 +892,14 @@
 .dsp-mini .dsp-op { padding: 12px 14px; gap: 4px; }
 .dsp-mini .dsp-op .dsp-tit { font-size: 14.5px; }
 
+  /* ---------- personalização visual */
+  .tema-opcoes { display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:9px; margin-top:18px; }
+  .tema-opcao { display:grid; justify-items:center; gap:7px; padding:11px 7px; border:1px solid var(--linha2); border-radius:14px; background:var(--vidro); color:var(--texto); font:inherit; font-size:var(--t6); cursor:pointer; transition:.2s ease; }
+  .tema-opcao:hover, .tema-opcao[aria-pressed="true"] { border-color:var(--marca); background:var(--marca-fundo2); box-shadow:0 0 0 1px var(--marca) inset; }
+  .tema-amostra { width:28px; height:28px; border-radius:50%; box-shadow:0 0 16px -3px currentColor; }
+  .tema-rodape { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-top:20px; }
+  @media (max-width: 520px) { .tema-opcoes { grid-template-columns:repeat(3, 1fr); } }
+
 /* ---------- aviso: a IA pode cometer falhas */
 .aviso-ia { display: flex; align-items: center; gap: 9px; padding: 9px 13px; border-radius: 11px; border: 1px solid rgba(226,194,122,.28);
   background: rgba(226,194,122,.06); color: var(--texto2); font-size: var(--t5); line-height: 1.4; }
@@ -1089,9 +1097,6 @@
 <div class="topo">
   <img class="marca-logo" src="/ui/estudio.svg" alt="">
   <h1>Estúdio Criativo Cortes</h1>
-  <button class="status-api api-nao-configurada" id="statusApi" type="button" title="Configurar API" aria-label="Status da API">
-    <span class="status-api-ponto" aria-hidden="true"></span><span data-status-api-text>API não configurada</span>
-  </button>
   <span class="versao-app" data-versao-app aria-label="Versão do programa">…</span>
   <form class="link-topo" id="formLinkTopo" autocomplete="off">
     <i data-lucide="link-2" class="i"></i>
@@ -1101,6 +1106,10 @@
 
   <button class="btn p" id="btnProjetos"><i data-lucide="folder-kanban" class="i"></i> Projetos</button>
   <button class="btn p" type="button" data-abrir-identidade><i data-lucide="stamp" class="i"></i> Identidade</button>
+  <button class="btn p" id="btnPersonalizar" type="button"><i data-lucide="palette" class="i"></i> Personalizar</button>
+  <button class="status-api api-nao-configurada" id="statusApi" type="button" title="Configurar API" aria-label="Status da API">
+    <span class="status-api-ponto" aria-hidden="true"></span><span data-status-api-text>API não configurada</span>
+  </button>
   <button class="btn p" id="btnAjustes"><i data-lucide="settings-2" class="i"></i> Ajustes</button>
 </div>
 
@@ -1944,6 +1953,30 @@
   </div>
 </div>
 
+<div class="dsp-fundo" id="modalPersonalizar" hidden role="dialog" aria-modal="true" aria-labelledby="temaTitulo">
+  <div class="dsp-caixa" style="max-width:620px">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px">
+      <div>
+        <span class="selo-info"><i data-lucide="palette" class="i"></i> Aparência</span>
+        <h2 id="temaTitulo" style="margin-top:8px; text-align:left">Personalizar o Estúdio</h2>
+      </div>
+      <button class="btn p" id="btnFecharPersonalizar" type="button" aria-label="Fechar"><i data-lucide="x" class="i"></i></button>
+    </div>
+    <p style="text-align:left; margin:8px 0 0">Escolha a cor de destaque do app. O verde neon continua como padrão e a escolha fica salva neste computador.</p>
+    <div class="tema-opcoes" id="temaOpcoes">
+      <button class="tema-opcao" type="button" data-tema="verde" aria-pressed="true"><span class="tema-amostra" style="color:#a3ff12;background:#a3ff12"></span><span>Verde neon</span></button>
+      <button class="tema-opcao" type="button" data-tema="azul" aria-pressed="false"><span class="tema-amostra" style="color:#36b8ff;background:#36b8ff"></span><span>Azul elétrico</span></button>
+      <button class="tema-opcao" type="button" data-tema="roxo" aria-pressed="false"><span class="tema-amostra" style="color:#c084fc;background:#c084fc"></span><span>Roxo criativo</span></button>
+      <button class="tema-opcao" type="button" data-tema="laranja" aria-pressed="false"><span class="tema-amostra" style="color:#ff9f43;background:#ff9f43"></span><span>Laranja vivo</span></button>
+      <button class="tema-opcao" type="button" data-tema="vermelho" aria-pressed="false"><span class="tema-amostra" style="color:#ff647c;background:#ff647c"></span><span>Vermelho</span></button>
+    </div>
+    <div class="tema-rodape">
+      <span class="pasta-status" id="temaStatus">Verde neon selecionado</span>
+      <div style="display:flex; gap:8px"><button class="btn p" id="btnTemaPadrao" type="button">Restaurar padrão</button><button class="btn principal" id="btnSalvarTema" type="button"><i data-lucide="check" class="i"></i> Concluído</button></div>
+    </div>
+  </div>
+</div>
+
 <div class="dsp-fundo" id="dspFundo" hidden role="dialog" aria-modal="true" aria-labelledby="dspTitulo">
   <div class="dsp-caixa">
     <h2 id="dspTitulo">Como o programa deve usar o seu PC?</h2>
@@ -2311,6 +2344,31 @@
   icones();
 
   // ------------------------------------------------------------ estado
+  const TEMAS_APP = {
+    verde: { nome: 'Verde neon', marca: '#a3ff12', marca2: '#c5ff70', claro: '#e2ffbd', fundo: 'rgba(163,255,18,.13)', fundo2: 'rgba(163,255,18,.06)', ic: 'rgba(163,255,18,.15)', brilho: 'rgba(163,255,18,.40)', sobre: '#101a03', brilhoFundo: 'rgba(34,65,12,.55)' },
+    azul: { nome: 'Azul elétrico', marca: '#36b8ff', marca2: '#8ed8ff', claro: '#c8edff', fundo: 'rgba(54,184,255,.13)', fundo2: 'rgba(54,184,255,.06)', ic: 'rgba(54,184,255,.15)', brilho: 'rgba(54,184,255,.40)', sobre: '#03131d', brilhoFundo: 'rgba(10,48,78,.55)' },
+    roxo: { nome: 'Roxo criativo', marca: '#c084fc', marca2: '#e3c2ff', claro: '#f0ddff', fundo: 'rgba(192,132,252,.13)', fundo2: 'rgba(192,132,252,.06)', ic: 'rgba(192,132,252,.15)', brilho: 'rgba(192,132,252,.40)', sobre: '#150b20', brilhoFundo: 'rgba(61,22,83,.55)' },
+    laranja: { nome: 'Laranja vivo', marca: '#ff9f43', marca2: '#ffd09a', claro: '#ffe5c7', fundo: 'rgba(255,159,67,.13)', fundo2: 'rgba(255,159,67,.06)', ic: 'rgba(255,159,67,.15)', brilho: 'rgba(255,159,67,.40)', sobre: '#211105', brilhoFundo: 'rgba(89,43,10,.55)' },
+    vermelho: { nome: 'Vermelho', marca: '#ff647c', marca2: '#ffabb8', claro: '#ffd6dc', fundo: 'rgba(255,100,124,.13)', fundo2: 'rgba(255,100,124,.06)', ic: 'rgba(255,100,124,.15)', brilho: 'rgba(255,100,124,.40)', sobre: '#23070c', brilhoFundo: 'rgba(86,17,28,.55)' },
+  };
+  const CHAVE_TEMA_APP = 'estudio.criativo.cortes.tema';
+  function aplicarTema(nome, persistir) {
+    const chave = TEMAS_APP[nome] ? nome : 'verde';
+    const t = TEMAS_APP[chave];
+    const raiz = document.documentElement;
+    raiz.style.setProperty('--marca', t.marca); raiz.style.setProperty('--marca2', t.marca2);
+    raiz.style.setProperty('--marca-claro', t.claro); raiz.style.setProperty('--marca-fundo', t.fundo);
+    raiz.style.setProperty('--marca-fundo2', t.fundo2); raiz.style.setProperty('--marca-ic', t.ic);
+    raiz.style.setProperty('--marca-brilho', t.brilho); raiz.style.setProperty('--sobre-marca', t.sobre);
+    raiz.style.setProperty('--brilho-fundo', t.brilhoFundo);
+    document.querySelectorAll('#temaOpcoes [data-tema]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tema === chave)));
+    if ($('temaStatus')) $('temaStatus').textContent = t.nome + ' selecionado';
+    if (persistir !== false) { try { localStorage.setItem(CHAVE_TEMA_APP, chave); } catch (_) {} }
+    return chave;
+  }
+  let temaAtual = 'verde';
+  try { temaAtual = aplicarTema(localStorage.getItem(CHAVE_TEMA_APP) || 'verde', false); } catch (_) { aplicarTema('verde', false); }
+
   // Chave nova: nada dos ajustes da versao antiga vem junto
   const LEMBRAR = 'estudio.criativo.cortes.v1';
   let arquivo = null, duracaoVideo = 0, pastaSaida = null;
@@ -5750,9 +5808,27 @@
   if ($('btnEntendiNovidades')) $('btnEntendiNovidades').addEventListener('click', fecharNovidades);
   if ($('modalNovidades')) $('modalNovidades').addEventListener('click', (e) => { if (e.target === $('modalNovidades')) fecharNovidades(); });
 
+  // ---- personalização visual
+  function abrirPersonalizar() {
+    $('modalPersonalizar').hidden = false;
+    aplicarTema(temaAtual, false);
+    icones($('modalPersonalizar'));
+  }
+  function fecharPersonalizar() { $('modalPersonalizar').hidden = true; }
+  if ($('btnPersonalizar')) $('btnPersonalizar').addEventListener('click', abrirPersonalizar);
+  if ($('btnFecharPersonalizar')) $('btnFecharPersonalizar').addEventListener('click', fecharPersonalizar);
+  if ($('btnSalvarTema')) $('btnSalvarTema').addEventListener('click', fecharPersonalizar);
+  if ($('btnTemaPadrao')) $('btnTemaPadrao').addEventListener('click', () => { temaAtual = aplicarTema('verde'); });
+  if ($('temaOpcoes')) $('temaOpcoes').addEventListener('click', (e) => {
+    const botao = e.target.closest('[data-tema]');
+    if (!botao) return;
+    temaAtual = aplicarTema(botao.dataset.tema);
+  });
+  if ($('modalPersonalizar')) $('modalPersonalizar').addEventListener('click', (e) => { if (e.target === $('modalPersonalizar')) fecharPersonalizar(); });
+
   function verificarBoasVindasInicial() {
     try {
-      if (!$('dspFundo').hidden || !$('modalAutoUpdate').hidden) return;
+       if (!$('dspFundo').hidden || !$('modalAutoUpdate').hidden || !$('modalPersonalizar').hidden) return;
       if (!localStorage.getItem(CHAVE_TUTORIAL)) {
         abrirTutorial(0);
       } else if (!localStorage.getItem(CHAVE_NOVIDADES)) {
